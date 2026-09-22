@@ -11,6 +11,7 @@
  *
  * Usage: export $(grep -v '^#' .env.local | xargs) && node scripts/verify-p3.mjs
  */
+import { chromium } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -223,6 +224,124 @@ const { data: pSeesLater } = await participant.client
   .select("title")
   .eq("title", "P3 cohort-wide test");
 check("a scheduled announcement is hidden until publish_at", pSeesLater?.length, 1);
+
+// ------------------------------------------------- cohort feature flags ----
+// The three launch switches. Nothing exercised them, and that gap hid a real
+// bug: the shared id guard used Zod's `uuid()`, which enforces RFC 9562
+// version and variant bits — and this cohort's seeded id
+// (22222222-2222-2222-2222-222222222222) does not satisfy them. Every flip
+// failed with "Unknown cohort" while the UI looked fine.
+//
+// Asserted through the RPC with a real admin session and the REAL cohort id,
+// because a fabricated id would not have caught it.
+const flagBefore = await admin
+  .from("cohorts")
+  .select("sessions_visible")
+  .eq("id", reviewer.cohortId)
+  .single();
+
+const { error: flagOnErr } = await reviewer.client.rpc("set_cohort_flag", {
+  p_cohort_id: reviewer.cohortId,
+  p_flag: "sessions_visible",
+  p_value: true,
+});
+check("an admin can turn a cohort flag on", flagOnErr, null);
+
+const { data: flagOn } = await admin
+  .from("cohorts")
+  .select("sessions_visible")
+  .eq("id", reviewer.cohortId)
+  .single();
+check("the flag actually persisted", flagOn.sessions_visible, true);
+
+const { data: flagAudit } = await admin
+  .from("audit_log")
+  .select("action, actor_user_id")
+  .eq("action", "cohort.flag")
+  .order("occurred_at", { ascending: false })
+  .limit(1);
+check("the flip wrote an audit row naming the actor", flagAudit?.[0]?.actor_user_id, reviewer.uid);
+
+const { error: flagAsParticipant } = await participant.client.rpc("set_cohort_flag", {
+  p_cohort_id: reviewer.cohortId,
+  p_flag: "sessions_visible",
+  p_value: false,
+});
+check("a participant CANNOT flip a cohort flag", Boolean(flagAsParticipant), true);
+
+const { error: badFlag } = await reviewer.client.rpc("set_cohort_flag", {
+  p_cohort_id: reviewer.cohortId,
+  p_flag: "role",
+  p_value: true,
+});
+check("an unknown flag name is refused", Boolean(badFlag), true);
+
+// Put the cohort back the way it was found.
+await admin
+  .from("cohorts")
+  .update({ sessions_visible: flagBefore.data.sessions_visible })
+  .eq("id", reviewer.cohortId);
+
+// ---------------------------------------------- every admin page renders ----
+// Admins read across the cohort, so a query that relies on RLS to mean "my
+// rows" returns everyone's for them. That is how the participant module page
+// broke — and an admin previewing the participant app hits both sets of
+// routes, which is why this walks them too.
+const baseUrl =
+  process.env.VERIFY_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+const { data: adminLink } = await admin.auth.admin.generateLink({
+  type: "magiclink",
+  email: R,
+});
+
+const browser = await chromium.launch({ headless: true });
+try {
+  const page = await browser.newPage();
+  await page.goto(
+    `${baseUrl}/auth/confirm?token_hash=${encodeURIComponent(adminLink.properties.hashed_token)}&type=magiclink`,
+    { waitUntil: "networkidle" },
+  );
+
+  const { data: firstWeek } = await admin
+    .from("program_weeks")
+    .select("number")
+    .eq("cohort_id", reviewer.cohortId)
+    .order("number")
+    .limit(1)
+    .single();
+
+  // A released module. This is the route that actually broke: as an admin the
+  // page saw every participant's module_progress, so `.maybeSingle()` threw.
+  const { data: openModule } = await admin
+    .from("week_modules")
+    .select("modules!inner(slug), program_weeks!inner(cohort_id, release_at)")
+    .eq("program_weeks.cohort_id", reviewer.cohortId)
+    .lte("program_weeks.release_at", new Date().toISOString())
+    .limit(1)
+    .single();
+
+  for (const path of [
+    "/admin",
+    "/admin/participants",
+    `/admin/participants/${participant.enrollmentId}`,
+    "/admin/submissions",
+    "/admin/content",
+    `/admin/content/${firstWeek.number}`,
+    "/admin/sessions",
+    "/admin/announcements",
+    // The staff account also uses the participant app.
+    "/",
+    "/learn",
+    `/learn/module/${openModule.modules.slug}`,
+    "/tasks",
+  ]) {
+    const response = await page.goto(`${baseUrl}${path}`, { waitUntil: "domcontentloaded" });
+    check(`${path} renders for an admin`, response?.status(), 200);
+  }
+} finally {
+  await browser.close();
+}
 
 console.log(`\n${passed} passed, ${failed} failed`);
 if (process.env.VERIFY_KEEP !== "1") {

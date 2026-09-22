@@ -32,7 +32,15 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
-      <body>{children}</body>
+      {/*
+        Browser extensions write their own attributes onto <body> before React
+        hydrates — Grammarly adds data-gr-ext-installed, and the resulting
+        mismatch is reported as a hydration error on every page. It is not our
+        markup and we cannot prevent it, so the warning is noise that buries
+        real ones. This suppresses the attribute comparison on this element
+        only; children still hydrate normally.
+      */}
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

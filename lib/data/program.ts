@@ -131,6 +131,8 @@ function stateFor(releaseAt: string, nextReleaseAt: string | undefined, now: Dat
 export const getWeeks = cache(async (): Promise<Week[]> => {
   const supabase = await getSupabase();
   const now = new Date();
+  const me = await getMe();
+  if (!me) return [];
 
   const weeks = unwrap(
     await supabase
@@ -153,14 +155,18 @@ export const getWeeks = cache(async (): Promise<Week[]> => {
   );
 
   const progress = unwrap(
-    await supabase.from("module_progress").select("module_id, status"),
+    await supabase
+      .from("module_progress")
+      .select("module_id, status")
+      .eq("enrollment_id", me.enrollmentId),
     "your progress",
   );
 
   const video = unwrap(
     await supabase
       .from("video_progress")
-      .select("lesson_id, percentage_watched, max_position_seconds"),
+      .select("lesson_id, percentage_watched, max_position_seconds")
+      .eq("enrollment_id", me.enrollmentId),
     "video progress",
   );
 
@@ -268,6 +274,8 @@ export type Material = {
 /** Null when the module does not exist or its week has not released. */
 export async function getModule(slug: string): Promise<ModuleDetail | null> {
   const supabase = await getSupabase();
+  const me = await getMe();
+  if (!me) return null;
 
   // Hand-typed: Supabase types are not generated until the CLI runs against a
   // live project, and nested selects otherwise widen to an error union.
@@ -301,11 +309,17 @@ export async function getModule(slug: string): Promise<ModuleDetail | null> {
   const weekLink = m.week_modules?.[0];
 
   const [mpRes, vpRes, materialsRes, assignmentRowRes] = await Promise.all([
-    supabase.from("module_progress").select("status").eq("module_id", m.id).maybeSingle(),
+    supabase
+      .from("module_progress")
+      .select("status")
+      .eq("enrollment_id", me.enrollmentId)
+      .eq("module_id", m.id)
+      .maybeSingle(),
     lesson
       ? supabase
           .from("video_progress")
           .select("percentage_watched, max_position_seconds")
+          .eq("enrollment_id", me.enrollmentId)
           .eq("lesson_id", lesson.id)
           .maybeSingle()
       : Promise.resolve({ data: null }),
@@ -341,6 +355,7 @@ export async function getModule(slug: string): Promise<ModuleDetail | null> {
         .select("id")
         .eq("item_type", "assignment")
         .eq("item_id", assignment.id)
+        .eq("enrollment_id", me.enrollmentId)
         .neq("status", "draft")
         .limit(1),
       "sub",

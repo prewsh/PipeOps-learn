@@ -43,7 +43,16 @@ export function buildCsp(nonce: string, supabaseUrl: string, isDev: boolean): st
       ...(isDev ? ["'unsafe-eval'"] : []),
     ],
     "style-src": ["'self'", "'unsafe-inline'"],
-    "img-src": ["'self'", "data:", "blob:", "https://images.unsplash.com", "https://i.ytimg.com"],
+    "img-src": [
+      "'self'",
+      "data:",
+      "blob:",
+      "https://images.unsplash.com",
+      "https://i.ytimg.com",
+      // Session flyers and any other private-bucket image, fetched through a
+      // short-lived signed URL on this project's storage host.
+      supabase,
+    ],
     "font-src": ["'self'", "data:"],
     "connect-src": ["'self'", supabase, supabaseWs, ...(isDev ? ["ws:"] : [])],
     "frame-src": ["https://www.youtube.com", "https://www.youtube-nocookie.com"],

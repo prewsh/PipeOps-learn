@@ -14,6 +14,7 @@
  *
  * Usage:  export $(grep -v '^#' .env.local | xargs) && node scripts/verify-p1.mjs
  */
+import { chromium } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -330,6 +331,68 @@ check(
   othersProgress?.length,
   bonusModule ? 2 : 1,
 );
+
+// ------------------------------------------------- every page renders ----
+// A page that throws in a Server Component returns 500, and until this existed
+// nothing noticed. The module page did exactly that: its queries relied on RLS
+// to mean "my rows", which is false for an admin previewing the participant
+// app, so `.maybeSingle()` got three rows and threw. Reviewing a diff would not
+// have found it; loading the page does.
+//
+// Status code, not page content — it is the one signal that means "the server
+// failed" in both dev and production.
+const baseUrl =
+  process.env.VERIFY_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+const { data: smokeLink } = await admin.auth.admin.generateLink({
+  type: "magiclink",
+  email: EMAIL,
+});
+
+const browser = await chromium.launch({ headless: true });
+try {
+  const page = await browser.newPage();
+  await page.goto(
+    `${baseUrl}/auth/confirm?token_hash=${encodeURIComponent(smokeLink.properties.hashed_token)}&type=magiclink`,
+    { waitUntil: "networkidle" },
+  );
+
+  // A module in a released week, resolved rather than hard-coded — the
+  // programme is edited from the admin screens.
+  const openModule = visibleModules.find((m) => !m.is_bonus);
+  const { data: openSlug } = await admin
+    .from("modules")
+    .select("slug")
+    .eq("id", openModule.id)
+    .single();
+  const { data: openWeek } = await admin
+    .from("program_weeks")
+    .select("number")
+    .eq("cohort_id", cohort.id)
+    .lte("release_at", new Date().toISOString())
+    .order("number")
+    .limit(1)
+    .single();
+
+  for (const path of [
+    "/",
+    "/learn",
+    `/learn/week/${openWeek.number}`,
+    `/learn/module/${openSlug.slug}`,
+    "/tasks",
+    "/leaderboard",
+    "/sessions",
+    "/resources",
+    "/announcements",
+    "/settings",
+    "/more",
+  ]) {
+    const response = await page.goto(`${baseUrl}${path}`, { waitUntil: "domcontentloaded" });
+    check(`${path} renders without a server error`, response?.status(), 200);
+  }
+} finally {
+  await browser.close();
+}
 
 // --------------------------------------------------------------- report ----
 console.log(`\n${passed} passed, ${failed} failed`);

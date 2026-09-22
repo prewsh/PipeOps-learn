@@ -331,21 +331,125 @@ export async function saveSession(
     status: "published" as const,
   };
 
-  const { error } = sessionId
-    ? await supabase.from("live_sessions").update(payload).eq("id", sessionId)
-    : await supabase.from("live_sessions").insert(payload);
+  const { data: saved, error } = sessionId
+    ? await supabase.from("live_sessions").update(payload).eq("id", sessionId).select("id").single()
+    : await supabase.from("live_sessions").insert(payload).select("id").single();
 
   if (error) return { error: error.message };
+
+  const flyer = await storeFlyer(cohortId, saved.id, formData);
+  if (flyer.error) {
+    // The session itself saved. Say what did and did not happen rather than
+    // reporting a failure that would send them back to re-enter the form.
+    revalidatePath("/admin/sessions");
+    return { error: `Session saved, but the flyer didn't upload: ${flyer.error}` };
+  }
 
   revalidatePath("/admin/sessions");
   revalidatePath("/sessions");
   return { ok: sessionId ? "Session saved." : "Session scheduled." };
 }
 
+const FLYER_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/avif"]);
+const FLYER_MAX_BYTES = 5 * 1024 * 1024;
+
+/**
+ * Uploads a flyer if one was chosen, and points the session at it.
+ *
+ * Bucket rules are enforced by Supabase Storage too (migration …0027); these
+ * checks exist to fail with a sentence a person can act on instead of a
+ * storage error code.
+ */
+async function storeFlyer(
+  cohortId: string,
+  sessionId: string,
+  formData: FormData,
+): Promise<{ error?: string }> {
+  const file = formData.get("flyer");
+  if (!(file instanceof File) || file.size === 0) return {};
+
+  if (!FLYER_TYPES.has(file.type)) {
+    return { error: "the flyer must be a PNG, JPEG, WebP or AVIF image" };
+  }
+  if (file.size > FLYER_MAX_BYTES) {
+    return { error: "the flyer is over 5MB" };
+  }
+
+  const supabase = await getSupabase();
+  const safe = file.name.replace(/[^\w.-]+/g, "_");
+  const path = `${cohortId}/${sessionId}/${Date.now()}-${safe}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("session-flyers")
+    .upload(path, file, { contentType: file.type });
+  if (uploadError) return { error: uploadError.message };
+
+  const { data: previous } = await supabase
+    .from("live_sessions")
+    .select("flyer_path")
+    .eq("id", sessionId)
+    .maybeSingle();
+
+  const { error: linkError } = await supabase
+    .from("live_sessions")
+    .update({ flyer_path: path })
+    .eq("id", sessionId);
+
+  if (linkError) {
+    // Nothing points at the object, so it would sit in the bucket forever.
+    await supabase.storage.from("session-flyers").remove([path]);
+    return { error: linkError.message };
+  }
+
+  if (previous?.flyer_path && previous.flyer_path !== path) {
+    await supabase.storage.from("session-flyers").remove([previous.flyer_path]);
+  }
+  return {};
+}
+
+/** Removes the flyer and leaves the session in place. */
+export async function removeSessionFlyer(sessionId: string): Promise<ContentState> {
+  if (!uuid.safeParse(sessionId).success) return { error: "Unknown session." };
+
+  const supabase = await getSupabase();
+  const { data: session } = await supabase
+    .from("live_sessions")
+    .select("flyer_path")
+    .eq("id", sessionId)
+    .maybeSingle();
+
+  const { error } = await supabase
+    .from("live_sessions")
+    .update({ flyer_path: null })
+    .eq("id", sessionId);
+  if (error) return { error: error.message };
+
+  if (session?.flyer_path) {
+    await supabase.storage.from("session-flyers").remove([session.flyer_path]);
+  }
+
+  revalidatePath("/admin/sessions");
+  revalidatePath("/sessions");
+  return { ok: "Flyer removed." };
+}
+
 export async function deleteSession(id: string): Promise<ContentState> {
   const supabase = await getSupabase();
+
+  // Read the flyer path first: the row is about to go, and the object would
+  // otherwise stay in the bucket with nothing referencing it.
+  const { data: session } = await supabase
+    .from("live_sessions")
+    .select("flyer_path")
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase.from("live_sessions").delete().eq("id", id);
   if (error) return { error: error.message };
+
+  if (session?.flyer_path) {
+    await supabase.storage.from("session-flyers").remove([session.flyer_path]);
+  }
   revalidatePath("/admin/sessions");
   revalidatePath("/sessions");
   return { ok: "Session removed." };

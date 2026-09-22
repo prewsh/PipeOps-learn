@@ -16,6 +16,8 @@ export type Session = {
   joinable: boolean;
   past: boolean;
   attended: boolean;
+  /** Signed, short-lived. The bucket is private (AGENTS.md section 7). */
+  flyerUrl: string | null;
 };
 
 export const getSessions = cache(async (): Promise<Session[]> => {
@@ -26,7 +28,7 @@ export const getSessions = cache(async (): Promise<Session[]> => {
       .from("live_sessions")
       .select(
         "id, speaker_name, speaker_title, topic, description, starts_at, " +
-          "duration_minutes, join_url, replay_url",
+          "duration_minutes, join_url, replay_url, flyer_path",
       )
       .order("starts_at", { ascending: true }),
     supabase.from("session_attendance").select("session_id, attended"),
@@ -44,8 +46,22 @@ export const getSessions = cache(async (): Promise<Session[]> => {
     duration_minutes: number | null;
     join_url: string | null;
     replay_url: string | null;
+    flyer_path: string | null;
   };
   const sessions = (rows ?? []) as unknown as SessionRow[];
+
+  // One batched call rather than one per card. A failure here costs the
+  // flyer, not the session — the times and the join link still render.
+  const flyerPaths = sessions.map((r) => r.flyer_path).filter((p): p is string => Boolean(p));
+  const signed = new Map<string, string>();
+  if (flyerPaths.length > 0) {
+    const { data: urls } = await supabase.storage
+      .from("session-flyers")
+      .createSignedUrls(flyerPaths, 900);
+    for (const entry of urls ?? []) {
+      if (entry.path && entry.signedUrl) signed.set(entry.path, entry.signedUrl);
+    }
+  }
 
   const attended = new Set((attendance ?? []).filter((a) => a.attended).map((a) => a.session_id));
   const now = Date.now();
@@ -69,6 +85,7 @@ export const getSessions = cache(async (): Promise<Session[]> => {
       joinable: now >= start - 30 * 60_000 && now <= end + 30 * 60_000,
       past: now > end,
       attended: attended.has(r.id),
+      flyerUrl: r.flyer_path ? (signed.get(r.flyer_path) ?? null) : null,
     };
   });
 });

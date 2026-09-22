@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getAdminSupabase } from "@/lib/supabase/admin";
 import { getSupabase } from "@/lib/supabase/server";
+import { getStatelessSupabase } from "@/lib/supabase/stateless";
 import { optionalHttpUrl, uuid } from "@/lib/validation";
 
 /** Admin mutations. Every one is audited by its RPC (PRD F13.6). */
@@ -157,6 +158,10 @@ export async function resendLoginLink(enrollmentId: string): Promise<{
   const { data: isAdmin } = await supabase.rpc("is_admin");
   if (!isAdmin) return { error: "Not authorised." };
 
+  const {
+    data: { user: actor },
+  } = await supabase.auth.getUser();
+
   const admin = getAdminSupabase();
   const { data: enrollment } = await admin
     .from("enrollments")
@@ -169,7 +174,10 @@ export async function resendLoginLink(enrollmentId: string): Promise<{
     return { error: `That enrolment is ${enrollment.status}. Reactivate it first.` };
   }
 
-  const { error } = await supabase.auth.signInWithOtp({
+  // A stateless client, not the admin's own session client: sending someone
+  // else a sign-in email is a support action and must not be able to disturb
+  // the cookies of the person performing it.
+  const { error } = await getStatelessSupabase().auth.signInWithOtp({
     email: enrollment.email,
     options: { shouldCreateUser: false },
   });
@@ -179,9 +187,11 @@ export async function resendLoginLink(enrollmentId: string): Promise<{
     return { error: "We couldn't send that email. Try again in a moment." };
   }
 
-  // The address itself is never logged (AGENTS.md section 7), but who resent
-  // to whom is worth keeping.
+  // The address itself is never logged (AGENTS.md section 7), but an audit row
+  // without an actor answers "did this happen" and not "who did it", which is
+  // the question an audit log exists for.
   await admin.from("audit_log").insert({
+    actor_user_id: actor?.id ?? null,
     action: "auth.resend",
     target_type: "enrollment",
     target_id: enrollmentId,

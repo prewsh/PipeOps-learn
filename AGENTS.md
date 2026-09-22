@@ -152,6 +152,13 @@ numbers for real participants. Treat them as non-negotiable.
   Privilege-bearing columns (`role`, `email`, `id`) are protected by
   column-level `GRANT` plus a trigger. If you add a sensitive column, protect
   it the same way and add a check to `scripts/verify-security.mjs`.
+- **The lockdown migration must be re-run after any migration that adds a
+  function, and `scripts/verify-security.mjs` checks that it was.** The first
+  attempt relied on `alter default privileges` plus a comment asking future
+  migrations to be careful. Neither held: the default privilege does not
+  suppress PUBLIC execute on this project, and two migrations added in the
+  same sitting shipped functions reachable by `anon`. Re-run
+  `20260922000026_sec_lockdown_final.sql`; it is written to be idempotent.
 - **A grant is not an authorisation check.** Postgres gives EXECUTE on every
   new function to PUBLIC, and Supabase exposes `public` over PostgREST, so a
   new function is callable from a browser the moment it exists.
@@ -175,6 +182,12 @@ numbers for real participants. Treat them as non-negotiable.
   time actually elapsed. `p_ended` lowers the completion bar, it does not set
   it — otherwise one call completes an unwatched video.
 - Participants read only their own submissions, progress, points and activity.
+- **RLS says what you MAY see, not what you MEAN.** Participant-facing queries
+  must filter by `enrollment_id` explicitly rather than trusting the policy to
+  scope them. An admin has cross-cohort read access, so an unscoped
+  `module_progress … .maybeSingle()` returns every participant's row and
+  throws the moment a staff account opens the participant app. Scope the
+  query; do not rely on the policy to do it.
 - `points_events` and `activity_events` are **server-write-only**. Never expose
   a client path that inserts them.
 - Week gating is enforced **in the query layer**, not by hiding UI. A locked
@@ -194,7 +207,10 @@ numbers for real participants. Treat them as non-negotiable.
 - Server Components read; Server Actions and route handlers write. Reach for
   `"use client"` only for genuine interactivity.
 - Validate every boundary with Zod — form input, route params, webhooks,
-  external responses. Never trust a client-supplied id.
+  external responses. Never trust a client-supplied id. Use `uuid` from
+  `lib/validation.ts` for ids: it is `z.guid()`, because Zod's `z.uuid()`
+  enforces RFC 9562 version and variant bits that this project's hand-written
+  seed ids do not satisfy, and it silently rejected the real cohort id.
 - Timestamps: store UTC, render in the cohort timezone with an explicit `(WAT)`
   label. Use `lib/time.ts`.
 - Errors: fail loudly server-side, degrade gracefully client-side. Never
@@ -259,6 +275,11 @@ Never the reverse.
 **Choosing E2E scenarios:** do not pick the simplest scenario that proves the
 happy path. Pick a medium-to-hard scenario — one with real state, edge timing
 and multiple actors.
+
+**Load the pages.** `verify-p1` and `verify-p3` walk every participant and
+admin route with a real session and assert a 200. Reviewing a diff does not
+find a Server Component that throws; opening the page does. Add a route here
+when you add one, and run both suites before saying a change works.
 
 **Every E2E run produces a verifiable, repeatable artifact** in
 `e2e/artifacts/<run-id>/`: `summary.json` (assertions and invariant checks),

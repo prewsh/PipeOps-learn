@@ -33,8 +33,20 @@ export const httpUrl = z
 /** For optional admin fields, where an empty input means "not set". */
 export const optionalHttpUrl = z.union([httpUrl, z.literal("")]).optional();
 
-/** Route and form parameters. Never trust a client-supplied id (AGENTS.md §8). */
-export const uuid = z.uuid();
+/**
+ * Route and form parameters. Never trust a client-supplied id (AGENTS.md §8).
+ *
+ * `z.guid()`, not `z.uuid()`. Zod 4's `uuid()` enforces the RFC 9562 version
+ * and variant bits, and several ids in this database are hand-written seeds —
+ * the cohort is `22222222-2222-2222-2222-222222222222`, whose variant nibble
+ * is invalid under that rule. `z.uuid()` rejected it, which silently broke
+ * every cohort feature flag with "Unknown cohort".
+ *
+ * What this guard is for is refusing anything that is not an opaque id before
+ * it reaches a query. Shape is the whole requirement; RFC conformance of an
+ * identifier we generated ourselves is not.
+ */
+export const uuid = z.guid();
 
 /**
  * The email OTP types Supabase will accept at /auth/confirm. Casting the raw

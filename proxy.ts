@@ -68,7 +68,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && (path === "/login" || path === "/verify" || path === "/admin/login")) {
+  // The staff door must remain reachable with an existing session. An
+  // authenticated participant may need to switch into a staff account, and an
+  // authenticated admin may simply have landed on the wrong door. The admin
+  // layout still performs the role check after authentication.
+  if (user && (path === "/login" || path === "/verify")) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     url.search = "";
@@ -87,5 +91,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // Next's development HMR socket is not an application request. Let the
+  // dev server handle it directly; running Supabase refresh and CSP logic on
+  // a WebSocket upgrade leaves the browser's HMR connection half-open.
+  matcher: [
+    "/((?!_next/static|_next/image|_next/hmr|_next/webpack-hmr|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

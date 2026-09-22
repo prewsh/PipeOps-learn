@@ -550,25 +550,47 @@ export async function getContentOverview() {
   };
 }
 
-export async function getSessionsForAdmin() {
-  const supabase = await getSupabase();
-  const { data } = await supabase
-    .from("live_sessions")
-    .select(
-      "id, speaker_name, speaker_title, topic, description, starts_at, " +
-        "duration_minutes, join_url, replay_url",
-    )
-    .order("starts_at", { ascending: false });
+export type AdminSession = {
+  id: string;
+  speaker_name: string;
+  speaker_title: string | null;
+  topic: string;
+  description: string | null;
+  starts_at: string;
+  duration_minutes: number;
+  join_url: string | null;
+  replay_url: string | null;
+  flyer_path: string | null;
+  /** Signed, short-lived — the flyer bucket is private. */
+  flyerUrl: string | null;
+};
 
-  return (data ?? []) as unknown as {
-    id: string;
-    speaker_name: string;
-    speaker_title: string | null;
-    topic: string;
-    description: string | null;
-    starts_at: string;
-    duration_minutes: number;
-    join_url: string | null;
-    replay_url: string | null;
-  }[];
+export async function getSessionsForAdmin(): Promise<AdminSession[]> {
+  const supabase = await getSupabase();
+  const rows = unwrap(
+    await supabase
+      .from("live_sessions")
+      .select(
+        "id, speaker_name, speaker_title, topic, description, starts_at, " +
+          "duration_minutes, join_url, replay_url, flyer_path",
+      )
+      .order("starts_at", { ascending: false }),
+    "sessions",
+  ) as unknown as Omit<AdminSession, "flyerUrl">[];
+
+  const paths = rows.map((r) => r.flyer_path).filter((p): p is string => Boolean(p));
+  const signed = new Map<string, string>();
+  if (paths.length > 0) {
+    const { data: urls } = await supabase.storage
+      .from("session-flyers")
+      .createSignedUrls(paths, 900);
+    for (const entry of urls ?? []) {
+      if (entry.path && entry.signedUrl) signed.set(entry.path, entry.signedUrl);
+    }
+  }
+
+  return rows.map((r) => ({
+    ...r,
+    flyerUrl: r.flyer_path ? (signed.get(r.flyer_path) ?? null) : null,
+  }));
 }

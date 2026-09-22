@@ -62,12 +62,18 @@ E2E_BASE_URL=https://learn.pipeops.io node scripts/verify-security.mjs
 
 ### Function privileges — read this before adding a migration
 
-`supabase/migrations/20260922000023_sec_privilege_lockdown.sql` revokes EXECUTE from `public`/`anon`/`authenticated` on every project function and grants back an explicit allowlist. It also sets a default privilege so new functions do not inherit PUBLIC execute.
+`supabase/migrations/20260922000026_sec_lockdown_final.sql` revokes EXECUTE from `public`/`anon`/`authenticated` on every project function and grants back an explicit allowlist.
+
+**Re-run it after any migration that creates a function.** It is written to be idempotent. The earlier attempt (…0023) tried to make this automatic with `alter default privileges`; on this project that does not suppress PUBLIC execute, and two migrations added after it shipped functions callable by `anon`. Do not trust the default — re-run the lockdown and let the suite confirm it:
+
+```bash
+node scripts/verify-security.mjs   # fails on anything outside the allowlist
+```
 
 Two consequences:
 
-- **A new participant-facing RPC needs an explicit `grant execute … to authenticated`.** Without one it is unreachable and the feature fails with a permission error.
-- **A newly installed extension may need its grants restated**, since the default privilege now revokes. `citext` is deliberately skipped by the lockdown loop (it is extension-owned) — `users.email` and `enrollments.email` are citext, and revoking `citext_eq` would break every email comparison, which means sign-in.
+- **A new participant-facing RPC needs an explicit `grant execute … to authenticated`** in the lockdown's allowlist, and a matching entry in `EXPECTED_AUTHENTICATED` in `scripts/verify-security.mjs`. Without the grant it is unreachable; without the test entry the suite fails, which is intended.
+- **`citext` is deliberately skipped** by the lockdown loop (it is extension-owned) — `users.email` and `enrollments.email` are citext, and revoking `citext_eq` would break every email comparison, which means sign-in.
 
 **Accepted advisor findings.** `citext` stays in `public`. Relocating it means dropping and recreating types two live columns depend on; the fix is riskier than the finding.
 
@@ -97,6 +103,7 @@ It rebuilds every derived value from source and is safe to run repeatedly.
 - Content is edited through `/admin/content`; there is no bulk import.
 - Portal submissions ship **frozen** (`cohorts.submissions_open = false`). Open them from `/admin/content` when ready.
 - The leaderboard and sessions ship **hidden** (`leaderboard_visible`, `sessions_visible` = false). Both are built and points accrue regardless; turn either on in `/admin/content`. Sessions can be scheduled in `/admin/sessions` before they are visible.
+- Real delivered-email verification is manual by design. `scripts/verify-auth.mjs` mints its own tokens so it can run unattended, which proves the token lifecycle but **not** SMTP, templates or inbox delivery. Before launch, send one to a real mailbox and run `VERIFY_OTP=<code from the email> node scripts/verify-auth.mjs` so the suite checks the code that actually arrived.
 - No automated accessibility pass has been run. 44px targets and the 4px grid are followed by construction, but keyboard order, focus restoration after server actions, and screen-reader labels are unverified.
 - Uploads are neither resumable nor chunked. This matters when submissions reopen, not before.
 - `resendLoginLink` sends real email and has not been fired end to end — exercise it once against a test address before relying on it during the cohort.

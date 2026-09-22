@@ -3,7 +3,12 @@
 import { useActionState, useTransition } from "react";
 import { Field, Status, TextArea, TextInput, toCohortLocal } from "@/components/admin/Fields";
 import { Button, Card, Meta } from "@/components/ui";
-import { type ContentState, deleteSession, saveSession } from "@/lib/actions/content";
+import {
+  type ContentState,
+  deleteSession,
+  removeSessionFlyer,
+  saveSession,
+} from "@/lib/actions/content";
 
 export function SessionForm({
   cohortId,
@@ -20,6 +25,8 @@ export function SessionForm({
     duration_minutes: number;
     join_url: string | null;
     replay_url: string | null;
+    flyer_path: string | null;
+    flyerUrl: string | null;
   };
 }) {
   const [state, action, pending] = useActionState<ContentState, FormData>(
@@ -82,6 +89,33 @@ export function SessionForm({
             <TextArea name="description" rows={3} defaultValue={session?.description ?? ""} />
           </Field>
         </div>
+
+        <div className="md:col-span-2">
+          <Field
+            label="Flyer"
+            hint="PNG, JPEG, WebP or AVIF, up to 5MB. Shown on the session card."
+          >
+            <div className="flex flex-wrap items-start gap-4">
+              {session?.flyerUrl ? (
+                <figure className="m-0 flex flex-col gap-1">
+                  {/* biome-ignore lint/performance/noImgElement: a signed URL expires, and next/image would cache then serve a dead src */}
+                  <img
+                    src={session.flyerUrl}
+                    alt={`Flyer for ${session.topic}`}
+                    className="h-28 w-auto rounded-lg border border-line object-cover"
+                  />
+                  <FlyerRemove id={session.id} />
+                </figure>
+              ) : null}
+              <input
+                type="file"
+                name="flyer"
+                accept="image/png,image/jpeg,image/webp,image/avif"
+                className="min-h-11 flex-1 text-sm text-ink-2 file:mr-3 file:min-h-9 file:cursor-pointer file:rounded-lg file:border file:border-line-strong file:bg-surface file:px-4 file:text-sm file:text-ink"
+              />
+            </div>
+          </Field>
+        </div>
         <div className="flex items-center gap-3 md:col-span-2">
           <Button type="submit" variant="primary" disabled={pending}>
             {pending ? "Saving…" : session ? "Save session" : "Schedule session"}
@@ -91,6 +125,20 @@ export function SessionForm({
         </div>
       </form>
     </Card>
+  );
+}
+
+function FlyerRemove({ id }: { id: string }) {
+  const [pending, start] = useTransition();
+  return (
+    <button
+      type="button"
+      disabled={pending}
+      onClick={() => start(async () => void (await removeSessionFlyer(id)))}
+      className="self-start font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3 hover:text-ink"
+    >
+      {pending ? "…" : "Remove flyer"}
+    </button>
   );
 }
 

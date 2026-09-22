@@ -209,9 +209,11 @@ console.log("\n── leaderboard leaks nothing extra ────────�
 
 const { data: board } = await alpha.client.rpc("leaderboard", { p_limit: 25 });
 const boardKeys = board?.[0] ? Object.keys(board[0]).sort() : [];
+// `enrollment_id` used to be in this list, which meant the check was pinning
+// the leak rather than forbidding it: every participant received a stable UUID
+// for every other participant. `is_me` already says which row is yours.
 check("the board exposes only name, points, streak, weeks and rank", boardKeys, [
   "display_name",
-  "enrollment_id",
   "is_me",
   "points_total",
   "rank",
@@ -263,10 +265,22 @@ const { error: announceErr } = await alpha.client.from("announcements").insert({
 check("cannot post an announcement", Boolean(announceErr), true);
 
 // Writing progress for someone else must be refused by the WITH CHECK clause.
+// This used to pass a TASK id as the module id, so the insert could have been
+// refused by the foreign key rather than by the policy — a test that passes
+// for the wrong reason tells you nothing. Use a real, released module.
+const { data: realModule } = await admin.from("modules").select("id").limit(1).single();
+
 const { error: foreignProgress } = await alpha.client
   .from("module_progress")
-  .insert({ enrollment_id: beta.enrollmentId, module_id: task.id, status: "completed" });
+  .insert({ enrollment_id: beta.enrollmentId, module_id: realModule.id, status: "completed" });
 check("cannot write progress onto another enrolment", Boolean(foreignProgress), true);
+
+const { count: leaked } = await admin
+  .from("module_progress")
+  .select("*", { count: "exact", head: true })
+  .eq("enrollment_id", beta.enrollmentId)
+  .eq("module_id", realModule.id);
+check("and nothing was written", leaked, 0);
 
 console.log("\n── forged submissions cannot mint points ─────────────────────");
 
@@ -492,6 +506,72 @@ check(
   true,
 );
 check("a single forged call does not complete the video", forgedWatch.completed_at, null);
+
+console.log("\n── function privilege drift ──────────────────────────────────");
+
+// The lockdown migration is a rule written in SQL, and a rule nobody checks is
+// a rule that decays: migrations …0024 and …0025 were added after the lockdown
+// and their functions came back reachable from a browser within the hour. This
+// reads the live grant table and fails on anything unexpected, so the next
+// migration that forgets is caught here rather than in an audit.
+//
+// Keep in step with the allowlist in 20260922000026_sec_lockdown_final.sql.
+// The duplication is deliberate: the migration states the intent, this states
+// the expectation, and a mismatch is exactly what should stop a deploy.
+const EXPECTED_AUTHENTICATED = new Set([
+  // RLS policy helpers — evaluated as the querying role, so they must stay open
+  "is_admin()",
+  "my_enrollment_id()",
+  "my_cohort_id()",
+  "module_is_released(p_module_id uuid)",
+  "assert_enrollment_access(p_enrollment_id uuid)",
+  // learning and progress
+  "start_module(p_module_id uuid)",
+  "complete_module(p_module_id uuid, p_via text)",
+  "record_video_progress(p_lesson_id uuid, p_position_seconds integer, " +
+    "p_delta_seconds integer, p_duration_seconds integer, p_ended boolean)",
+  // submissions
+  "item_deadline(p_type work_item_type, p_item_id uuid)",
+  "save_draft(p_type work_item_type, p_item_id uuid, p_urls jsonb, p_text text)",
+  "submit_work(p_type work_item_type, p_item_id uuid, p_urls jsonb, p_text text)",
+  "assert_submittable(p_type work_item_type, p_item_id uuid, p_urls jsonb, " +
+    "p_text text, p_final boolean)",
+  // denominators
+  "program_item_count()",
+  "program_module_count()",
+  // motivation
+  "leaderboard(p_limit integer)",
+  "leaderboard_consistent(p_limit integer)",
+  "active_creator_count()",
+  // own-enrolment recomputation, each guarded by assert_enrollment_access
+  "recompute_progress(p_enrollment_id uuid)",
+  "recompute_week_progress(p_enrollment_id uuid)",
+  "recompute_points(p_enrollment_id uuid)",
+  "compute_health(p_enrollment_id uuid)",
+  "compute_streak(p_enrollment_id uuid)",
+  // admin operations, each gated by is_admin() in its own body
+  "mark_attendance(p_session_id uuid, p_enrollment_id uuid, p_attended boolean)",
+  "review_submission(p_submission_id uuid, p_status submission_status, p_note text)",
+  "set_enrollment_status(p_enrollment_id uuid, p_status enrollment_status, p_reason text)",
+  "set_admin_note(p_enrollment_id uuid, p_note text)",
+  "set_cohort_flag(p_cohort_id uuid, p_flag text, p_value boolean)",
+  "refresh_cohort_health(p_cohort_id uuid)",
+  "recompute_cohort(p_cohort_id uuid)",
+  "reconcile_lateness(p_item_type work_item_type, p_item_id uuid)",
+]);
+
+const { data: privReport, error: privError } = await admin.rpc("function_privilege_report");
+check("the privilege report is readable", privError, null);
+
+const anonReachable = (privReport ?? []).filter((f) => f.anon_can).map((f) => f.signature);
+check("no project function is callable by anon", anonReachable, []);
+
+const authReachable = (privReport ?? []).filter((f) => f.authenticated_can).map((f) => f.signature);
+const unexpected = authReachable.filter((sig) => !EXPECTED_AUTHENTICATED.has(sig));
+check("no function is callable by participants outside the allowlist", unexpected, []);
+
+const missing = [...EXPECTED_AUTHENTICATED].filter((sig) => !authReachable.includes(sig));
+check("every allow-listed function is actually reachable", missing, []);
 
 console.log("\n── unauthenticated route protection ──────────────────────────");
 
