@@ -19,7 +19,17 @@
  * breaks the product would be the worse trade.
  */
 export function buildCsp(nonce: string, supabaseUrl: string, isDev: boolean): string {
-  const supabase = new URL(supabaseUrl).origin;
+  // This runs on every request. A missing or malformed value would otherwise
+  // surface as "Invalid URL" from deep inside the proxy, which says nothing
+  // about what to fix.
+  let supabase: string;
+  try {
+    supabase = new URL(supabaseUrl).origin;
+  } catch {
+    throw new Error(
+      "NEXT_PUBLIC_SUPABASE_URL is missing or not a URL; the CSP cannot be built without it.",
+    );
+  }
   const supabaseWs = supabase.replace(/^https:/, "wss:");
 
   const directives: Record<string, string[]> = {

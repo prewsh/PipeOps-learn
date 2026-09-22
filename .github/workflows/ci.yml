@@ -28,3 +28,13 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  # The five suites in scripts/verify-*.mjs authenticate as real participants
+  # against a live Supabase project, so they need project secrets and a running
+  # app. They are not run here: pointing public CI at the live cohort database
+  # would mean creating and deleting real rows on every pull request.
+  #
+  # Run them from a machine with .env.local before deploying — docs/DEPLOYMENT.md
+  # section 5 — or wire this job to a dedicated staging project:
+  #
+  #   for s in p1 p2 p3 auth security; do node scripts/verify-$s.mjs || exit 1; done
