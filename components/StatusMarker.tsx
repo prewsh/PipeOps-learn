@@ -29,7 +29,8 @@ const LABEL: Record<Status, string> = {
 };
 
 function Marker({ status }: { status: Status }) {
-  const base = "inline-block h-1.5 w-1.5 shrink-0 rounded-full";
+  const base =
+    "motion-fast inline-block h-1.5 w-1.5 shrink-0 rounded-full transition-[background-color,border-color]";
 
   switch (status) {
     case "complete":

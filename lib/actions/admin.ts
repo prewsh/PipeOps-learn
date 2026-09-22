@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getAdminSupabase } from "@/lib/supabase/admin";
 import { getSupabase } from "@/lib/supabase/server";
+import { optionalHttpUrl } from "@/lib/validation";
 
 /** Admin mutations. Every one is audited by its RPC (PRD F13.6). */
 
@@ -62,7 +63,7 @@ export async function refreshHealth(cohortId: string): Promise<{ count?: number;
 const announcementSchema = z.object({
   title: z.string().trim().min(3, "Give it a title."),
   body: z.string().trim().min(10, "Say something."),
-  linkUrl: z.union([z.url(), z.literal("")]).optional(),
+  linkUrl: optionalHttpUrl,
   isPinned: z.boolean().default(false),
   audienceIds: z.array(z.string()).optional(),
 });

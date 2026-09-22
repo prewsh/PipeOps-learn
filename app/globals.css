@@ -29,6 +29,18 @@
 
   /* Spacing — 4px grid */
   --spacing: 4px;
+
+  /* Motion. Three durations, one easing, and that is the whole vocabulary.
+     Anything that needs a fourth is probably doing too much.
+       fast   hover, focus, pressed, a status marker changing
+       state  progress bars, disclosure, saved/submitted feedback
+       enter  one content region arriving — never a stagger across cards
+     Deadlines, errors and locked states are deliberately excluded: motion
+     that delays understanding is a defect, not polish. */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --motion-fast: 140ms;
+  --motion-state: 240ms;
+  --motion-enter: 360ms;
 }
 
 @layer base {
@@ -57,5 +69,59 @@
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* One subtle arrival for the primary content region. Applied once per
+     screen, never per card — a staggered grid reads as a website, and this is
+     something people use every day. */
+  .motion-enter {
+    animation: rise-in var(--motion-enter) var(--ease) both;
+  }
+
+  /* Derived numbers that change under the reader: progress bars, counters,
+     the leaderboard position. The value is always correct on arrival; the
+     transition only makes the change legible. */
+  .motion-state {
+    transition-duration: var(--motion-state);
+    transition-timing-function: var(--ease);
+  }
+
+  .motion-fast {
+    transition-duration: var(--motion-fast);
+    transition-timing-function: var(--ease);
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/*
+ * Reduced motion is honoured globally rather than component by component, so
+ * a new component cannot forget. State still changes instantly — only the
+ * movement between states is removed.
+ *
+ * `!important` is the point here, not an oversight: this has to outrank the
+ * Tailwind utilities it is overriding, or a `duration-300` on any component
+ * quietly wins and the preference is ignored. biome.json turns the rule off
+ * for this file alone.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SubmissionsToggle } from "@/components/admin/SubmissionsToggle";
+import { CohortFlags } from "@/components/admin/CohortFlags";
 import { Card, Meta } from "@/components/ui";
 import { getContentOverview } from "@/lib/data/admin";
 import { formatDeadline } from "@/lib/time";
@@ -21,7 +21,16 @@ export default async function ContentPage() {
         </p>
       </header>
 
-      {cohort ? <SubmissionsToggle cohortId={cohort.id} open={cohort.submissions_open} /> : null}
+      {cohort ? (
+        <CohortFlags
+          cohortId={cohort.id}
+          values={{
+            submissions_open: cohort.submissions_open,
+            leaderboard_visible: cohort.leaderboard_visible,
+            sessions_visible: cohort.sessions_visible,
+          }}
+        />
+      ) : null}
 
       <Card className="overflow-hidden">
         <div className="hidden border-b border-line bg-fill-subtle px-5 py-2 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3 md:grid md:grid-cols-[3rem_1fr_9rem_7rem_6rem]">

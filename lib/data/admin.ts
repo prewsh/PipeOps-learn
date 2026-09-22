@@ -474,7 +474,7 @@ export async function getContentOverview() {
       .order("number"),
     supabase
       .from("cohorts")
-      .select("id, name, submissions_open")
+      .select("id, name, submissions_open, leaderboard_visible, sessions_visible")
       .eq("code", "ugc-01")
       .maybeSingle(),
   ]);
@@ -498,7 +498,13 @@ export async function getContentOverview() {
   const weeksWithTask = new Set((tasks ?? []).map((t) => t.week_id));
 
   return {
-    cohort: cohort as unknown as { id: string; name: string; submissions_open: boolean } | null,
+    cohort: cohort as unknown as {
+      id: string;
+      name: string;
+      submissions_open: boolean;
+      leaderboard_visible: boolean;
+      sessions_visible: boolean;
+    } | null,
     weeks: (
       (weeks ?? []) as unknown as {
         id: string;

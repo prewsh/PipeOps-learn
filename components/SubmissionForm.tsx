@@ -45,6 +45,7 @@ export function SubmissionForm({
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [draftError, setDraftError] = useState<string | null>(null);
 
   const dirty = useRef(false);
   const submitAction = submitWork.bind(null, item.type, item.id);
@@ -59,8 +60,13 @@ export function SubmissionForm({
       .split(/[\s,]+/)
       .map((u) => u.trim())
       .filter(Boolean);
-    const { ok } = await saveDraft(item.type, item.id, list, text);
-    if (ok) setSavedAt(new Date());
+    const { ok, error } = await saveDraft(item.type, item.id, list, text);
+    if (ok) {
+      setSavedAt(new Date());
+      setDraftError(null);
+    } else {
+      setDraftError(error ?? "Couldn't save your draft. Check your connection.");
+    }
   }, [urls, text, item.type, item.id, locked]);
 
   useEffect(() => {
@@ -104,15 +110,19 @@ export function SubmissionForm({
           continue;
         }
 
-        await attachFile(submissionId, {
+        const { id, error: attachError } = await attachFile(submissionId, {
           storagePath: path,
           filename: file.name,
           mimeType: file.type,
           sizeBytes: file.size,
         });
+        if (!id) {
+          setUploadError(`${file.name}: ${attachError ?? "could not be attached"}`);
+          continue;
+        }
         setFiles((prev) => [
           ...prev,
-          { id: path, filename: file.name, storagePath: path, sizeBytes: file.size },
+          { id, filename: file.name, storagePath: path, sizeBytes: file.size },
         ]);
       }
     } catch {
@@ -140,10 +150,6 @@ export function SubmissionForm({
 
   return (
     <form action={action} className="flex flex-col gap-5">
-      <input type="hidden" name="requiresUrl" value={wantsUrl ? "1" : "0"} />
-      <input type="hidden" name="requiresText" value={wantsText && item.textMin ? "1" : "0"} />
-      <input type="hidden" name="textMin" value={item.textMin ?? 0} />
-
       {wantsUrl ? (
         <div className="flex flex-col gap-2">
           <label
@@ -261,6 +267,15 @@ export function SubmissionForm({
         </div>
       ) : null}
 
+      {draftError ? (
+        <p className="flex gap-2 text-sm text-ink" role="status">
+          <span aria-hidden className="font-mono font-medium">
+            !
+          </span>
+          {draftError}
+        </p>
+      ) : null}
+
       {state.error ? (
         <p className="flex gap-2 text-sm text-ink" role="alert">
           <span aria-hidden className="font-mono font-medium">
@@ -287,7 +302,7 @@ export function SubmissionForm({
           Save draft
         </Button>
         {savedAt ? (
-          <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3">
+          <span className="motion-enter font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3">
             Draft saved{" "}
             {savedAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
           </span>

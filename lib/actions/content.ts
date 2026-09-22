@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getSupabase } from "@/lib/supabase/server";
+import { optionalHttpUrl, uuid } from "@/lib/validation";
 
 /**
  * Content editing for the programme team (PRD F13.4).
@@ -244,17 +245,46 @@ export async function deleteResource(id: string): Promise<ContentState> {
   return { ok: "Resource removed." };
 }
 
-export async function setSubmissionsOpen(cohortId: string, open: boolean): Promise<ContentState> {
+export type CohortFlag = "submissions_open" | "leaderboard_visible" | "sessions_visible";
+
+const FLAG_COPY: Record<CohortFlag, { on: string; off: string }> = {
+  submissions_open: { on: "Submissions are open.", off: "Submissions are frozen." },
+  leaderboard_visible: {
+    on: "The leaderboard is live for participants.",
+    off: "The leaderboard shows “coming soon”.",
+  },
+  sessions_visible: {
+    on: "Sessions are live for participants.",
+    off: "Sessions show “coming soon”.",
+  },
+};
+
+/**
+ * Cohort-level switches, through the audited RPC (F13.6).
+ *
+ * These go via `set_cohort_flag` rather than a direct table update so that
+ * turning the leaderboard on, or freezing submissions mid-cohort, leaves a row
+ * saying who did it and when. The RPC also rejects any column name that is not
+ * one of these three.
+ */
+export async function setCohortFlag(
+  cohortId: string,
+  flag: CohortFlag,
+  value: boolean,
+): Promise<ContentState> {
+  if (!uuid.safeParse(cohortId).success) return { error: "Unknown cohort." };
+
   const supabase = await getSupabase();
-  const { error } = await supabase
-    .from("cohorts")
-    .update({ submissions_open: open })
-    .eq("id", cohortId);
+  const { error } = await supabase.rpc("set_cohort_flag", {
+    p_cohort_id: cohortId,
+    p_flag: flag,
+    p_value: value,
+  });
   if (error) return { error: error.message };
 
   revalidatePath("/", "layout");
   revalidatePath("/admin", "layout");
-  return { ok: open ? "Submissions are open." : "Submissions are frozen." };
+  return { ok: value ? FLAG_COPY[flag].on : FLAG_COPY[flag].off };
 }
 
 const sessionSchema = z.object({
@@ -263,8 +293,8 @@ const sessionSchema = z.object({
   topic: z.string().trim().min(3, "Give the session a topic."),
   description: z.string().trim().max(1000).optional(),
   durationMinutes: z.coerce.number().int().min(10).max(480),
-  joinUrl: z.union([z.url(), z.literal("")]).optional(),
-  replayUrl: z.union([z.url(), z.literal("")]).optional(),
+  joinUrl: optionalHttpUrl,
+  replayUrl: optionalHttpUrl,
 });
 
 export async function saveSession(

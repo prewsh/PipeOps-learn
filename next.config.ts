@@ -3,16 +3,14 @@ import type { NextConfig } from "next";
 /**
  * Security headers.
  *
- * No CSP yet: the YouTube IFrame API injects inline script and styles, so a
- * meaningful policy needs nonces threaded through the player. Added without
- * that it would either break playback or be loose enough to be theatre. The
- * headers below are the ones that work today with no such trade-off.
+ * The Content-Security-Policy is NOT here: it carries a per-request nonce, so
+ * it is built in middleware.ts (lib/csp.ts). A static copy in this file would
+ * be a second policy competing with that one.
  */
 const securityHeaders = [
   // The app must never be framed — it would allow clickjacking a submission
-  // or an admin approval.
+  // or an admin approval. Kept alongside frame-ancestors for older browsers.
   { key: "X-Frame-Options", value: "DENY" },
-  { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   // Never leak a token-bearing path to a third party.
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

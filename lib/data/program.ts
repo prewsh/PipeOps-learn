@@ -50,6 +50,9 @@ export type Me = {
   cohortName: string;
   /** Portal submissions are frozen while the flow is held back. */
   submissionsOpen: boolean;
+  /** Cohort feature flags. Both default false — see migration …0024. */
+  leaderboardVisible: boolean;
+  sessionsVisible: boolean;
   progressPct: number;
   onboarded: boolean;
 };
@@ -62,17 +65,22 @@ export const getMe = cache(async (): Promise<Me | null> => {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data } = await supabase
+  const { data: rows } = await supabase
     .from("enrollments")
     .select(
       "id, cohort_id, progress_pct, name, email, " +
-        "cohorts!inner(name, status, submissions_open), users!inner(name, onboarded_at)",
+        "cohorts!inner(name, status, starts_on, submissions_open, " +
+        "leaderboard_visible, sessions_visible), users!inner(name, onboarded_at)",
     )
     .eq("user_id", user.id)
     .eq("status", "active")
-    .limit(1)
-    .maybeSingle();
+    .in("cohorts.status", ["active", "completed"])
+    // Several enrolments is an allowed case (F2.2). Ordering is what makes
+    // "which one" a defined answer rather than whichever row came back first.
+    .order("starts_on", { ascending: false, referencedTable: "cohorts" })
+    .limit(1);
 
+  const data = rows?.[0];
   if (!data) return null;
 
   const row = data as unknown as {
@@ -81,7 +89,12 @@ export const getMe = cache(async (): Promise<Me | null> => {
     progress_pct: number;
     name: string | null;
     email: string;
-    cohorts: { name: string; submissions_open: boolean };
+    cohorts: {
+      name: string;
+      submissions_open: boolean;
+      leaderboard_visible: boolean;
+      sessions_visible: boolean;
+    };
     users: { name: string | null; onboarded_at: string | null };
   };
   const cohort = row.cohorts;
@@ -97,6 +110,8 @@ export const getMe = cache(async (): Promise<Me | null> => {
     cohortId: row.cohort_id,
     cohortName: cohort.name,
     submissionsOpen: Boolean(cohort.submissions_open),
+    leaderboardVisible: Boolean(cohort.leaderboard_visible),
+    sessionsVisible: Boolean(cohort.sessions_visible),
     progressPct: Number(row.progress_pct ?? 0),
     onboarded: Boolean(userRow.onboarded_at),
   };

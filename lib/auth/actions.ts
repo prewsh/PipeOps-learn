@@ -18,6 +18,29 @@ const emailSchema = z.email().trim().toLowerCase();
 
 export type AuthState = { error?: string };
 
+/**
+ * The enrolment a sign-in should be judged against: the most recently started
+ * eligible cohort (PRD F2.2).
+ *
+ * `.maybeSingle()` used to do this, which meant a participant enrolled in two
+ * cohorts — the explicit case the PRD allows for — got "Something went wrong"
+ * instead of a login link, because the query returned two rows. Ordering is
+ * not a nicety here; it is what makes the answer defined.
+ */
+async function currentEnrollmentFor(email: string) {
+  const admin = getAdminSupabase();
+  const { data, error } = await admin
+    .from("enrollments")
+    .select("id, status, cohort_id, cohorts!inner(status, starts_on)")
+    .eq("email", email)
+    .in("cohorts.status", ["active", "completed"])
+    .order("starts_on", { ascending: false, referencedTable: "cohorts" })
+    .limit(1);
+
+  if (error) return { data: null, error };
+  return { data: data?.[0] ?? null, error: null };
+}
+
 const NOT_ENROLLED =
   "We couldn't find this email in the current PipeOps UGC Program cohort. " +
   "If you were accepted, check which address you applied with.";
@@ -27,12 +50,7 @@ export async function requestAccess(_prev: AuthState, formData: FormData): Promi
   if (!parsed.success) return { error: "Enter a valid email address." };
   const email = parsed.data;
 
-  const admin = getAdminSupabase();
-  const { data: enrollment, error } = await admin
-    .from("enrollments")
-    .select("id, status, cohorts!inner(status)")
-    .eq("email", email)
-    .maybeSingle();
+  const { data: enrollment, error } = await currentEnrollmentFor(email);
 
   if (error) return { error: "Something went wrong. Try again in a moment." };
   if (!enrollment) return { error: NOT_ENROLLED };
@@ -106,12 +124,15 @@ export async function recordLogin() {
   if (!user) return;
 
   const admin = getAdminSupabase();
-  const { data: enrollment } = await admin
+  const { data: enrollments } = await admin
     .from("enrollments")
-    .select("id")
+    .select("id, cohorts!inner(starts_on, status)")
     .eq("user_id", user.id)
     .eq("status", "active")
-    .maybeSingle();
+    .in("cohorts.status", ["active", "completed"])
+    .order("starts_on", { ascending: false, referencedTable: "cohorts" })
+    .limit(1);
+  const enrollment = enrollments?.[0] ?? null;
 
   await Promise.all([
     admin.from("users").update({ last_login_at: new Date().toISOString() }).eq("id", user.id),

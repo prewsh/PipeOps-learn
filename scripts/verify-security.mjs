@@ -486,7 +486,11 @@ const { data: forgedWatch } = await admin
   .eq("enrollment_id", alpha.enrollmentId)
   .eq("lesson_id", openLesson.id)
   .single();
-check("an hour of watch time cannot be claimed in one second", forgedWatch.watched_seconds <= 20, true);
+check(
+  "an hour of watch time cannot be claimed in one second",
+  forgedWatch.watched_seconds <= 20,
+  true,
+);
 check("a single forged call does not complete the video", forgedWatch.completed_at, null);
 
 console.log("\n── unauthenticated route protection ──────────────────────────");

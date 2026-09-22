@@ -35,7 +35,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[84rem] px-5 pb-24 pt-6 md:px-8 md:pb-16 md:pt-8 xl:px-12">
+        <main className="motion-enter mx-auto w-full max-w-[84rem] px-5 pb-24 pt-6 md:px-8 md:pb-16 md:pt-8 xl:px-12">
           {children}
         </main>
       </div>
