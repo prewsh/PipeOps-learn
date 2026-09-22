@@ -268,6 +268,227 @@ const { error: foreignProgress } = await alpha.client
   .insert({ enrollment_id: beta.enrollmentId, module_id: task.id, status: "completed" });
 check("cannot write progress onto another enrolment", Boolean(foreignProgress), true);
 
+console.log("\n── forged submissions cannot mint points ─────────────────────");
+
+// submissions.item_id is polymorphic and carries no foreign key. Before the
+// integrity migration, submit_work took any UUID and recompute_points paid out
+// for it. This is that attack, run for real.
+const ghost = "00000000-dead-4000-8000-00000000beef";
+
+const { data: pointsBefore } = await admin
+  .from("enrollments")
+  .select("points_total")
+  .eq("id", alpha.enrollmentId)
+  .single();
+
+const { error: ghostDraft } = await alpha.client.rpc("save_draft", {
+  p_type: "program_task",
+  p_item_id: ghost,
+  p_urls: ["https://example.com/nothing"],
+  p_text: "there is no such task",
+});
+check("save_draft refuses an item that does not exist", Boolean(ghostDraft), true);
+
+const { error: ghostSubmit } = await alpha.client.rpc("submit_work", {
+  p_type: "program_task",
+  p_item_id: ghost,
+  p_urls: ["https://example.com/nothing"],
+  p_text: "there is no such task",
+});
+check("submit_work refuses an item that does not exist", Boolean(ghostSubmit), true);
+
+const { count: ghostRows } = await admin
+  .from("submissions")
+  .select("*", { count: "exact", head: true })
+  .eq("item_id", ghost);
+check("no submission row exists for the fabricated item", ghostRows, 0);
+
+await admin.rpc("recompute_points", { p_enrollment_id: alpha.enrollmentId });
+const { data: pointsAfter } = await admin
+  .from("enrollments")
+  .select("points_total")
+  .eq("id", alpha.enrollmentId)
+  .single();
+check(
+  "a fabricated item earns no points",
+  Number(pointsAfter.points_total),
+  Number(pointsBefore.points_total),
+);
+
+// The same attack from the other direction: a forged row already in the table
+// (as a pre-fix exploit would have left) must not be paid out on recompute,
+// and the ledger must stay append-only while that is corrected.
+const { data: forged } = await admin
+  .from("submissions")
+  .insert({
+    enrollment_id: alpha.enrollmentId,
+    item_type: "program_task",
+    item_id: ghost,
+    status: "submitted",
+    submitted_at: new Date().toISOString(),
+    urls: ["https://example.com/nothing"],
+  })
+  .select("id")
+  .single();
+
+await admin.rpc("recompute_points", { p_enrollment_id: alpha.enrollmentId });
+const { data: ghostAward } = await admin
+  .from("points_events")
+  .select("id")
+  .eq("enrollment_id", alpha.enrollmentId)
+  .eq("target_id", ghost);
+check("a forged submission row earns no ledger entry", ghostAward?.length, 0);
+await admin.from("submissions").delete().eq("id", forged.id);
+
+// Release state and publish state are part of the same gate.
+const { data: lockedWeek } = await admin
+  .from("program_weeks")
+  .select("id")
+  .gt("release_at", new Date().toISOString())
+  .order("number")
+  .limit(1)
+  .single();
+
+const { data: lockedTask } = await admin
+  .from("program_tasks")
+  .insert({
+    week_id: lockedWeek.id,
+    title: "__verify_sec_locked_task",
+    brief: "Fixture in an unreleased week.",
+    submission_types: ["url"],
+  })
+  .select("id")
+  .single();
+
+const { error: lockedErr } = await alpha.client.rpc("submit_work", {
+  p_type: "program_task",
+  p_item_id: lockedTask.id,
+  p_urls: ["https://example.com/early"],
+});
+check("submitting to an unreleased week is refused", Boolean(lockedErr), true);
+
+const { data: draftTask } = await admin
+  .from("program_tasks")
+  .insert({
+    week_id: task.week_id ?? lockedWeek.id,
+    title: "__verify_sec_unpublished_task",
+    brief: "Fixture that is not published.",
+    submission_types: ["url"],
+    status: "draft",
+  })
+  .select("id")
+  .single();
+
+const { error: unpublishedErr } = await alpha.client.rpc("submit_work", {
+  p_type: "program_task",
+  p_item_id: draftTask.id,
+  p_urls: ["https://example.com/unpublished"],
+});
+check("submitting to an unpublished item is refused", Boolean(unpublishedErr), true);
+
+await admin
+  .from("program_tasks")
+  .delete()
+  .in("title", ["__verify_sec_locked_task", "__verify_sec_unpublished_task"]);
+
+// z.url() accepts javascript: and data:. These links are rendered as anchors
+// in the review queue, so the protocol is checked where it cannot be skipped.
+for (const bad of ["javascript:alert(1)", "data:text/html,<script>alert(1)</script>"]) {
+  const { error } = await alpha.client.rpc("submit_work", {
+    p_type: "program_task",
+    p_item_id: task.id,
+    p_urls: [bad],
+  });
+  check(`a ${bad.split(":")[0]}: link is refused`, Boolean(error), true);
+}
+
+console.log("\n── function privileges ───────────────────────────────────────");
+
+// SECURITY DEFINER functions run as the owner. A grant is not an authorisation
+// check, so each one that accepts an enrolment id must verify ownership.
+for (const fn of ["compute_health", "compute_streak", "recompute_points", "recompute_progress"]) {
+  const { error } = await alpha.client.rpc(fn, { p_enrollment_id: beta.enrollmentId });
+  check(`${fn}() refuses another participant's enrolment`, Boolean(error), true);
+}
+
+const { error: ownHealth } = await alpha.client.rpc("compute_health", {
+  p_enrollment_id: alpha.enrollmentId,
+});
+check("compute_health() still works on your own enrolment", ownHealth, null);
+
+// Internal helpers must not be reachable from a browser at all. Each probe
+// passes the REAL signature — calling with the wrong arguments would error for
+// the wrong reason and pass this check while the function stayed exposed.
+const internals = [
+  ["submissions_are_open", {}],
+  ["scorable_submissions", { p_enrollment_id: alpha.enrollmentId }],
+  ["work_item_for_caller", { p_type: "program_task", p_item_id: task.id }],
+  ["is_safe_url", { p_url: "https://example.com" }],
+  ["assert_safe_urls", { p_urls: [] }],
+  ["points_for", { p_rule: "MODULE_COMPLETED" }],
+];
+for (const [fn, args] of internals) {
+  const { error } = await alpha.client.rpc(fn, args);
+  check(`${fn}() is not callable by a participant`, Boolean(error), true);
+}
+
+console.log("\n── progress cannot be forged ─────────────────────────────────");
+
+const { data: lockedModule } = await admin
+  .from("week_modules")
+  .select("module_id, program_weeks!inner(release_at)")
+  .gt("program_weeks.release_at", new Date().toISOString())
+  .limit(1)
+  .single();
+
+const { error: lockedComplete } = await alpha.client.rpc("complete_module", {
+  p_module_id: lockedModule.module_id,
+  p_via: "manual",
+});
+check("cannot manually complete an unreleased module", Boolean(lockedComplete), true);
+
+const { data: lockedLesson } = await admin
+  .from("lessons")
+  .select("id")
+  .eq("module_id", lockedModule.module_id)
+  .limit(1)
+  .maybeSingle();
+
+if (lockedLesson) {
+  const { error: lockedWatch } = await alpha.client.rpc("record_video_progress", {
+    p_lesson_id: lockedLesson.id,
+    p_position_seconds: 700,
+    p_delta_seconds: 700,
+    p_duration_seconds: 720,
+    p_ended: true,
+  });
+  check("cannot bank video progress against an unreleased lesson", Boolean(lockedWatch), true);
+}
+
+// The headline forgery: claim the whole video in one call and take the points.
+const { data: openLesson } = await alpha.client.from("lessons").select("id").limit(1).single();
+await admin
+  .from("video_progress")
+  .delete()
+  .eq("enrollment_id", alpha.enrollmentId)
+  .eq("lesson_id", openLesson.id);
+
+await alpha.client.rpc("record_video_progress", {
+  p_lesson_id: openLesson.id,
+  p_position_seconds: 3600,
+  p_delta_seconds: 3600,
+  p_duration_seconds: 1,
+  p_ended: true,
+});
+const { data: forgedWatch } = await admin
+  .from("video_progress")
+  .select("watched_seconds, completed_at")
+  .eq("enrollment_id", alpha.enrollmentId)
+  .eq("lesson_id", openLesson.id)
+  .single();
+check("an hour of watch time cannot be claimed in one second", forgedWatch.watched_seconds <= 20, true);
+check("a single forged call does not complete the video", forgedWatch.completed_at, null);
+
 console.log("\n── unauthenticated route protection ──────────────────────────");
 
 for (const path of [

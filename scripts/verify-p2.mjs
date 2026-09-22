@@ -13,6 +13,7 @@
  *   - a participant cannot review their own work
  *   - a participant cannot see anyone else's submission
  *   - double-submit is idempotent
+ *   - the cohort freeze refuses a DIRECT RPC call, not just the form
  *
  * Usage: export $(grep -v '^#' .env.local | xargs) && node scripts/verify-p2.mjs
  */
@@ -74,6 +75,12 @@ async function ensureTaskFixture() {
 let passed = 0;
 let failed = 0;
 
+process.on("uncaughtException", async (error) => {
+  console.error(`\n❌ aborted: ${error.message}`);
+  await restoreSubmissionsState();
+  process.exit(1);
+});
+
 function check(name, actual, expected) {
   const ok = JSON.stringify(actual) === JSON.stringify(expected);
   ok ? passed++ : failed++;
@@ -110,7 +117,29 @@ async function signIn(email, { role } = {}) {
   return { client, uid, enrollmentId: enr.id };
 }
 
+let frozenState = null;
+
+/** The cohort is deliberately frozen (F7 freeze). The suite records the real
+ *  value, opens submissions for the lifecycle checks, and always puts it back
+ *  — leaving a live cohort open would be worse than a failed test. */
+async function setSubmissionsOpen(open) {
+  const { data: c } = await admin
+    .from("cohorts")
+    .select("id, submissions_open")
+    .eq("code", "ugc-01")
+    .single();
+  if (frozenState === null) frozenState = c.submissions_open;
+  await admin.from("cohorts").update({ submissions_open: open }).eq("id", c.id);
+}
+
+async function restoreSubmissionsState() {
+  if (frozenState === null) return;
+  const { data: c } = await admin.from("cohorts").select("id").eq("code", "ugc-01").single();
+  await admin.from("cohorts").update({ submissions_open: frozenState }).eq("id", c.id);
+}
+
 async function cleanup() {
+  await restoreSubmissionsState();
   const { data: list } = await admin.auth.admin.listUsers();
   for (const email of [A, B, REVIEWER]) {
     await admin.from("enrollments").delete().eq("email", email);
@@ -133,6 +162,34 @@ const { data: task } = await alpha.client
   .eq("title", FIXTURE_TASK_TITLE)
   .single();
 check("participant can see a released programme task", Boolean(task?.id), true);
+
+// ------------------------------------------------ the freeze is a real gate --
+// The server action checks submissionsOpen, but the action is not a security
+// boundary. A direct RPC call has to be refused too.
+await setSubmissionsOpen(false);
+const { error: frozenDraft } = await alpha.client.rpc("save_draft", {
+  p_type: "program_task",
+  p_item_id: task.id,
+  p_urls: ["https://linkedin.com/posts/while-frozen"],
+  p_text: "should not persist",
+});
+check("a frozen cohort refuses save_draft over the RPC", Boolean(frozenDraft), true);
+
+const { error: frozenSubmit } = await alpha.client.rpc("submit_work", {
+  p_type: "program_task",
+  p_item_id: task.id,
+  p_urls: ["https://linkedin.com/posts/while-frozen"],
+  p_text: "should not persist",
+});
+check("a frozen cohort refuses submit_work over the RPC", Boolean(frozenSubmit), true);
+
+const { count: wroteWhileFrozen } = await admin
+  .from("submissions")
+  .select("*", { count: "exact", head: true })
+  .eq("enrollment_id", alpha.enrollmentId);
+check("nothing was written while frozen", wroteWhileFrozen, 0);
+
+await setSubmissionsOpen(true);
 
 // ------------------------------------------------- a draft is not a submit --
 await alpha.client.rpc("save_draft", {
@@ -322,6 +379,11 @@ check(
 );
 
 console.log(`\n${passed} passed, ${failed} failed`);
+
+// The freeze goes back unconditionally — VERIFY_KEEP keeps fixtures for
+// inspection, it does not authorise leaving a live cohort accepting work.
+await restoreSubmissionsState();
+
 if (process.env.VERIFY_KEEP !== "1") {
   await cleanup();
   await admin.from("program_tasks").delete().eq("title", FIXTURE_TASK_TITLE);
