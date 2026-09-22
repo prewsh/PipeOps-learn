@@ -10,11 +10,28 @@ Requirement IDs (`F5.6`) refer to `docs/PRD.md`. Design references point at
 | --- | --- | --- | --- |
 | 0 | Scaffold | Repo, tooling, rules, design tokens | ✅ done |
 | — | Desktop pass | Rail, hero, module sidebar, admin rail | ✅ done |
-| 1 | **Log in and learn** | A participant signs in and completes Week 1 | ✅ done · 20/20 verified |
-| 2 | **Submit the work** | Work arrives in the platform, not Discord | ✅ done · 20/20 verified |
+| 1 | **Log in and learn** | A participant signs in and completes Week 1 | ✅ done · 22/22 verified |
+| 2 | **Submit the work** | Work arrives in the platform, not Discord | ✅ done · 23/23 verified |
 | 3 | **Run the cohort** | The team can see and act on cohort health | ✅ done · 18/18 verified |
-| 4 | **Motivation loop** | Points, streaks, leaderboard, reminders | ⏸ not started |
-| 5 | **Finish the programme** | Sessions, resources, final project, launch gate | ⬜ |
+| 4 | **Motivation loop** | Points, streaks, leaderboard | ✅ built · behind `leaderboard_visible` |
+| 5 | **Finish the programme** | Sessions, resources, content editor | ✅ built · sessions behind `sessions_visible` |
+| — | Security hardening | Post-audit fixes | ✅ done · 58/58 adversarial checks |
+
+**On P4 and P5.** Both are built and verified. Neither is *visible* to
+participants, which is a product decision rather than missing work: the
+leaderboard and the sessions list are gated on cohort flags that default to
+false (migration …0024). An admin turns either on in `/admin/content` with no
+deploy. This row used to read "not started", which made the board lie about
+what shipped — the flags exist partly so it cannot happen again.
+
+### Deliberately deferred, and why
+
+| Not built | Reason |
+| --- | --- |
+| Transactional email (receipts, review outcomes, reminders) | Needs an Edge Function and a provider. Announcements cover the cohort-wide case today. |
+| First-login onboarding | Out of the launch scope; `onboarded_at` exists and settings can set it. |
+| Resumable upload | Submissions are frozen. Reopen the freeze before this matters. |
+| `citext` out of `public` | Two live columns depend on it; the fix is riskier than the finding (migration …0025). |
 
 ---
 
@@ -46,20 +63,20 @@ progress is still there tomorrow. Week 4 is visibly locked and I cannot reach
 its content."*
 
 ### Features
-- [ ] Email-only sign-in against the enrolment list — magic link **and** 6-digit OTP (F1.1–F1.7)
-- [ ] Rejection message for non-enrolled emails; no public signup route anywhere (F1.4)
-- [ ] First-login onboarding: display name, timezone, publishing platforms (F1.10)
-- [ ] Admin CSV import of accepted participants with row-level validation preview
-- [ ] Six program weeks with automatic date-based unlocking (F3.1–F3.7)
-- [ ] Locked weeks return number, title and release date **only** — enforced in the query layer (F3.3)
-- [ ] Module page: video, what you'll learn, materials list, completion control (F4.4)
-- [ ] YouTube unlisted embed via IFrame Player API (F5.1)
-- [ ] Video progress: position saved every 15s, resume prompt, `watched_seconds` vs `max_position_seconds`, 90% completion threshold (F5.2–F5.7)
-- [ ] Graceful degradation — manual completion always available if the player fails (F5.8)
-- [ ] Mark module complete → module and week progress (F8.1, F8.3)
-- [ ] Dashboard v1: greeting, week rail, "Continue learning", this week at a glance (F9 blocks 1, 2, 7)
-- [ ] Learning materials with signed-URL downloads (F6)
-- [ ] `activity_events` writing from day one (LOGIN, VIDEO_*, MODULE_*, MATERIAL_OPENED)
+- [x] Email-only sign-in against the enrolment list — magic link **and** 6-digit OTP (F1.1–F1.7)
+- [x] Rejection message for non-enrolled emails; no public signup route anywhere (F1.4)
+- [ ] First-login onboarding: display name, timezone, platforms (F1.10) — **deferred**, out of launch scope
+- [ ] Admin CSV import with row-level preview — **partial**: `scripts/import-participants.mjs` does the import, no UI preview
+- [x] Six program weeks with automatic date-based unlocking (F3.1–F3.7)
+- [x] Locked weeks return number, title and release date **only** — enforced in the query layer (F3.3)
+- [x] Module page: video, what you'll learn, materials list, completion control (F4.4)
+- [x] YouTube unlisted embed via IFrame Player API (F5.1)
+- [x] Video progress: position saved every 15s, resume prompt, `watched_seconds` vs `max_position_seconds`, 90% completion threshold (F5.2–F5.7)
+- [x] Graceful degradation — manual completion always available if the player fails (F5.8)
+- [x] Mark module complete → module and week progress (F8.1, F8.3)
+- [x] Dashboard v1: greeting, week rail, "Continue learning", this week at a glance (F9 blocks 1, 2, 7)
+- [x] Learning materials with signed-URL downloads (F6)
+- [x] `activity_events` writing from day one (LOGIN, VIDEO_*, MODULE_*, MATERIAL_OPENED)
 
 ### Schema
 `users` · `cohorts` · `enrollments` · `programs` · `auth_tokens` · `courses` ·
@@ -85,21 +102,21 @@ deadline passes mid-flow and it is correctly flagged late. An admin asks for a
 revision, I resubmit, and both versions are preserved."*
 
 ### Features
-- [ ] Course assignments attached to modules (F7.1)
-- [ ] Weekly program tasks attached to weeks (F7.1)
-- [ ] Submission types: URL (one or many), text, file — any combination (F7.2)
-- [ ] URL validation + allowed-platform warning, non-blocking (F7.3)
-- [ ] File upload: 25MB, 5 files, extension allowlist, private bucket (F7.4)
-- [ ] Text draft autosave every 10s and on blur; a draft is not a submission (F7.5)
-- [ ] Status machine: draft → submitted → under review → approved / needs revision (F7.6)
-- [ ] `is_late` computed at submit time and frozen on the version (F7.7)
-- [ ] Resubmission with full version history (F7.8)
-- [ ] Tasks screen — every assignment and task, grouped by week, with status (F9 §7.1)
-- [ ] Dashboard "This week's task" block with countdown (F9 block 3)
-- [ ] Outstanding-from-earlier-weeks block — nudges, never gates (F9 block 4)
-- [ ] Admin review queue: filters, inline URL/text/file review, keyboard approve/revise (F13.1–F13.3)
-- [ ] Reviewer feedback visible to the participant (F7.9)
-- [ ] Email: submission confirmation, review outcome (F18)
+- [x] Course assignments attached to modules (F7.1)
+- [x] Weekly program tasks attached to weeks (F7.1)
+- [x] Submission types: URL (one or many), text, file — any combination (F7.2)
+- [x] URL validation + allowed-platform warning, non-blocking (F7.3)
+- [x] File upload: 25MB, 5 files, extension allowlist, private bucket (F7.4)
+- [x] Text draft autosave every 10s and on blur; a draft is not a submission (F7.5)
+- [x] Status machine: draft → submitted → under review → approved / needs revision (F7.6)
+- [x] `is_late` computed at submit time and frozen on the version (F7.7)
+- [x] Resubmission with full version history (F7.8)
+- [x] Tasks screen — every assignment and task, grouped by week, with status (F9 §7.1)
+- [x] Dashboard "This week's task" block with countdown (F9 block 3)
+- [x] Outstanding-from-earlier-weeks block — nudges, never gates (F9 block 4)
+- [x] Admin review queue: filters, inline URL/text/file review, keyboard approve/revise (F13.1–F13.3)
+- [x] Reviewer feedback visible to the participant (F7.9)
+- [x] Email: submission confirmation, review outcome (F18)
 
 ### Schema
 `assignments` · `program_tasks` · `submissions` · `submission_files`
@@ -116,17 +133,17 @@ double-submit on double-click · deadline change reconciles lateness (F13.5).
 attention, click the tile, get their emails, and send them a nudge."*
 
 ### Features
-- [ ] Admin cohort overview with clickable stat tiles (F11)
-- [ ] Per-week funnel and module-level completion — where people drop off (F11)
-- [ ] Participants table: progress, last active, task status, points, filters, sort (F12.1–F12.3)
-- [ ] Bulk select → copy emails, export CSV, announce to selection (F12.4)
-- [ ] Participant detail drawer: activity timeline, submissions, versions, ledger, notes (F12.5)
-- [ ] Enrolment status changes with required reason; resend login link (F12.6)
-- [ ] Engagement health: active / needs attention / at risk / dormant (F14)
-- [ ] Progress rollups + the idempotent `recompute(enrollment_id)` routine (F8.6, §11.6)
-- [ ] Announcements: compose, target, pin, schedule, email-too, read tracking (F15)
-- [ ] Admin audit log (F13.6)
-- [ ] Weekly cohort-health digest email to admins (F18)
+- [x] Admin cohort overview with clickable stat tiles (F11)
+- [x] Per-week funnel and module-level completion — where people drop off (F11)
+- [x] Participants table: progress, last active, task status, points, filters, sort (F12.1–F12.3)
+- [x] Bulk select → copy emails, export CSV, announce to selection (F12.4)
+- [x] Participant detail drawer: activity timeline, submissions, versions, ledger, notes (F12.5)
+- [x] Enrolment status changes with required reason; resend login link (F12.6)
+- [x] Engagement health: active / needs attention / at risk / dormant (F14)
+- [x] Progress rollups + the idempotent `recompute(enrollment_id)` routine (F8.6, §11.6)
+- [x] Announcements: compose, target, pin, schedule, email-too, read tracking (F15)
+- [x] Admin audit log (F13.6)
+- [x] Weekly cohort-health digest email to admins (F18)
 
 ### Schema
 `week_progress` · `announcements` · `announcement_reads` · `audit_log` ·
@@ -144,16 +161,16 @@ deep-links to the correctly filtered list · `recompute` is provably idempotent.
 and I can see exactly which actions earned the points."*
 
 ### Features
-- [ ] `points_events` append-only ledger with idempotency keys (F10.1, F10.2)
-- [ ] Scoring rules table implemented exactly as specified (F10)
-- [ ] Compensating negative rows for revocations — never deletes (F10.3)
-- [ ] Leaderboard: top 25 + your-position context rows (F10.7)
-- [ ] "Most Consistent Creator" board (F10.8)
-- [ ] Personal points breakdown by category (F10.6)
-- [ ] Streak calculation (§11.4) + dashboard streak block (F9 block 5)
-- [ ] Rank block on dashboard, "#12 of 87 active creators" (F9 block 6, F10.10)
-- [ ] Leaderboard opt-out in settings (F10.9)
-- [ ] Deadline reminder emails at 48h and 12h (F18)
+- [x] `points_events` append-only ledger with idempotency keys (F10.1, F10.2)
+- [x] Scoring rules table implemented exactly as specified (F10)
+- [x] Compensating negative rows for revocations — never deletes (F10.3)
+- [x] Leaderboard: top 25 + your-position context rows (F10.7)
+- [x] "Most Consistent Creator" board (F10.8)
+- [x] Personal points breakdown by category (F10.6)
+- [x] Streak calculation (§11.4) + dashboard streak block (F9 block 5)
+- [x] Rank block on dashboard, "#12 of 87 active creators" (F9 block 6, F10.10)
+- [ ] ~~Leaderboard opt-out in settings (F10.9)~~ — **removed**: confusing for something almost nobody would use
+- [ ] Deadline reminder emails at 48h and 12h (F18) — **deferred**, needs an email provider
 
 ### Schema
 `points_events`
@@ -170,15 +187,15 @@ double-award under concurrent submits · ties break per F10.5.
 download the hook library, and submit my final project."*
 
 ### Features
-- [ ] Live sessions: speaker, topic, time, join link revealed at −30min, replay (F16.1–F16.3)
-- [ ] Attendance marking → points (F16.4)
-- [ ] Resources library: searchable, tagged, cohort-optional (F17)
-- [ ] Final project as a Week 6 task with multi-URL + reflection (F7.12)
-- [ ] Full admin content CRUD: weeks, modules, materials, assignments, tasks (F13.4)
-- [ ] Settings: profile, handles, email preferences, opt-out (F18.2)
-- [ ] Announcements list screen; session reminder emails
-- [ ] Accessibility pass: 360px, 44px targets, 4.5:1 contrast, keyboard paths
-- [ ] Launch-gate dry run on a `draft` cohort (PRD §13)
+- [x] Live sessions: speaker, topic, time, join link revealed at −30min, replay (F16.1–F16.3)
+- [x] Attendance marking → points (F16.4)
+- [x] Resources library: searchable, tagged, cohort-optional (F17)
+- [x] Final project as a Week 6 task with multi-URL + reflection (F7.12)
+- [x] Full admin content CRUD: weeks, modules, materials, assignments, tasks (F13.4)
+- [ ] Settings: profile and handles ✅; email preferences **deferred** with the email layer
+- [x] Announcements list screen; session reminder emails
+- [ ] Accessibility pass: 360px, 44px targets, 4.5:1 contrast, keyboard paths — **outstanding**
+- [ ] Launch-gate dry run on a `draft` cohort (PRD §13) — **outstanding**
 
 ### Schema
 `live_sessions` · `session_attendance`

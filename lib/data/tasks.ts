@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unwrap } from "@/lib/data/query";
 import { getSupabase } from "@/lib/supabase/server";
 
 /**
@@ -100,7 +101,7 @@ function toSubmission(row: Record<string, unknown>): Submission {
 export const getWorkItems = cache(async (): Promise<WorkItem[]> => {
   const supabase = await getSupabase();
 
-  const [{ data: taskRows }, { data: submissionRows }] = await Promise.all([
+  const [taskRowsRes, submissionRowsRes] = await Promise.all([
     supabase
       .from("program_tasks")
       .select(
@@ -116,6 +117,8 @@ export const getWorkItems = cache(async (): Promise<WorkItem[]> => {
       )
       .order("version", { ascending: false }),
   ]);
+  const taskRows = unwrap(taskRowsRes, "weekly tasks");
+  const submissionRows = unwrap(submissionRowsRes, "your submissions");
 
   const tasks = (taskRows ?? []) as unknown as TaskRow[];
   const submissions = (submissionRows ?? []) as unknown as SubmissionRow[];

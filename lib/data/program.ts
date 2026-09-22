@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unwrap, unwrapCount } from "@/lib/data/query";
 import { getSupabase } from "@/lib/supabase/server";
 
 /**
@@ -65,20 +66,23 @@ export const getMe = cache(async (): Promise<Me | null> => {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: rows } = await supabase
-    .from("enrollments")
-    .select(
-      "id, cohort_id, progress_pct, name, email, " +
-        "cohorts!inner(name, status, starts_on, submissions_open, " +
-        "leaderboard_visible, sessions_visible), users!inner(name, onboarded_at)",
-    )
-    .eq("user_id", user.id)
-    .eq("status", "active")
-    .in("cohorts.status", ["active", "completed"])
-    // Several enrolments is an allowed case (F2.2). Ordering is what makes
-    // "which one" a defined answer rather than whichever row came back first.
-    .order("starts_on", { ascending: false, referencedTable: "cohorts" })
-    .limit(1);
+  const rows = unwrap(
+    await supabase
+      .from("enrollments")
+      .select(
+        "id, cohort_id, progress_pct, name, email, " +
+          "cohorts!inner(name, status, starts_on, submissions_open, " +
+          "leaderboard_visible, sessions_visible), users!inner(name, onboarded_at)",
+      )
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .in("cohorts.status", ["active", "completed"])
+      // Several enrolments is an allowed case (F2.2). Ordering is what makes
+      // "which one" a defined answer rather than whichever row came back first.
+      .order("starts_on", { ascending: false, referencedTable: "cohorts" })
+      .limit(1),
+    "your enrolment",
+  );
 
   const data = rows?.[0];
   if (!data) return null;
@@ -128,25 +132,37 @@ export const getWeeks = cache(async (): Promise<Week[]> => {
   const supabase = await getSupabase();
   const now = new Date();
 
-  const { data: weeks } = await supabase
-    .from("program_weeks")
-    .select("id, number, title, theme, overview, release_at, deadline_at, image_url")
-    .order("number");
+  const weeks = unwrap(
+    await supabase
+      .from("program_weeks")
+      .select("id, number, title, theme, overview, release_at, deadline_at, image_url")
+      .order("number"),
+    "the programme",
+  );
 
   if (!weeks?.length) return [];
 
-  const { data: links } = await supabase
-    .from("week_modules")
-    .select(
-      'week_id, "order", modules!inner(id, number, code, is_bonus, slug, title, estimated_minutes, lessons(id))',
-    )
-    .order("order");
+  const links = unwrap(
+    await supabase
+      .from("week_modules")
+      .select(
+        'week_id, "order", modules!inner(id, number, code, is_bonus, slug, title, estimated_minutes, lessons(id))',
+      )
+      .order("order"),
+    "the week's modules",
+  );
 
-  const { data: progress } = await supabase.from("module_progress").select("module_id, status");
+  const progress = unwrap(
+    await supabase.from("module_progress").select("module_id, status"),
+    "your progress",
+  );
 
-  const { data: video } = await supabase
-    .from("video_progress")
-    .select("lesson_id, percentage_watched, max_position_seconds");
+  const video = unwrap(
+    await supabase
+      .from("video_progress")
+      .select("lesson_id, percentage_watched, max_position_seconds"),
+    "video progress",
+  );
 
   const progressBy = new Map((progress ?? []).map((p) => [p.module_id, p.status]));
   const videoBy = new Map((video ?? []).map((v) => [v.lesson_id, v]));
@@ -284,28 +300,31 @@ export async function getModule(slug: string): Promise<ModuleDetail | null> {
   const lesson = m.lessons?.[0];
   const weekLink = m.week_modules?.[0];
 
-  const [{ data: mp }, { data: vp }, { data: materials }, { data: assignmentRow }] =
-    await Promise.all([
-      supabase.from("module_progress").select("status").eq("module_id", m.id).maybeSingle(),
-      lesson
-        ? supabase
-            .from("video_progress")
-            .select("percentage_watched, max_position_seconds")
-            .eq("lesson_id", lesson.id)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
-      supabase
-        .from("learning_materials")
-        .select("id, title, description, type, url, is_required")
-        .eq("owner_type", "module")
-        .eq("owner_id", m.id)
-        .order("order"),
-      supabase
-        .from("assignments")
-        .select("id, title, brief, deadline_at")
-        .eq("module_id", m.id)
-        .maybeSingle(),
-    ]);
+  const [mpRes, vpRes, materialsRes, assignmentRowRes] = await Promise.all([
+    supabase.from("module_progress").select("status").eq("module_id", m.id).maybeSingle(),
+    lesson
+      ? supabase
+          .from("video_progress")
+          .select("percentage_watched, max_position_seconds")
+          .eq("lesson_id", lesson.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    supabase
+      .from("learning_materials")
+      .select("id, title, description, type, url, is_required")
+      .eq("owner_type", "module")
+      .eq("owner_id", m.id)
+      .order("order"),
+    supabase
+      .from("assignments")
+      .select("id, title, brief, deadline_at")
+      .eq("module_id", m.id)
+      .maybeSingle(),
+  ]);
+  const mp = unwrap(mpRes, "module progress");
+  const vp = unwrap(vpRes, "video progress");
+  const materials = unwrap(materialsRes, "module resources");
+  const assignmentRow = unwrap(assignmentRowRes, "this module's assignment");
 
   const assignment = assignmentRow as {
     id: string;
@@ -316,13 +335,16 @@ export async function getModule(slug: string): Promise<ModuleDetail | null> {
 
   let submitted = false;
   if (assignment) {
-    const { data: sub } = await supabase
-      .from("submissions")
-      .select("id")
-      .eq("item_type", "assignment")
-      .eq("item_id", assignment.id)
-      .neq("status", "draft")
-      .limit(1);
+    const sub = unwrap(
+      await supabase
+        .from("submissions")
+        .select("id")
+        .eq("item_type", "assignment")
+        .eq("item_id", assignment.id)
+        .neq("status", "draft")
+        .limit(1),
+      "sub",
+    );
     submitted = Boolean(sub?.length);
   }
 
@@ -425,7 +447,7 @@ export const getProgramTotals = cache(
   async (): Promise<{ totalItems: number; completedItems: number }> => {
     const supabase = await getSupabase();
 
-    const [{ data: total }, { count: modulesDone }, { data: submitted }] = await Promise.all([
+    const [totalRes, modulesDoneRes, submittedRes] = await Promise.all([
       supabase.rpc("program_item_count"),
       supabase
         .from("module_progress")
@@ -434,6 +456,9 @@ export const getProgramTotals = cache(
         .eq("modules.is_bonus", false),
       supabase.from("submissions").select("item_id").neq("status", "draft"),
     ]);
+    const total = unwrap(totalRes, "total");
+    const modulesDone = unwrapCount(modulesDoneRes, "modules done");
+    const submitted = unwrap(submittedRes, "submitted");
 
     const distinctSubmitted = new Set((submitted ?? []).map((r) => r.item_id)).size;
 

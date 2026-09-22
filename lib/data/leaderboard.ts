@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unwrap } from "@/lib/data/query";
 import { getSupabase } from "@/lib/supabase/server";
 
 /**
@@ -56,11 +57,14 @@ export const getConsistentBoard = cache(async (): Promise<ConsistentRow[]> => {
 export const getMyStanding = cache(async () => {
   const supabase = await getSupabase();
 
-  const [{ data: board }, { data: activeCount }, { data: events }] = await Promise.all([
+  const [boardRes, activeCountRes, eventsRes] = await Promise.all([
     supabase.rpc("leaderboard", { p_limit: 25 }),
     supabase.rpc("active_creator_count"),
     supabase.from("points_events").select("rule, points"),
   ]);
+  const board = unwrap(boardRes, "the leaderboard");
+  const activeCount = unwrap(activeCountRes, "the active creator count");
+  const events = unwrap(eventsRes, "your points");
 
   const mine = ((board ?? []) as Record<string, unknown>[]).find((r) => r.is_me);
 
