@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  body { margin:0; background:#F6F6F7; font-family:'IBM Plex Sans',system-ui,'Segoe UI','Helvetica Neue',Arial,sans-serif; -webkit-font-smoothing:antialiased; color:#0B0B0C; }
+  a { color:#4F21EA; text-decoration:none; }
+  a:hover { color:#0B0B0C; text-decoration:underline; }
+  * { box-sizing:border-box; }
+</style>
+</helmet>
+
+<div style="max-width:1140px;margin:0 auto;padding:0 24px 140px">
+
+  <header style="padding:64px 0 40px;border-bottom:1px solid #0B0B0C">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
+      <div style="width:22px;height:22px;background:#0B0B0C;border-radius:4px"></div>
+      <span style="font-size:15px;font-weight:700;letter-spacing:-0.006em">PipeOps Learn</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.04em">/ design system</span>
+    </div>
+    <h1 style="margin:0;font-size:clamp(38px,6vw,68px);line-height:0.98;letter-spacing:-0.021em;font-weight:700;max-width:16ch">Foundations &amp; components</h1>
+    <p style="margin:20px 0 0;font-size:17px;line-height:1.55;color:#56585C;max-width:58ch;text-wrap:pretty">One monochrome system for the participant app, the admin console and every transactional email. Status is carried by shape, weight and position — never by hue — so the whole product survives at black, white and grey.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:28px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;border:1px solid #E8E8EA;background:#fff;border-radius:999px;padding:6px 12px">v1.0 · 21 Sep 2026</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;border:1px solid #E8E8EA;background:#fff;border-radius:999px;padding:6px 12px">mobile-first · 360px floor</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;border:1px solid #E8E8EA;background:#fff;border-radius:999px;padding:6px 12px">IBM Plex Sans · IBM Plex Mono</span>
+    </div>
+  </header>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:64px 0 26px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">01</span>
+    <h2 style="margin:0;font-size:26px;letter-spacing:-0.014em;font-weight:700">Colour</h2>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px">
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;overflow:hidden">
+      <div style="height:84px;background:#0B0B0C"></div>
+      <div style="padding:12px 14px 14px">
+        <div style="font-size:13px;font-weight:600">ink</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:3px">#0B0B0C</div>
+        <div style="font-size:12px;color:#56585C;margin-top:8px;line-height:1.4">Body text, primary buttons, headings</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;overflow:hidden">
+      <div style="height:84px;background:#1A1C1F"></div>
+      <div style="padding:12px 14px 14px">
+        <div style="font-size:13px;font-weight:600">ink-surface</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:3px">#1A1C1F</div>
+        <div style="font-size:12px;color:#56585C;margin-top:8px;line-height:1.4">Dark cards, video shell, admin rail</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;overflow:hidden">
+      <div style="height:84px;background:#56585C"></div>
+      <div style="padding:12px 14px 14px">
+        <div style="font-size:13px;font-weight:600">ink-2</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:3px">#56585C</div>
+        <div style="font-size:12px;color:#56585C;margin-top:8px;line-height:1.4">Secondary text, meta, descriptions</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;overflow:hidden">
+      <div style="height:84px;background:#8A8D93"></div>
+      <div style="padding:12px 14px 14px">
+        <div style="font-size:13px;font-weight:600">ink-3</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:3px">#8A8D93</div>
+        <div style="font-size:12px;color:#56585C;margin-top:8px;line-height:1.4">Labels, disabled, locked state only</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;overflow:hidden">
+      <div style="height:84px;background:#C9CBCE"></div>
+      <div style="padding:12px 14px 14px">
+        <div style="font-size:13px;font-weight:600">line-strong</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:3px">#C9CBCE</div>
+        <div style="font-size:12px;color:#56585C;margin-top:8px;line-height:1.4">Input borders, progress track</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;overflow:hidden">
+      <div style="height:84px;background:#E3E4E6"></div>
+      <div style="padding:12px 14px 14px">
+        <div style="font-size:13px;font-weight:600">line</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:3px">#E3E4E6</div>
+        <div style="font-size:12px;color:#56585C;margin-top:8px;line-height:1.4">Card borders, dividers, table rules</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;overflow:hidden">
+      <div style="height:84px;background:#F0F0F1"></div>
+      <div style="padding:12px 14px 14px">
+        <div style="font-size:13px;font-weight:600">fill-subtle</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:3px">#F0F0F1</div>
+        <div style="font-size:12px;color:#56585C;margin-top:8px;line-height:1.4">Chips, hover rows, inactive tabs</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;overflow:hidden">
+      <div style="height:84px;background:#F6F6F7"></div>
+      <div style="padding:12px 14px 14px">
+        <div style="font-size:13px;font-weight:600">canvas</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:3px">#F6F6F7</div>
+        <div style="font-size:12px;color:#56585C;margin-top:8px;line-height:1.4">App background behind all cards</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;overflow:hidden">
+      <div style="height:84px;background:#FFFFFF;border-bottom:1px solid #E8E8EA"></div>
+      <div style="padding:12px 14px 14px">
+        <div style="font-size:13px;font-weight:600">surface</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:3px">#FFFFFF</div>
+        <div style="font-size:12px;color:#56585C;margin-top:8px;line-height:1.4">Cards, sheets, tables, inputs</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;overflow:hidden">
+      <div style="height:84px;background:#4F21EA"></div>
+      <div style="padding:12px 14px 14px">
+        <div style="font-size:13px;font-weight:600">accent · restricted</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:3px">#4F21EA</div>
+        <div style="font-size:12px;color:#56585C;margin-top:8px;line-height:1.4">PipeOps brand. Links + 2px focus ring only. Never a fill, never a status.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:64px 0 26px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">02</span>
+    <h2 style="margin:0;font-size:26px;letter-spacing:-0.014em;font-weight:700">Type</h2>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px">
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:24px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:18px">SATOSHI · UI + HEADLINES</div>
+      <div style="display:grid;gap:18px">
+        <div>
+          <div style="font-size:44px;line-height:1;letter-spacing:-0.021em;font-weight:700">Week 3 of 6</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:8px">display / 44px / 900 / -3.5%</div>
+        </div>
+        <div>
+          <div style="font-size:28px;line-height:1.08;letter-spacing:-0.014em;font-weight:700">Finding your niche</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:8px">h1 / 28px / 700 / -2.5%</div>
+        </div>
+        <div>
+          <div style="font-size:20px;line-height:1.2;letter-spacing:-0.008em;font-weight:700">This week's task</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:8px">h2 / 20px / 700</div>
+        </div>
+        <div>
+          <div style="font-size:16px;line-height:1.55;color:#0B0B0C">Body. Write a niche statement and three to five content pillars you will publish against for the rest of the programme.</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:8px">body / 16px / 400 / 1.55</div>
+        </div>
+        <div>
+          <div style="font-size:14px;line-height:1.5;color:#56585C">Secondary body and helper copy sits at fourteen on grey.</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:8px">small / 14px / 400 / ink-2</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:24px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:18px">JETBRAINS MONO · META</div>
+      <div style="display:grid;gap:18px">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#0B0B0C">Due Sun 11 Oct · 23:59 WAT</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:8px">label / 12px / 500 / +8% / caps</div>
+        </div>
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.06em;color:#56585C">M05 · 14 MIN · PART 2</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:8px">micro / 11px / 400 / +6%</div>
+        </div>
+        <div style="border-top:1px solid #E8E8EA;padding-top:18px">
+          <div style="font-size:13px;line-height:1.6;color:#56585C;text-wrap:pretty">Mono carries every number a participant is judged by — deadlines, points, ranks, module codes, percentages — so data never reads as prose. Satoshi carries everything a human wrote.</div>
+        </div>
+        <div style="border-top:1px solid #E8E8EA;padding-top:18px;display:grid;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#56585C">Text floor, mobile</span><span style="font-family:'IBM Plex Mono',monospace">14px</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#56585C">Tap target floor</span><span style="font-family:'IBM Plex Mono',monospace">44px</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#56585C">Layout floor</span><span style="font-family:'IBM Plex Mono',monospace">360px</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#56585C">Grid unit</span><span style="font-family:'IBM Plex Mono',monospace">4px · 8 · 12 · 16 · 24 · 32 · 48</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:64px 0 26px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">03</span>
+    <h2 style="margin:0;font-size:26px;letter-spacing:-0.014em;font-weight:700">Status without colour</h2>
+  </div>
+
+  <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:24px;margin-bottom:12px">
+    <p style="margin:0 0 20px;font-size:14px;line-height:1.55;color:#56585C;max-width:70ch;text-wrap:pretty">Every state is a 6px marker plus a word. Filled = done. Ring = in flight. Hollow = not started. Hollow with a bar = locked. Half-filled = attention. A slash suffix = late. The same chip works in the mobile app, the admin table and a plain-text email.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px solid #0B0B0C;background:#0B0B0C;color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500"><span style="width:6px;height:6px;border-radius:50%;background:#fff"></span>Approved</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px solid #0B0B0C;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500"><span style="width:6px;height:6px;border-radius:50%;background:#0B0B0C"></span>Complete</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px solid #C9CBCE;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500"><span style="width:6px;height:6px;border-radius:50%;border:1.5px solid #0B0B0C"></span>Submitted</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px solid #C9CBCE;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500"><span style="width:6px;height:6px;border-radius:50%;background:linear-gradient(90deg,#0B0B0C 50%,#fff 50%);border:1.5px solid #0B0B0C"></span>Under review</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px solid #0B0B0C;background:#F0F0F1;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600"><span style="width:6px;height:6px;background:#0B0B0C"></span>Needs revision</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px dashed #D6D7D9;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500;color:#56585C"><span style="width:6px;height:6px;border-radius:50%;border:1.5px solid #8A8D93"></span>Not started</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px solid #E8E8EA;background:#F6F6F7;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500;color:#8A8D93"><span style="width:8px;height:3px;background:#8A8D93"></span>Locked</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px solid #0B0B0C;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500">Draft saved<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">12:04</span></span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px solid #0B0B0C;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;text-decoration:line-through;text-decoration-thickness:1px">Late</span>
+    </div>
+    <div style="height:1px;background:#E3E4E6;margin:24px 0"></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:12px">ENGAGEMENT HEALTH · F14</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px solid #C9CBCE;background:#fff;border-radius:6px;padding:6px 10px;font-size:12px"><span style="width:6px;height:6px;border-radius:50%;background:#0B0B0C"></span>Active<span style="color:#8A8D93">≤3d</span></span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px solid #C9CBCE;background:#fff;border-radius:6px;padding:6px 10px;font-size:12px"><span style="width:6px;height:6px;border-radius:50%;background:linear-gradient(90deg,#0B0B0C 50%,#fff 50%);border:1.5px solid #0B0B0C"></span>Needs attention<span style="color:#8A8D93">4–6d</span></span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1.5px solid #0B0B0C;background:#F0F0F1;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600"><span style="width:7px;height:7px;background:#0B0B0C;transform:rotate(45deg)"></span>At risk<span style="color:#56585C">7d+</span></span>
+      <span style="display:inline-flex;align-items:center;gap:7px;border:1px dashed #8A8D93;background:#fff;border-radius:6px;padding:6px 10px;font-size:12px;color:#56585C"><span style="width:6px;height:6px;border-radius:50%;border:1.5px solid #8A8D93"></span>Dormant<span style="color:#8A8D93">14d+</span></span>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:64px 0 26px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">04</span>
+    <h2 style="margin:0;font-size:26px;letter-spacing:-0.014em;font-weight:700">Controls</h2>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:24px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:18px">BUTTONS · ONE PRIMARY PER SCREEN</div>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+        <button style="border:0;background:#0B0B0C;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:14px 22px;border-radius:8px;cursor:pointer;min-height:48px" style-hover="background:#1A1C1F">Submit task →</button>
+        <button style="border:1px solid #0B0B0C;background:#fff;color:#0B0B0C;font-family:inherit;font-size:15px;font-weight:700;padding:13px 21px;border-radius:8px;cursor:pointer;min-height:48px" style-hover="background:#F0F0F1">Save draft</button>
+        <button style="border:1px solid #E8E8EA;background:#fff;color:#56585C;font-family:inherit;font-size:14px;font-weight:500;padding:11px 16px;border-radius:8px;cursor:pointer;min-height:44px" style-hover="border-color:#C9CBCE;color:#0B0B0C">View submission</button>
+        <button style="border:0;background:transparent;color:#0B0B0C;font-family:inherit;font-size:14px;font-weight:600;padding:10px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Resend code</button>
+        <button style="border:1px solid #E8E8EA;background:#F6F6F7;color:#8A8D93;font-family:inherit;font-size:15px;font-weight:700;padding:13px 21px;border-radius:8px;min-height:48px;cursor:not-allowed">Opens 12 October</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button style="border:1px solid #0B0B0C;background:#0B0B0C;color:#fff;font-family:inherit;font-size:13px;font-weight:600;padding:9px 14px;border-radius:6px;cursor:pointer">Approve <span style="font-family:'IBM Plex Mono',monospace;opacity:0.6">A</span></button>
+          <button style="border:1px solid #0B0B0C;background:#fff;color:#0B0B0C;font-family:inherit;font-size:13px;font-weight:600;padding:9px 14px;border-radius:6px;cursor:pointer">Request revision <span style="font-family:'IBM Plex Mono',monospace;color:#8A8D93">R</span></button>
+        </div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:24px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:18px">INPUTS</div>
+      <div style="display:grid;gap:16px">
+        <label style="display:block">
+          <span style="display:block;font-size:13px;font-weight:600;margin-bottom:7px">Email address</span>
+          <input type="text" value="precious@pipeops.io" style="width:100%;border:1px solid #C9CBCE;border-radius:8px;padding:13px 14px;font-family:inherit;font-size:15px;background:#fff;min-height:48px" />
+        </label>
+        <label style="display:block">
+          <span style="display:block;font-size:13px;font-weight:600;margin-bottom:7px">Post URL</span>
+          <input type="text" placeholder="https://" style="width:100%;border:2px solid #4F21EA;border-radius:8px;padding:12px 13px;font-family:inherit;font-size:15px;background:#fff;min-height:48px;outline:none" />
+          <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;margin-top:7px">FOCUS · 2px #4F21EA — the only brand colour in the app</span>
+        </label>
+        <label style="display:block">
+          <span style="display:block;font-size:13px;font-weight:600;margin-bottom:7px">Reflection</span>
+          <textarea style="width:100%;border:1px solid #C9CBCE;border-radius:8px;padding:13px 14px;font-family:inherit;font-size:15px;min-height:88px;resize:vertical">Autosaves every 10s and on blur. A draft is not a submission.</textarea>
+          <span style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:7px"><span>min 200 · max 2000</span><span>412</span></span>
+        </label>
+        <div>
+          <span style="display:block;font-size:13px;font-weight:600;margin-bottom:7px">Error state</span>
+          <input type="text" value="not-a-url" style="width:100%;border:1.5px solid #0B0B0C;border-radius:8px;padding:12px 13px;font-family:inherit;font-size:15px;background:#F0F0F1;min-height:48px" />
+          <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;margin-top:7px"><span style="width:12px;height:12px;border-radius:50%;background:#0B0B0C;color:#fff;font-size:9px;display:inline-flex;align-items:center;justify-content:center">!</span>Enter a full URL starting with https://</span>
+        </div>
+        <div style="border:1px dashed #D6D7D9;border-radius:10px;padding:22px;text-align:center;background:#F6F6F7">
+          <div style="font-size:14px;font-weight:600">Drop files or browse</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:6px">PDF MP4 PNG · max 25MB · up to 5 files</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:64px 0 26px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">05</span>
+    <h2 style="margin:0;font-size:26px;letter-spacing:-0.014em;font-weight:700">Blocks</h2>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">
+
+    <div style="display:grid;gap:12px">
+      <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:14px">PROGRESS</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+          <span style="font-size:13px;font-weight:600">Programme</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px">45% · 14/30</span>
+        </div>
+        <div style="height:8px;background:#E3E4E6;border-radius:99px;overflow:hidden">
+          <div style="width:45%;height:100%;background:#0B0B0C"></div>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:18px">
+          <div style="flex:1;height:32px;border-radius:4px;background:#0B0B0C"></div>
+          <div style="flex:1;height:32px;border-radius:4px;background:#0B0B0C"></div>
+          <div style="flex:1;height:32px;border-radius:4px;background:#0B0B0C;position:relative;box-shadow:0 0 0 2px #fff,0 0 0 3.5px #0B0B0C"></div>
+          <div style="flex:1;height:32px;border-radius:4px;background:#F0F0F1;border:1px dashed #D6D7D9"></div>
+          <div style="flex:1;height:32px;border-radius:4px;background:#F0F0F1;border:1px dashed #D6D7D9"></div>
+          <div style="flex:1;height:32px;border-radius:4px;background:#F0F0F1;border:1px dashed #D6D7D9"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:6px"><span>W1</span><span>W2</span><span>W3 now</span><span>W4</span><span>W5</span><span>W6</span></div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:14px">STAT TILE · ADMIN, CLICKS THROUGH FILTERED</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="border:1px solid #E8E8EA;border-radius:10px;padding:14px" style-hover="border-color:#0B0B0C">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;letter-spacing:0.05em">ACTIVE THIS WEEK</div>
+            <div style="font-size:30px;font-weight:700;letter-spacing:-0.018em;margin-top:6px">71</div>
+            <div style="font-size:12px;color:#56585C">of 96 · 74%</div>
+          </div>
+          <div style="border:1.5px solid #0B0B0C;border-radius:10px;padding:14px;background:#F0F0F1">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0B0B0C;letter-spacing:0.05em">NEED ATTENTION</div>
+            <div style="font-size:30px;font-weight:700;letter-spacing:-0.018em;margin-top:6px">12</div>
+            <div style="font-size:12px;color:#56585C">→ filtered list</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:14px">EMPTY STATE · EVERY LIST HAS ONE</div>
+        <div style="border:1px dashed #D6D7D9;border-radius:10px;padding:28px 20px;text-align:center;background:#F6F6F7">
+          <div style="display:flex;justify-content:center;margin-bottom:12px"><svg viewBox="0 0 24 24" style="width:28px;height:28px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 12.6h4.2l1.4 2.4h4.8l1.4-2.4H20"></path><path d="M4 12.6 6.6 5h10.8L20 12.6v6.6H4z"></path></svg></div>
+          <div style="font-size:15px;font-weight:700">You're all caught up for Week 3</div>
+          <div style="font-size:13px;color:#56585C;margin-top:6px;line-height:1.5">Week 4 opens Monday 12 October, 00:00 WAT.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;gap:12px">
+      <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:14px">WEEK CARD · 4 STATES</div>
+        <div style="display:grid;gap:8px">
+          <div style="border:1px solid #E8E8EA;border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center">
+            <span style="width:6px;height:6px;border-radius:50%;background:#0B0B0C"></span>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">WEEK 1 · COMPLETE</div>
+              <div style="font-size:15px;font-weight:700;margin-top:2px">Creator economy &amp; niche</div>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">5/5</span>
+          </div>
+          <div style="border:1.5px solid #0B0B0C;border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;background:#fff">
+            <span style="width:6px;height:6px;border-radius:50%;border:1.5px solid #0B0B0C"></span>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500">WEEK 3 · CURRENT · DUE SUN 11 OCT</div>
+              <div style="font-size:15px;font-weight:700;margin-top:2px">Planning, scripting &amp; hooks</div>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">2/5</span>
+          </div>
+          <div style="border:1px solid #E8E8EA;border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center">
+            <span style="width:6px;height:6px;border-radius:50%;background:linear-gradient(90deg,#0B0B0C 50%,#fff 50%);border:1.5px solid #0B0B0C"></span>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">WEEK 2 · OPEN · 1 OUTSTANDING</div>
+              <div style="font-size:15px;font-weight:700;margin-top:2px">Algorithms &amp; research</div>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">4/5</span>
+          </div>
+          <div style="border:1px solid #E8E8EA;border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;background:#F6F6F7">
+            <span style="width:8px;height:3px;background:#8A8D93"></span>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">WEEK 4 · LOCKED</div>
+              <div style="font-size:15px;font-weight:700;margin-top:2px;color:#8A8D93">Opens Mon 12 October</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#56585C;margin-top:12px;line-height:1.5">Locked cards render number, title and release date only — the API returns nothing else (F3.3).</div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:14px">MODULE ROW</div>
+        <div style="display:grid;gap:2px">
+          <div style="display:flex;gap:12px;align-items:center;padding:12px;border-radius:8px;background:#F6F6F7">
+            <span style="width:20px;height:20px;border-radius:50%;background:#0B0B0C;color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center">✓</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:600">M05 · Planning &amp; scripting</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:2px">14 MIN · WATCHED 100%</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;padding:12px;border-radius:8px" style-hover="background:#F0F0F1">
+            <span style="width:20px;height:20px;border-radius:50%;border:1.5px solid #0B0B0C;position:relative"><span style="position:absolute;inset:3px;border-radius:50%;background:linear-gradient(90deg,#0B0B0C 62%,transparent 62%)"></span></span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:600">M06 · Hooks that stop the scroll</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:2px">11 MIN · RESUME 4:12</div>
+            </div>
+            <span style="font-size:13px;font-weight:600">→</span>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;padding:12px;border-radius:8px;opacity:0.5">
+            <span style="width:20px;height:20px;border-radius:50%;border:1.5px dashed #8A8D93"></span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:600">M07 · Filming on a phone</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:2px">LOCKED · WEEK 4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;gap:12px">
+      <div style="background:#1A1C1F;border-radius:12px;padding:20px;color:#fff">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:14px">VIDEO SHELL · YOUTUBE UNLISTED</div>
+        <div style="aspect-ratio:16/9;border-radius:8px;background:repeating-linear-gradient(135deg,#232528 0 6px,#1A1C1F 6px 12px);display:flex;align-items:center;justify-content:center;position:relative">
+          <span style="width:52px;height:52px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" style="width:20px;height:20px;flex:0 0 auto;fill:#0B0B0C;stroke:none"><path d="M8.6 5.9 18.6 12 8.6 18.1z"></path></svg></span>
+          <span style="position:absolute;bottom:10px;left:12px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">IFRAME PLAYER API · rel=0 · playsinline</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:12px">
+          <div style="font-size:13px;color:#C9CBCE">Resume from <span style="font-family:'IBM Plex Mono',monospace;color:#fff">4:12</span>?</div>
+          <div style="display:flex;gap:8px">
+            <button style="border:0;background:#fff;color:#0B0B0C;font-family:inherit;font-size:13px;font-weight:600;padding:9px 14px;border-radius:6px;cursor:pointer">Resume</button>
+            <button style="border:1px solid #56585C;background:transparent;color:#fff;font-family:inherit;font-size:13px;font-weight:500;padding:9px 14px;border-radius:6px;cursor:pointer">Start over</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:14px">TABLE ROW · ADMIN</div>
+        <div style="overflow-x:auto;margin:0 -20px;padding:0 20px">
+          <table style="width:100%;border-collapse:collapse;min-width:420px">
+            <thead>
+              <tr>
+                <th style="text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;font-weight:400;padding:0 10px 8px 0;border-bottom:1px solid #0B0B0C">PARTICIPANT</th>
+                <th style="text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;font-weight:400;padding:0 10px 8px 0;border-bottom:1px solid #0B0B0C">PROG.</th>
+                <th style="text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;font-weight:400;padding:0 10px 8px 0;border-bottom:1px solid #0B0B0C">W3 TASK</th>
+                <th style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;font-weight:400;padding:0 0 8px 0;border-bottom:1px solid #0B0B0C">PTS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style-hover="background:#F6F6F7">
+                <td style="padding:12px 10px 12px 0;border-bottom:1px solid #E8E8EA">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="width:26px;height:26px;border-radius:50%;background:#0B0B0C;color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center">AO</span>
+                    <div><div style="font-size:14px;font-weight:600">Ada Okafor</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">ada@mail.com</div></div>
+                  </div>
+                </td>
+                <td style="padding:12px 10px;border-bottom:1px solid #E8E8EA">
+                  <div style="display:flex;align-items:center;gap:8px"><span style="width:44px;height:5px;background:#E3E4E6;border-radius:99px;overflow:hidden;display:inline-block"><span style="display:block;width:60%;height:100%;background:#0B0B0C"></span></span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px">60%</span></div>
+                </td>
+                <td style="padding:12px 10px;border-bottom:1px solid #E8E8EA"><span style="display:inline-flex;align-items:center;gap:6px;border:1px solid #C9CBCE;border-radius:999px;padding:4px 9px;font-size:11px"><span style="width:5px;height:5px;border-radius:50%;border:1.5px solid #0B0B0C"></span>Submitted</span></td>
+                <td style="padding:12px 0;border-bottom:1px solid #E8E8EA;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500">285</td>
+              </tr>
+              <tr style="background:#F0F0F1">
+                <td style="padding:12px 10px 12px 0;border-bottom:1px solid #E8E8EA">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="width:26px;height:26px;border-radius:50%;border:1.5px solid #0B0B0C;color:#0B0B0C;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center">TB</span>
+                    <div><div style="font-size:14px;font-weight:600">Tunde Bello <span style="display:inline-block;width:7px;height:7px;background:#0B0B0C;transform:rotate(45deg);margin-left:4px"></span></div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">at risk · 9d</div></div>
+                  </div>
+                </td>
+                <td style="padding:12px 10px;border-bottom:1px solid #E8E8EA">
+                  <div style="display:flex;align-items:center;gap:8px"><span style="width:44px;height:5px;background:#E3E4E6;border-radius:99px;overflow:hidden;display:inline-block"><span style="display:block;width:17%;height:100%;background:#0B0B0C"></span></span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px">17%</span></div>
+                </td>
+                <td style="padding:12px 10px;border-bottom:1px solid #E8E8EA"><span style="display:inline-flex;align-items:center;gap:6px;border:1px dashed #D6D7D9;border-radius:999px;padding:4px 9px;font-size:11px;color:#56585C">Not started</span></td>
+                <td style="padding:12px 0;border-bottom:1px solid #E8E8EA;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500">55</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:14px">NAVIGATION</div>
+        <div style="border:1px solid #E8E8EA;border-radius:10px;padding:8px;display:flex;justify-content:space-between;background:#fff;margin-bottom:12px">
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 8px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 10.8 12 4l8 6.8V20H4z"></path><path d="M9.5 20v-5.6h5V20"></path></svg><span style="font-size:10px;font-weight:700">Home</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 8px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 6.6C10.5 5 8.2 4.5 4.6 4.8V18c3.6-.3 5.9.2 7.4 1.7 1.5-1.5 3.8-2 7.4-1.7V4.8c-3.6-.3-5.9.2-7.4 1.8z"></path><path d="M12 6.6v13.1"></path></svg><span style="font-size:10px;color:#8A8D93">Learn</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 8px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg><span style="font-size:10px;color:#8A8D93">Tasks</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 8px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 20v-8.5"></path><path d="M12 20V4.6"></path><path d="M19 20v-6"></path></svg><span style="font-size:10px;color:#8A8D93">Board</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 8px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6 12h.01"></path><path d="M12 12h.01"></path><path d="M18 12h.01"></path></svg><span style="font-size:10px;color:#8A8D93">More</span></span>
+        </div>
+        <div style="font-size:12px;color:#56585C;line-height:1.5">Mobile: 5-slot tab bar, Sessions / Resources / Community / Settings behind More. Desktop: the same items as a left rail.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:64px 0 26px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">06</span>
+    <h2 style="margin:0;font-size:26px;letter-spacing:-0.014em;font-weight:700">Rules of the system</h2>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+    <div style="background:#0B0B0C;color:#fff;border-radius:12px;padding:22px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:10px">01</div>
+      <div style="font-size:17px;font-weight:700;line-height:1.25;letter-spacing:-0.006em">One dominant action per screen</div>
+      <p style="margin:10px 0 0;font-size:13px;line-height:1.55;color:#C9CBCE">Everything else is secondary, tertiary or a link. If two things look primary, the screen has failed.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:22px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:10px">02</div>
+      <div style="font-size:17px;font-weight:700;line-height:1.25;letter-spacing:-0.006em">Deadlines are always double</div>
+      <p style="margin:10px 0 0;font-size:13px;line-height:1.55;color:#56585C">Absolute date with an explicit (WAT) label, plus a relative countdown. Never one without the other.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:22px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:10px">03</div>
+      <div style="font-size:17px;font-weight:700;line-height:1.25;letter-spacing:-0.006em">Nothing blocks, everything nudges</div>
+      <p style="margin:10px 0 0;font-size:13px;line-height:1.55;color:#56585C">Outstanding items appear as accountability, not as gates. Released weeks never re-lock.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:22px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:10px">04</div>
+      <div style="font-size:17px;font-weight:700;line-height:1.25;letter-spacing:-0.006em">Reward behaviour, never reach</div>
+      <p style="margin:10px 0 0;font-size:13px;line-height:1.55;color:#56585C">No follower counts, likes or views anywhere in the product — not in the ranking, not on a card.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:22px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:10px">05</div>
+      <div style="font-size:17px;font-weight:700;line-height:1.25;letter-spacing:-0.006em">Imagery is a placeholder, not decoration</div>
+      <p style="margin:10px 0 0;font-size:13px;line-height:1.55;color:#56585C">Striped grey blocks with a mono caption mark where real thumbnails, speaker photos and brand assets drop in.</p>
+      <div style="margin-top:14px;aspect-ratio:16/9;border-radius:8px;background:repeating-linear-gradient(135deg,#F0F0F1 0 7px,#E3E4E6 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#56585C">module thumbnail 16:9</span></div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:22px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;margin-bottom:10px">06</div>
+      <div style="font-size:17px;font-weight:700;line-height:1.25;letter-spacing:-0.006em">Accessible at monochrome</div>
+      <p style="margin:10px 0 0;font-size:13px;line-height:1.55;color:#56585C">Body text ≥ 4.5:1 on its background. Grey #8A8D93 is permitted for labels at 11–12px mono and locked states only.</p>
+    </div>
+  </div>
+
+</div>
+
+
+<div style="max-width:1140px;margin:0 auto;padding:0 24px 140px">
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:0 0 26px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">07</span>
+    <h2 style="margin:0;font-size:26px;letter-spacing:-0.014em;font-weight:700">Icon set</h2>
+  </div>
+  <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:24px">
+    <p style="margin:0 0 22px;font-size:14px;line-height:1.55;color:#56585C;max-width:72ch;text-wrap:pretty">One geometric line family on a 24px grid: 1.7px stroke, round caps and joins, <span style="font-family:'IBM Plex Mono',monospace;font-size:13px">currentColor</span> only — an icon inherits the ink of whatever it sits in and never introduces colour. 19px in navigation, 13–16px inline beside mono labels, 28–30px in empty states. Never filled, except the play triangle.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:2px;border:1px solid #E8E8EA;border-radius:10px;overflow:hidden">
+      <div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 10.8 12 4l8 6.8V20H4z"></path><path d="M9.5 20v-5.6h5V20"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">HOME</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 6.6C10.5 5 8.2 4.5 4.6 4.8V18c3.6-.3 5.9.2 7.4 1.7 1.5-1.5 3.8-2 7.4-1.7V4.8c-3.6-.3-5.9.2-7.4 1.8z"></path><path d="M12 6.6v13.1"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">LEARN</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">TASKS</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 20v-8.5"></path><path d="M12 20V4.6"></path><path d="M19 20v-6"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">BOARD</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6 12h.01"></path><path d="M12 12h.01"></path><path d="M18 12h.01"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">MORE</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 7.6h10.4v8.8H4z"></path><path d="M14.4 12.3l5.6-3v7.4l-5.6-3z"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">VIDEO</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 7.6h5l2 2.2h9v9.2H4z"></path><path d="M4 7.6V5h5l2 2.6"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">FOLDER</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.6 6h14.8v9.4h-8.9L5.6 19v-3.6z"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">CHAT</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 8.2h8.6"></path><path d="M17.4 8.2H20"></path><path d="M4 15.8h2.8"></path><path d="M11.6 15.8H20"></path><circle cx="15" cy="8.2" r="2.3"></circle><circle cx="9.2" cy="15.8" r="2.3"></circle></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">SLIDERS</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4.6a4.8 4.8 0 0 1 4.8 4.8v3.3l1.9 3.2H5.3l1.9-3.2V9.4A4.8 4.8 0 0 1 12 4.6z"></path><path d="M10.1 18.6a1.9 1.9 0 0 0 3.8 0"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">BELL</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="7.6"></circle><path d="M12 7.8v4.5l3 1.8"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">CLOCK</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 3.6l1.9 4.9 4.9 1.9-4.9 1.9L12 17.1l-1.9-4.8-4.9-1.9 4.9-1.9z"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">SPARK</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="7.6"></circle><circle cx="12" cy="12" r="3"></circle></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">TARGET</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12.6l4.6 4.6L19 7.2"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">CHECK</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6.4 11h11.2v8.6H6.4z"></path><path d="M9 11V8.6a3 3 0 0 1 6 0V11"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">LOCK</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M8.6 5.9 18.6 12 8.6 18.1z"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">PLAY</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><circle cx="9.4" cy="9" r="3.2"></circle><path d="M3.8 19.2c.6-3 2.9-4.7 5.6-4.7s5 1.7 5.6 4.7"></path><path d="M16.2 7.3a3 3 0 0 1 0 5.5"></path><path d="M17.4 14.8c2 .6 3.3 2 3.7 4.4"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">USERS</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M3.8 6.6h16.4v10.8H3.8z"></path><path d="M3.8 7.2 12 12.8l8.2-5.6"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">MAIL</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6.6 3.9h6.8L18 8.4v11.7H6.6z"></path><path d="M13.2 3.9v4.7H18"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">FILE</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4.6v9.8"></path><path d="M8.2 10.9 12 14.6l3.8-3.7"></path><path d="M5.2 19.4h13.6"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">DOWNLOAD</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M14.2 5H19v4.8"></path><path d="M19 5l-7.4 7.4"></path><path d="M16.8 13.4V19H5V7.2h5.6"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">EXTERNAL</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><circle cx="11" cy="11" r="6"></circle><path d="M15.4 15.4 20 20"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">SEARCH</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.6 7h14.8"></path><path d="M7.4 12h9.2"></path><path d="M10.4 17h3.2"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">FILTER</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4.6 20 18.6H4z"></path><path d="M12 9.8v4"></path><path d="M12 16.4h.01"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">ALERT</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.6 6.6h14.8v12.8H4.6z"></path><path d="M4.6 10.6h14.8"></path><path d="M8.6 4.2v3"></path><path d="M15.4 4.2v3"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">CALENDAR</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.6 4.6h5.8v5.8H4.6z"></path><path d="M13.6 4.6h5.8v5.8h-5.8z"></path><path d="M4.6 13.6h5.8v5.8H4.6z"></path><path d="M13.6 13.6h5.8v5.8h-5.8z"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">GRID</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4 20 8.2 12 12.4 4 8.2z"></path><path d="M4 12.4 12 16.6l8-4.2"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">LAYERS</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 12.6h4.2l1.4 2.4h4.8l1.4-2.4H20"></path><path d="M4 12.6 6.6 5h10.8L20 12.6v6.6H4z"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">INBOX</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M10.4 13.6a3.4 3.4 0 0 1 0-4.8l2.4-2.4a3.4 3.4 0 0 1 4.8 4.8l-1.2 1.2"></path><path d="M13.6 10.4a3.4 3.4 0 0 1 0 4.8l-2.4 2.4a3.4 3.4 0 0 1-4.8-4.8l1.2-1.2"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">LINK</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 19.4V9.6"></path><path d="M8.2 13.3 12 9.5l3.8 3.8"></path><path d="M5.2 5h13.6"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">UPLOAD</span></div><div style="background:#F6F6F7;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:9px"><span style="color:#0B0B0C;display:flex"><svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6.4 4.6V20"></path><path d="M6.4 5.2h11l-1.8 3.6 1.8 3.6h-11z"></path></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.05em;color:#56585C">FLAG</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:22px">
+      <div style="border:1px solid #E8E8EA;border-radius:10px;padding:16px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">WITH A LABEL</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px"><svg viewBox="0 0 24 24" style="width:16px;height:16px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="7.6"></circle><path d="M12 7.8v4.5l3 1.8"></path></svg><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.06em">DUE IN 3 DAYS</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px"><svg viewBox="0 0 24 24" style="width:16px;height:16px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 3.6l1.9 4.9 4.9 1.9-4.9 1.9L12 17.1l-1.9-4.8-4.9-1.9 4.9-1.9z"></path></svg><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.06em">3 WEEK STREAK</span></div>
+        <div style="display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" style="width:16px;height:16px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4.6 20 18.6H4z"></path><path d="M12 9.8v4"></path><path d="M12 16.4h.01"></path></svg><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.06em">2 OUTSTANDING</span></div>
+      </div>
+      <div style="border:1px solid #E8E8EA;border-radius:10px;padding:16px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">IN A CONTROL</div>
+        <button style="border:0;background:#0B0B0C;color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:12px 16px;border-radius:8px;display:inline-flex;align-items:center;gap:9px;cursor:pointer;min-height:44px"><svg viewBox="0 0 24 24" style="width:18px;height:18px;flex:0 0 auto;fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 19.4V9.6"></path><path d="M8.2 13.3 12 9.5l3.8 3.8"></path><path d="M5.2 5h13.6"></path></svg>Submit task</button>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:12px;border:1px solid #E8E8EA;border-radius:8px;padding:11px 13px"><svg viewBox="0 0 24 24" style="width:17px;height:17px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><circle cx="11" cy="11" r="6"></circle><path d="M15.4 15.4 20 20"></path></svg><span style="font-size:14px;color:#8A8D93">Search resources</span></div>
+      </div>
+      <div style="border:1px solid #E8E8EA;border-radius:10px;padding:16px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">DON'T</div>
+        <div style="display:grid;gap:9px;font-size:13px;line-height:1.45;color:#56585C">
+          <div style="display:flex;gap:8px"><span style="font-weight:600;color:#0B0B0C">×</span>Fill an icon to signal state — the chip does that</div>
+          <div style="display:flex;gap:8px"><span style="font-weight:600;color:#0B0B0C">×</span>Use an icon alone for a destructive action</div>
+          <div style="display:flex;gap:8px"><span style="font-weight:600;color:#0B0B0C">×</span>Mix stroke weights on one screen</div>
+          <div style="display:flex;gap:8px"><span style="font-weight:600;color:#0B0B0C">×</span>Use emoji anywhere, including streaks</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

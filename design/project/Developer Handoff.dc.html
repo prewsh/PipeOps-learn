@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin:0; background:#F6F6F7; font-family:'IBM Plex Sans',system-ui,'Segoe UI','Helvetica Neue',Arial,sans-serif; -webkit-font-smoothing:antialiased; color:#0B0B0C; }
+  a { color:#4F21EA; text-decoration:none; }
+  a:hover { color:#0B0B0C; text-decoration:underline; }
+  * { box-sizing:border-box; }
+</style>
+</helmet>
+
+<div style="max-width:1100px;margin:0 auto;padding:0 24px 140px">
+
+  <header style="padding:64px 0 36px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:26px">
+      <div style="width:22px;height:22px;background:#0B0B0C;border-radius:4px"></div>
+      <span style="font-size:15px;font-weight:600">PipeOps Learn</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/ developer handoff</span>
+    </div>
+    <h1 style="margin:0;font-size:clamp(34px,5vw,56px);line-height:1;letter-spacing:-0.021em;font-weight:700;max-width:20ch">Everything the build needs</h1>
+    <p style="margin:18px 0 0;font-size:17px;line-height:1.55;color:#56585C;max-width:60ch;text-wrap:pretty">Routes, state machines, the scoring ledger, access rules and the eight decisions still open. Requirement IDs match the PRD — use them in tickets.</p>
+  </header>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:48px 0 18px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">01</span>
+    <h2 style="margin:0;font-size:22px;letter-spacing:-0.014em;font-weight:700">Route map</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:12px">
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">PARTICIPANT</div>
+      <div style="display:grid;gap:9px;font-size:13px">
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;color:#0B0B0C;width:150px;flex:0 0 auto">/login</span><span style="color:#56585C">email → code + link</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/login/verify</span><span style="color:#56585C">6-digit, resend timer</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/welcome</span><span style="color:#56585C">3-step, one time</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/</span><span style="color:#56585C">dashboard · F9</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/learn</span><span style="color:#56585C">week rail + flat index</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/learn/week/[n]</span><span style="color:#56585C">+ locked variant</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/learn/module/[slug]</span><span style="color:#56585C">fixed order · F4.4</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/tasks</span><span style="color:#56585C">grouped by week</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/tasks/[id]</span><span style="color:#56585C">brief, form, history</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/leaderboard</span><span style="color:#56585C">2 boards + personal</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/sessions</span><span style="color:#56585C">upcoming · past</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/resources</span><span style="color:#56585C">searchable library</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/announcements</span><span style="color:#56585C">list + detail</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/settings</span><span style="color:#56585C">profile, prefs, opt-out</span></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">ADMIN · ROLE-GATED</div>
+      <div style="display:grid;gap:9px;font-size:13px">
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/admin</span><span style="color:#56585C">tiles → filtered table</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/admin/participants</span><span style="color:#56585C">table + drawer</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/admin/submissions</span><span style="color:#56585C">keyboard review queue</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/admin/content</span><span style="color:#56585C">weeks, modules, materials</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/admin/tasks</span><span style="color:#56585C">tasks + assignments</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/admin/sessions</span><span style="color:#56585C">+ attendance marking</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/admin/announcements</span><span style="color:#56585C">composer + schedule</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/admin/leaderboard</span><span style="color:#56585C">rules + audit log</span></div>
+        <div style="display:flex;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;width:150px;flex:0 0 auto">/admin/settings</span><span style="color:#56585C">cohort + CSV import</span></div>
+      </div>
+      <div style="border-top:1px solid #E8E8EA;margin-top:16px;padding-top:14px;font-size:13px;line-height:1.55;color:#56585C">Next.js App Router · server components for reads, server actions for writes · Supabase Postgres with RLS on every participant-facing table · Supabase Storage private buckets · Resend, queued · hosted on PipeOps.</div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:48px 0 18px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">02</span>
+    <h2 style="margin:0;font-size:22px;letter-spacing:-0.014em;font-weight:700">State machines</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">WEEK · COMPUTED, NEVER FLIPPED</div>
+      <div style="display:grid;gap:10px">
+        <div style="display:flex;align-items:center;gap:11px;border:1px solid #E8E8EA;border-radius:8px;padding:11px 12px"><span style="width:8px;height:3px;background:#8A8D93"></span><div><div style="font-size:13px;font-weight:600">locked</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:2px">now &lt; release_at</div></div></div>
+        <div style="display:flex;align-items:center;gap:11px;border:1.5px solid #0B0B0C;border-radius:8px;padding:11px 12px"><span style="width:6px;height:6px;border-radius:50%;border:1.5px solid #0B0B0C"></span><div><div style="font-size:13px;font-weight:600">current</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:2px">release_at ≤ now &lt; next.release_at</div></div></div>
+        <div style="display:flex;align-items:center;gap:11px;border:1px solid #E8E8EA;border-radius:8px;padding:11px 12px"><span style="width:6px;height:6px;border-radius:50%;background:#0B0B0C"></span><div><div style="font-size:13px;font-weight:600">open</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:2px">now ≥ next.release_at · never re-locks</div></div></div>
+      </div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:14px">Locked weeks expose number, title and release_at only, enforced in the query layer. Moving release_at earlier is the "release now" mechanism.</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">SUBMISSION</div>
+      <div style="display:grid;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">
+        <div style="border:1px solid #E8E8EA;border-radius:8px;padding:10px 12px">draft → submitted</div>
+        <div style="border:1px solid #E8E8EA;border-radius:8px;padding:10px 12px">submitted → under_review</div>
+        <div style="border:1px solid #E8E8EA;border-radius:8px;padding:10px 12px">under_review → approved</div>
+        <div style="border:1px solid #E8E8EA;border-radius:8px;padding:10px 12px">under_review → needs_revision</div>
+        <div style="border:1px solid #E8E8EA;border-radius:8px;padding:10px 12px">needs_revision → submitted <span style="color:#8A8D93">(v+1)</span></div>
+      </div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:14px"><span style="font-weight:600">is_late</span> is a boolean, not a status — computed at submit time and frozen on that version. No rejection state in V1. Resubmission is off once approved.</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">HEALTH · DERIVED, NEVER EDITED</div>
+      <div style="display:grid;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid #E8E8EA;border-radius:8px;padding:10px 12px"><span style="font-size:13px">Active</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C">≤ 3 DAYS</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid #E8E8EA;border-radius:8px;padding:10px 12px"><span style="font-size:13px">Needs attention</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C">4–6 DAYS</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border:1.5px solid #0B0B0C;border-radius:8px;padding:10px 12px"><span style="font-size:13px;font-weight:600">At risk</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">7D+ OR 2 MISSED</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid #E8E8EA;border-radius:8px;padding:10px 12px"><span style="font-size:13px">Dormant</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C">14D+ / NEVER</span></div>
+      </div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:14px">Recomputed on every activity write, plus a daily job at 06:00 WAT for people whose only change is time passing. V1 sends no automatic at-risk email.</div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:48px 0 18px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">03</span>
+    <h2 style="margin:0;font-size:22px;letter-spacing:-0.014em;font-weight:700">Progress &amp; scoring</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">
+    <div style="background:#0B0B0C;color:#fff;border-radius:12px;padding:20px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">FIXED DENOMINATOR · COHORT 01</div>
+      <div style="display:grid;gap:9px;font-size:14px">
+        <div style="display:flex;justify-content:space-between"><span style="color:#C9CBCE">Modules</span><span style="font-family:'IBM Plex Mono',monospace">12</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#C9CBCE">Required course assignments</span><span style="font-family:'IBM Plex Mono',monospace">12</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#C9CBCE">Required programme tasks</span><span style="font-family:'IBM Plex Mono',monospace">6</span></div>
+        <div style="height:1px;background:#333639;margin:4px 0"></div>
+        <div style="display:flex;justify-content:space-between;font-weight:600"><span>Total required items</span><span style="font-family:'IBM Plex Mono',monospace">30</span></div>
+      </div>
+      <div style="font-size:13px;line-height:1.55;color:#C9CBCE;margin-top:16px">Programme completion % = completed ÷ 30. The denominator never moves, so the number only rises and is comparable between participants.</div>
+      <div style="border-top:1px solid #333639;margin-top:16px;padding-top:14px;font-size:13px;line-height:1.55;color:#C9CBCE">A week is complete when all modules are complete, all required assignments submitted, and the required task submitted. Module completion and assignment completion are tracked separately and never conflated.</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">POINTS LEDGER · IDEMPOTENT</div>
+      <div style="display:grid;gap:8px;font-size:13px">
+        <div style="display:flex;justify-content:space-between"><span>MODULE_COMPLETED</span><span style="font-family:'IBM Plex Mono',monospace">+10</span></div>
+        <div style="display:flex;justify-content:space-between"><span>ASSIGNMENT_SUBMITTED</span><span style="font-family:'IBM Plex Mono',monospace">+15</span></div>
+        <div style="display:flex;justify-content:space-between"><span>TASK_SUBMITTED</span><span style="font-family:'IBM Plex Mono',monospace">+20</span></div>
+        <div style="display:flex;justify-content:space-between"><span>ON_TIME_BONUS</span><span style="font-family:'IBM Plex Mono',monospace">+5</span></div>
+        <div style="display:flex;justify-content:space-between"><span>WEEK_MODULES_BONUS</span><span style="font-family:'IBM Plex Mono',monospace">+10</span></div>
+        <div style="display:flex;justify-content:space-between"><span>WEEK_COMPLETED_BONUS</span><span style="font-family:'IBM Plex Mono',monospace">+10</span></div>
+        <div style="display:flex;justify-content:space-between"><span>SESSION_ATTENDED</span><span style="font-family:'IBM Plex Mono',monospace">+5</span></div>
+        <div style="display:flex;justify-content:space-between"><span>FINAL_PROJECT_APPROVED</span><span style="font-family:'IBM Plex Mono',monospace">+30</span></div>
+        <div style="height:1px;background:#E8E8EA;margin:4px 0"></div>
+        <div style="display:flex;justify-content:space-between;font-weight:600"><span>Theoretical max</span><span style="font-family:'IBM Plex Mono',monospace">≈ 660</span></div>
+      </div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:16px">Unique on (enrollment, rule, target) so recomputation never double-awards. Reversals write a compensating negative row with <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">reversal_of</span> — rows are never deleted. Missing a deadline costs the bonus, never points.</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">VIDEO &amp; STREAK</div>
+      <div style="display:grid;gap:9px;font-size:13px;line-height:1.5">
+        <div>Persist position every <span style="font-family:'IBM Plex Mono',monospace">15s</span> while playing, and on pause, tab-hide and unload. Debounced.</div>
+        <div>Track <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">max_position_seconds</span> and <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">watched_seconds</span> separately; % derives from watched_seconds.</div>
+        <div>Watched at ≥ 90% or on ENDED. Writes are monotonic — a lower position never reduces stored maxima.</div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-size:12px">VIDEO_PROGRESS</span> events at most once per module per 60s; the authoritative position lives in <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">video_progress</span>.</div>
+      </div>
+      <div style="border-top:1px solid #E8E8EA;margin-top:14px;padding-top:14px;font-size:13px;line-height:1.55;color:#56585C">Streak = unbroken run of qualifying weeks ending at the current week. Unreleased weeks can't break it; an unqualified current week doesn't break it, it just isn't counted yet. A missed week resets to 0.</div>
+      <div style="background:#F0F0F1;border-radius:8px;padding:12px;margin-top:14px;font-size:13px;line-height:1.55"><span style="font-weight:600">recompute(enrollment_id)</span> rebuilds week_progress, enrollment rollups and missing points events. Idempotent, safe in bulk — the escape hatch for any live-cohort scoring bug.</div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:48px 0 18px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">04</span>
+    <h2 style="margin:0;font-size:22px;letter-spacing:-0.014em;font-weight:700">Data model</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:12px">IDENTITY</div>
+      <div style="display:grid;gap:10px;font-size:13px;line-height:1.45">
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">users</span><div style="color:#56585C">email unique lowercased, role, socials, email_prefs, leaderboard_opt_out, timezone</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">programs · cohorts</span><div style="color:#56585C">code, starts_on, ends_on, timezone, status, discord_url, branding</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">enrollments</span><div style="color:#56585C">unique (cohort, user) + cached progress_pct, points_total, streak_weeks, health_state, last_active_at</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">auth_tokens</span><div style="color:#56585C">code_hash, magic_token_hash, expires_at, attempts, ip</div></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:12px">CONTENT &amp; SCHEDULE</div>
+      <div style="display:grid;gap:10px;font-size:13px;line-height:1.45">
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">courses · course_parts · modules</span><div style="color:#56585C">ordered, status draft/published</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">lessons</span><div style="color:#56585C">one per module in V1; video_provider, video_ref, duration</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">learning_materials</span><div style="color:#56585C">owner_type module/week/session/library, is_required, tags</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">program_weeks · week_modules</span><div style="color:#56585C">unique (cohort, number); join lets a module sit in different weeks per cohort</div></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:12px">WORK &amp; PROGRESS</div>
+      <div style="display:grid;gap:10px;font-size:13px;line-height:1.45">
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">assignments · program_tasks</span><div style="color:#56585C">submission_types, limits, points, is_required, requires_review, is_final_project</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">submissions · submission_files</span><div style="color:#56585C">unique (enrollment, item_type, item_id, version)</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">video_progress · module_progress</span><div style="color:#56585C">unique per (enrollment, lesson/module)</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">week_progress</span><div style="color:#56585C">derived cache</div></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:12px">TELEMETRY &amp; COMMS</div>
+      <div style="display:grid;gap:10px;font-size:13px;line-height:1.45">
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">points_events</span><div style="color:#56585C">signed ints, append-only, idempotency key</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">activity_events</span><div style="color:#56585C">append-only; LOGIN, VIDEO_*, MODULE_*, MATERIAL_OPENED, *_SUBMITTED, SUBMISSION_REVIEWED, SESSION_ATTENDED, ANNOUNCEMENT_READ, LEADERBOARD_VIEWED</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">announcements · announcement_reads</span><div style="color:#56585C">audience all / filter / explicit ids</div></div>
+        <div><span style="font-family:'IBM Plex Mono',monospace;font-weight:500">live_sessions · session_attendance · email_log · audit_log</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px;margin-top:12px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:14px">ROW-LEVEL SECURITY</div>
+    <div style="display:grid;gap:10px;font-size:14px;line-height:1.5">
+      <div style="display:flex;gap:11px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;flex:0 0 auto;padding-top:2px">01</span><span>A participant reads content only for cohorts they're enrolled in, and only weeks where <span style="font-family:'IBM Plex Mono',monospace;font-size:13px">release_at ≤ now()</span>.</span></div>
+      <div style="display:flex;gap:11px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;flex:0 0 auto;padding-top:2px">02</span><span>Read/write only their own submissions and progress; read-only on their own points and activity.</span></div>
+      <div style="display:flex;gap:11px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;flex:0 0 auto;padding-top:2px">03</span><span>Leaderboard reads go through a view exposing display name, points, streak and rank — never submissions or emails.</span></div>
+      <div style="display:flex;gap:11px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;flex:0 0 auto;padding-top:2px">04</span><span>Admin and reviewer bypass cohort scoping for reads, and are the only roles that write content, reviews, attendance and announcements.</span></div>
+      <div style="display:flex;gap:11px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;flex:0 0 auto;padding-top:2px">05</span><span>Points and activity events are never writable by a participant client — they're written server-side from the action that caused them.</span></div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:48px 0 18px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">05</span>
+    <h2 style="margin:0;font-size:22px;letter-spacing:-0.014em;font-weight:700">Build order &amp; launch gate</h2>
+  </div>
+  <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:20px">
+    <div style="display:grid;gap:2px;border:1px solid #E8E8EA;border-radius:10px;overflow:hidden">
+      <div style="background:#F6F6F7;padding:12px 14px;display:flex;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:22px;flex:0 0 auto">0</span><span style="font-size:14px">Schema, RLS, Cohort 01 seed, deploy pipeline</span></div>
+      <div style="background:#F6F6F7;padding:12px 14px;display:flex;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:22px;flex:0 0 auto">1</span><span style="font-size:14px">Auth, enrollment gate, CSV import, onboarding, app shell</span></div>
+      <div style="background:#F6F6F7;padding:12px 14px;display:flex;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:22px;flex:0 0 auto">2</span><span style="font-size:14px">Weeks, unlocking, modules, video progress, materials</span></div>
+      <div style="background:#F6F6F7;padding:12px 14px;display:flex;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:22px;flex:0 0 auto">3</span><span style="font-size:14px">Assignments, tasks, submissions, drafts, lateness</span></div>
+      <div style="background:#F6F6F7;padding:12px 14px;display:flex;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:22px;flex:0 0 auto">4</span><span style="font-size:14px">Participant dashboard, progress rollups</span></div>
+      <div style="background:#F6F6F7;padding:12px 14px;display:flex;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:22px;flex:0 0 auto">5</span><span style="font-size:14px">Admin overview, participants, review queue, content CRUD</span></div>
+      <div style="background:#F6F6F7;padding:12px 14px;display:flex;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:22px;flex:0 0 auto">6</span><span style="font-size:14px">Points ledger, leaderboard, streaks</span></div>
+      <div style="background:#F6F6F7;padding:12px 14px;display:flex;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:22px;flex:0 0 auto">7</span><span style="font-size:14px">Announcements, sessions, resources, email set, health</span></div>
+      <div style="background:#0B0B0C;color:#fff;padding:12px 14px;display:flex;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:22px;flex:0 0 auto">8</span><span style="font-size:14px">Dry run on a draft cohort, mobile + load pass, launch</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:16px">
+      <div style="border:1.5px solid #0B0B0C;border-radius:10px;padding:14px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;margin-bottom:8px">LAUNCH GATE</div>
+        <div style="font-size:13px;line-height:1.55;color:#56585C">Two internal accounts complete Week 1 end to end on a draft cohort: log in, watch, submit all three item types, get reviewed, and appear correctly on the leaderboard and in the admin table.</div>
+      </div>
+      <div style="border:1px solid #E8E8EA;border-radius:10px;padding:14px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:8px">NON-FUNCTIONAL</div>
+        <div style="font-size:13px;line-height:1.55;color:#56585C">Dashboard interactive under 2.5s on 3G / mid-range Android. Usable at 360px. All lists paginated, progress writes debounced. ~100 concurrent at release minute; cache the release spike.</div>
+      </div>
+      <div style="border:1px solid #E8E8EA;border-radius:10px;padding:14px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:8px">SUCCESS TARGETS</div>
+        <div style="font-size:13px;line-height:1.55;color:#56585C">Activation ≥ 85% · weekly active ≥ 70% through W4 · weekly submission ≥ 60% · completion ≥ 35% · Discord submissions ≈ 0 · admin status compile &lt; 15 min · release-day incidents 0.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin:48px 0 18px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">06</span>
+    <h2 style="margin:0;font-size:22px;letter-spacing:-0.014em;font-weight:700">Open decisions</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-size:15px;font-weight:600;line-height:1.3">Assignments per module or per week?</div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:8px">These screens assume 12 — one per module. Per-week (6) changes the fixed denominator to 24.</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:12px">AFFECTS PHASES 3–6</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-size:15px;font-weight:600;line-height:1.3">Does a task need approval to score?</div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:8px">Assumed: submission scores, approval is a quality signal — except the final project (+30 on approval).</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-size:15px;font-weight:600;line-height:1.3">When do submissions close?</div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:8px">Assumed: <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">ends_on + 7 days</span>, then read-only. Needs a designed "programme closed" state if you choose a hard cutoff.</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-size:15px;font-weight:600;line-height:1.3">Leaderboard from day one?</div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:8px">Assumed: visible immediately with a designed empty state ("first module completed takes #1").</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-size:15px;font-weight:600;line-height:1.3">Final project: pass/fail or rubric?</div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:8px">Assumed: approval plus a feedback note. A rubric adds a scoring UI to the review queue.</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-size:15px;font-weight:600;line-height:1.3">How many reviewers, and do they own slices?</div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:8px">The queue as designed is unassigned and oldest-first. Per-reviewer ownership adds an assignment column and a filter.</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-size:15px;font-weight:600;line-height:1.3">Confirm Cohort 01 dates</div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:8px">Week 1 releases Mon 21 Sep 2026, Sunday 23:59 WAT deadlines throughout.</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-size:15px;font-weight:600;line-height:1.3">Is Discord membership verified or just linked?</div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:8px">Designed as a link out. Verification would add an OAuth dependency V1 explicitly avoids.</div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+</body>
+</html>

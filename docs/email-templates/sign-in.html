@@ -1,0 +1,112 @@
+<!--
+  PipeOps Learn — sign-in email.
+  Paste into Supabase → Authentication → Emails → Templates.
+
+  Use type=signup in the "Confirm signup" template and type=magiclink in the
+  "Magic Link" template. Everything else is identical.
+
+  Email constraints this works within: inline styles only, table layout, no
+  webfonts (IBM Plex is requested and degrades to the system stack), explicit
+  colours so dark-mode clients cannot invert the code into illegibility.
+
+  Design: docs/DESIGN.md. Monochrome; #4F21EA appears only on the link. The
+  code is set in mono because mono carries every number a participant is
+  judged by.
+-->
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">Your PipeOps Learn sign-in code</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F6F6F7;margin:0;padding:24px 0">
+  <tr>
+    <td align="center" style="padding:0 16px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background:#FFFFFF;border:1px solid #E3E4E6;border-radius:12px">
+
+        <!-- wordmark -->
+        <tr>
+          <td style="padding:28px 28px 0">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding-right:10px">
+                  <div style="width:20px;height:20px;background:#0B0B0C;border-radius:4px"></div>
+                </td>
+                <td style="font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;color:#0B0B0C;letter-spacing:-0.006em;white-space:nowrap">
+                  PipeOps Learn
+                </td>
+                <td style="padding-left:8px;font-family:'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;white-space:nowrap">
+                  / UGC PROGRAMME
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- heading -->
+        <tr>
+          <td style="padding:24px 28px 0">
+            <h1 style="margin:0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:26px;line-height:1.15;letter-spacing:-0.025em;font-weight:700;color:#0B0B0C">
+              Sign in
+            </h1>
+            <p style="margin:12px 0 0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;color:#56585C">
+              Enter this code on the sign-in screen. It works once, and expires in an hour.
+            </p>
+          </td>
+        </tr>
+
+        <!-- the code -->
+        <tr>
+          <td style="padding:20px 28px 0">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F0F0F1;border:1px solid #E3E4E6;border-radius:10px">
+              <tr>
+                <td align="center" style="padding:20px 16px">
+                  <div style="font-family:'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93;text-transform:uppercase;margin-bottom:10px">
+                    Sign-in code
+                  </div>
+                  <div style="font-family:'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace;font-size:32px;line-height:1;letter-spacing:0.22em;font-weight:500;color:#0B0B0C">
+                    {{ .Token }}
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- link alternative -->
+        <tr>
+          <td style="padding:20px 28px 0">
+            <p style="margin:0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.55;color:#56585C">
+              Or
+              <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup" style="color:#4F21EA;text-decoration:none;font-weight:500">tap here to sign in</a>.
+              If the link misbehaves inside an in-app browser, use the code above.
+            </p>
+          </td>
+        </tr>
+
+        <!-- what's waiting -->
+        <tr>
+          <td style="padding:24px 28px 0">
+            <div style="border-top:1px solid #E3E4E6;padding-top:18px">
+              <div style="font-family:'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93;text-transform:uppercase">
+                Waiting for you
+              </div>
+              <p style="margin:10px 0 0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#56585C">
+                Week 1 · Creator economy &amp; niche — two modules, your niche statement, and your first post.
+              </p>
+            </div>
+          </td>
+        </tr>
+
+        <!-- footer -->
+        <tr>
+          <td style="padding:22px 28px 28px">
+            <p style="margin:0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:#8A8D93">
+              This programme is invite-only and this code was sent to {{ .Email }}. If you weren't expecting it, ignore this email — nothing happens until the code is used.
+            </p>
+          </td>
+        </tr>
+      </table>
+
+      <div style="max-width:520px;margin:16px auto 0;font-family:'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace;font-size:11px;letter-spacing:0.06em;color:#8A8D93;text-align:center">
+        PIPEOPS LEARN · COHORT 01
+      </div>
+    </td>
+  </tr>
+</table>

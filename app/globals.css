@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/*
+ * PipeOps Learn design tokens.
+ * Source of truth: design/project/Design System.dc.html (v1.0, 21 Sep 2026).
+ * Written up in docs/DESIGN.md. Never introduce a raw hex value in a component.
+ *
+ * The system is monochrome by design: status is carried by shape, weight and
+ * position, never by hue. #4F21EA is the ONLY colour in the product and is
+ * restricted to links and the 2px focus ring.
+ */
+@theme {
+  /* Colour */
+  --color-ink: #0b0b0c; /* body text, primary buttons, headings */
+  --color-ink-surface: #1a1c1f; /* dark cards, video shell, admin rail */
+  --color-ink-2: #56585c; /* secondary text, meta, descriptions */
+  --color-ink-3: #8a8d93; /* labels, disabled, locked state only */
+  --color-line-strong: #c9cbce; /* input borders, progress track */
+  --color-line: #e3e4e6; /* card borders, dividers, table rules */
+  --color-fill-subtle: #f0f0f1; /* chips, hover rows, inactive tabs */
+  --color-canvas: #f6f6f7; /* app background behind all cards */
+  --color-surface: #ffffff; /* cards, sheets, tables, inputs */
+  --color-accent: #4f21ea; /* RESTRICTED: links + focus ring only */
+
+  /* Type — IBM Plex, loaded in app/layout.tsx. Sans carries what a human
+     wrote; mono carries every number a participant is judged by. */
+  --font-sans: var(--font-ibm-plex-sans), system-ui, "Segoe UI", Arial, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Spacing — 4px grid */
+  --spacing: 4px;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* The only brand colour in the app. */
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--color-ink);
+    text-decoration: underline;
+  }
+
+  /* 2px accent focus ring — the single permitted use of colour on controls. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}

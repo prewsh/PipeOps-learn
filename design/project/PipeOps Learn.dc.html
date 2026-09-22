@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin:0; background:#F6F6F7; font-family:'IBM Plex Sans',system-ui,'Segoe UI','Helvetica Neue',Arial,sans-serif; -webkit-font-smoothing:antialiased; color:#0B0B0C; }
+  a { color:#0B0B0C; text-decoration:none; }
+  a:hover { color:#4F21EA; }
+  * { box-sizing:border-box; }
+</style>
+</helmet>
+
+<div style="max-width:940px;margin:0 auto;padding:0 24px 120px">
+
+  <header style="padding:72px 0 44px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
+      <div style="width:22px;height:22px;background:#0B0B0C;border-radius:4px"></div>
+      <span style="font-size:15px;font-weight:600">PipeOps Learn</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/ v1 design specification</span>
+    </div>
+    <h1 style="margin:0;font-size:clamp(38px,6vw,64px);line-height:0.98;letter-spacing:-0.021em;font-weight:700;max-width:16ch">Learn → create → submit → publish</h1>
+    <p style="margin:20px 0 0;font-size:17px;line-height:1.55;color:#56585C;max-width:58ch;text-wrap:pretty">The full design for the platform and its first tenant programme — UGC Cohort 01, 96 participants, six weeks. Mobile-first, monochrome, IBM Plex.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:26px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;border:1px solid #E8E8EA;background:#fff;border-radius:999px;padding:6px 12px">30 SCREENS</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;border:1px solid #E8E8EA;background:#fff;border-radius:999px;padding:6px 12px">6 EMAILS</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;border:1px solid #E8E8EA;background:#fff;border-radius:999px;padding:6px 12px">31 ICONS</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;border:1px solid #E8E8EA;background:#fff;border-radius:999px;padding:6px 12px">21 SEP 2026</span>
+    </div>
+  </header>
+
+  <div style="display:grid;gap:2px;border:1px solid #E8E8EA;border-radius:14px;overflow:hidden;background:#E8E8EA">
+    <a href="Participant%20Screens.dc.html" style="display:flex;gap:18px;align-items:center;background:#fff;padding:24px 22px" style-hover="background:#F0F0F1">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;width:24px;flex:0 0 auto">01</span>
+      <svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M7.5 3.6h9v16.8h-9z"></path><path d="M10.6 17.8h2.8"></path></svg>
+      <span style="flex:1;min-width:0">
+        <span style="display:block;font-size:19px;font-weight:600;letter-spacing:-0.012em">The participant path</span>
+        <span style="display:block;font-size:14px;color:#56585C;margin-top:4px">15 mobile screens + the desktop rail — dashboard, weeks, module, submission, leaderboard, sessions, settings</span>
+      </span>
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.5 12h15"></path><path d="M13.5 6l6 6-6 6"></path></svg>
+    </a>
+    <a href="Admin%20Screens.dc.html" style="display:flex;gap:18px;align-items:center;background:#fff;padding:24px 22px" style-hover="background:#F0F0F1">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;width:24px;flex:0 0 auto">02</span>
+      <svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.6 4.6h5.8v5.8H4.6z"></path><path d="M13.6 4.6h5.8v5.8h-5.8z"></path><path d="M4.6 13.6h5.8v5.8H4.6z"></path><path d="M13.6 13.6h5.8v5.8h-5.8z"></path></svg>
+      <span style="flex:1;min-width:0">
+        <span style="display:block;font-size:19px;font-weight:600;letter-spacing:-0.012em">The admin console</span>
+        <span style="display:block;font-size:14px;color:#56585C;margin-top:4px">Cohort overview, participants table and drawer, keyboard review queue, content, tasks, sessions, points, CSV import</span>
+      </span>
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.5 12h15"></path><path d="M13.5 6l6 6-6 6"></path></svg>
+    </a>
+    <a href="Auth%20and%20Static.dc.html" style="display:flex;gap:18px;align-items:center;background:#fff;padding:24px 22px" style-hover="background:#F0F0F1">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;width:24px;flex:0 0 auto">03</span>
+      <svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6.4 11h11.2v8.6H6.4z"></path><path d="M9 11V8.6a3 3 0 0 1 6 0V11"></path></svg>
+      <span style="flex:1;min-width:0">
+        <span style="display:block;font-size:19px;font-weight:600;letter-spacing:-0.012em">Access, static &amp; email</span>
+        <span style="display:block;font-size:14px;color:#56585C;margin-top:4px">Passwordless login, OTP, refusal and failure states, onboarding, the public programme page, six email templates</span>
+      </span>
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.5 12h15"></path><path d="M13.5 6l6 6-6 6"></path></svg>
+    </a>
+    <a href="Design%20System.dc.html" style="display:flex;gap:18px;align-items:center;background:#fff;padding:24px 22px" style-hover="background:#F0F0F1">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;width:24px;flex:0 0 auto">04</span>
+      <svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4 20 8.2 12 12.4 4 8.2z"></path><path d="M4 12.4 12 16.6l8-4.2"></path></svg>
+      <span style="flex:1;min-width:0">
+        <span style="display:block;font-size:19px;font-weight:600;letter-spacing:-0.012em">Design system</span>
+        <span style="display:block;font-size:14px;color:#56585C;margin-top:4px">Colour, type, status-without-colour, controls, blocks, the six rules, and the 31-icon set</span>
+      </span>
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.5 12h15"></path><path d="M13.5 6l6 6-6 6"></path></svg>
+    </a>
+    <a href="Developer%20Handoff.dc.html" style="display:flex;gap:18px;align-items:center;background:#fff;padding:24px 22px" style-hover="background:#F0F0F1">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;width:24px;flex:0 0 auto">05</span>
+      <svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6.6 3.9h6.8L18 8.4v11.7H6.6z"></path><path d="M13.2 3.9v4.7H18"></path></svg>
+      <span style="flex:1;min-width:0">
+        <span style="display:block;font-size:19px;font-weight:600;letter-spacing:-0.012em">Developer handoff</span>
+        <span style="display:block;font-size:14px;color:#56585C;margin-top:4px">Route map, state machines, scoring ledger, data model, RLS, build order, and the eight open decisions</span>
+      </span>
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.5 12h15"></path><path d="M13.5 6l6 6-6 6"></path></svg>
+    </a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:40px">
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:10px">TYPE</div>
+      <div style="font-size:15px;font-weight:600">IBM Plex Sans</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;margin-top:4px">IBM Plex Mono</div>
+      <div style="font-size:13px;line-height:1.5;color:#56585C;margin-top:10px">Matching pipeops.io. Mono carries every number a participant is judged by.</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:10px">PALETTE</div>
+      <div style="display:flex;gap:4px;margin-bottom:10px">
+        <span style="flex:1;height:26px;border-radius:4px;background:#0B0B0C"></span>
+        <span style="flex:1;height:26px;border-radius:4px;background:#56585C"></span>
+        <span style="flex:1;height:26px;border-radius:4px;background:#8A8D93"></span>
+        <span style="flex:1;height:26px;border-radius:4px;background:#E8E8EA"></span>
+        <span style="flex:1;height:26px;border-radius:4px;background:#fff;border:1px solid #E8E8EA"></span>
+        <span style="width:14px;height:26px;border-radius:4px;background:#4F21EA"></span>
+      </div>
+      <div style="font-size:13px;line-height:1.5;color:#56585C">Black, white, grey. Brand purple only for links and the focus ring.</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93;margin-bottom:10px">NOT IN V1</div>
+      <div style="font-size:13px;line-height:1.55;color:#56585C">No chat or forums, certificates, quizzes, peer review, AI feedback, payments, or social-metric ingestion. Discord stays the community layer.</div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+</body>
+</html>

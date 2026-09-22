@@ -1,0 +1,19 @@
+PipeOps Learn / UGC Programme
+
+SIGN IN
+
+Enter this code on the sign-in screen. It works once, and expires in an hour.
+
+    {{ .Token }}
+
+Or open this link:
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup
+
+WAITING FOR YOU
+Week 1 - Creator economy & niche: two modules, your niche statement, and
+your first post.
+
+This programme is invite-only and this code was sent to {{ .Email }}. If you
+weren't expecting it, ignore this email - nothing happens until the code is used.
+
+PIPEOPS LEARN / COHORT 01

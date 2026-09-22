@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  body { margin:0; background:#EDEDEE; font-family:'IBM Plex Sans',system-ui,'Segoe UI','Helvetica Neue',Arial,sans-serif; -webkit-font-smoothing:antialiased; color:#0B0B0C; }
+  a { color:#4F21EA; text-decoration:none; }
+  a:hover { color:#0B0B0C; text-decoration:underline; }
+  * { box-sizing:border-box; }
+</style>
+</helmet>
+
+<div style="padding:0 24px 140px">
+
+  <header style="max-width:1140px;margin:0 auto;padding:64px 0 36px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:26px">
+      <div style="width:22px;height:22px;background:#0B0B0C;border-radius:4px"></div>
+      <span style="font-size:15px;font-weight:700;letter-spacing:-0.006em">PipeOps Learn</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/ participant app</span>
+    </div>
+    <h1 style="margin:0;font-size:clamp(36px,5.5vw,60px);line-height:0.98;letter-spacing:-0.021em;font-weight:700;max-width:18ch">The participant path</h1>
+    <p style="margin:18px 0 0;font-size:17px;line-height:1.55;color:#56585C;max-width:60ch;text-wrap:pretty">Designed at 390px first — most of Cohort 01 is on a phone with bad signal. One question, one action per screen.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:40px 28px;justify-content:center;align-items:flex-start">
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑01</span>
+        <span style="font-size:15px;font-weight:700">Dashboard</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+          <div style="height:32px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#fff;font-family:'IBM Plex Mono',monospace;font-size:10px"><span>9:41</span><span style="color:#8A8D93">learn.pipeops.io</span></div>
+        </sc-if>
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:18px;height:18px;background:#0B0B0C;border-radius:3px"></div>
+            <span style="font-size:13px;font-weight:600">UGC Programme</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;border:1px solid #E8E8EA;border-radius:4px;padding:2px 5px">C01</span>
+          </div>
+          <span style="width:28px;height:28px;border-radius:50%;background:#0B0B0C;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">PA</span>
+        </div>
+        <div style="padding:16px;display:grid;gap:12px">
+
+          <div>
+            <div style="font-size:22px;font-weight:700;letter-spacing:-0.018em">Welcome back, Precious</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;margin-top:6px;letter-spacing:0.04em">WEEK 3 OF 6 · 45% · 14/30</div>
+            <div style="height:8px;background:#E3E4E6;border-radius:99px;overflow:hidden;margin-top:8px"><div style="width:45%;height:100%;background:#0B0B0C"></div></div>
+          </div>
+
+          <div style="background:#0B0B0C;color:#fff;border-radius:14px;padding:18px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#8A8D93"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M8.6 5.9 18.6 12 8.6 18.1z"></path></svg><span style="margin-left:6px">CONTINUE LEARNING</span></div>
+            <div style="font-size:19px;font-weight:700;letter-spacing:-0.008em;margin-top:8px;line-height:1.2">M06 · Hooks that stop the scroll</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#C9CBCE;margin-top:8px">11 MIN · RESUME 4:12</div>
+            <div style="height:4px;background:#333639;border-radius:99px;overflow:hidden;margin-top:10px"><div style="width:38%;height:100%;background:#fff"></div></div>
+            <button style="width:100%;margin-top:14px;border:0;background:#fff;color:#0B0B0C;font-family:inherit;font-size:15px;font-weight:700;padding:14px;border-radius:8px;cursor:pointer;min-height:48px">Resume module →</button>
+          </div>
+
+          <div style="background:#fff;border:1.5px solid #0B0B0C;border-radius:14px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg><span style="margin-left:6px">THIS WEEK'S TASK</span></div>
+              <span style="display:inline-flex;align-items:center;gap:6px;border:1px dashed #D6D7D9;border-radius:999px;padding:4px 9px;font-size:11px;color:#56585C;white-space:nowrap"><span style="width:5px;height:5px;border-radius:50%;border:1.5px solid #8A8D93"></span>Not started</span>
+            </div>
+            <div style="font-size:17px;font-weight:700;letter-spacing:-0.008em;margin-top:8px;line-height:1.25">3 scripts, 5 hooks, 1 published video</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500">DUE SUN 11 OCT · 23:59 WAT</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#0B0B0C;color:#fff;border-radius:4px;padding:2px 6px">IN 3 DAYS</span>
+            </div>
+            <button style="width:100%;margin-top:14px;border:0;background:#0B0B0C;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:14px;border-radius:8px;cursor:pointer;min-height:48px">Submit task</button>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:12px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M12 4.6 20 18.6H4z"></path><path d="M12 9.8v4"></path><path d="M12 16.4h.01"></path></svg><span style="margin-left:6px">OUTSTANDING</span></div>
+            <div style="display:grid;gap:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:7px;height:7px;background:#0B0B0C;transform:rotate(45deg);flex:0 0 auto"></span>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">W2 task · Idea bank</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">4 DAYS LATE</div></div>
+                <span style="font-size:13px;font-weight:600">→</span>
+              </div>
+              <div style="height:1px;background:#E3E4E6"></div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:7px;height:7px;background:#0B0B0C;transform:rotate(45deg);flex:0 0 auto"></span>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">M04 · Research doc</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">REQUIRED</div></div>
+                <span style="font-size:13px;font-weight:600">→</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M12 3.6l1.9 4.9 4.9 1.9-4.9 1.9L12 17.1l-1.9-4.8-4.9-1.9 4.9-1.9z"></path></svg><span style="margin-left:6px">STREAK</span></div>
+              <div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:30px;font-weight:700;letter-spacing:-0.04em">3</span><span style="font-size:13px;font-weight:600">weeks</span></div>
+              <div style="display:flex;gap:3px;margin-top:10px">
+                <span style="flex:1;height:6px;background:#0B0B0C;border-radius:2px"></span>
+                <span style="flex:1;height:6px;background:#0B0B0C;border-radius:2px"></span>
+                <span style="flex:1;height:6px;background:#0B0B0C;border-radius:2px"></span>
+                <span style="flex:1;height:6px;background:#E3E4E6;border-radius:2px"></span>
+                <span style="flex:1;height:6px;background:#E3E4E6;border-radius:2px"></span>
+                <span style="flex:1;height:6px;background:#E3E4E6;border-radius:2px"></span>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><circle cx="12" cy="12" r="7.6"></circle><circle cx="12" cy="12" r="3"></circle></svg><span style="margin-left:6px">POSITION</span></div>
+              <div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:30px;font-weight:700;letter-spacing:-0.04em">#12</span><span style="font-size:13px;color:#56585C">of 87</span></div>
+              <div style="font-size:12px;font-weight:600;margin-top:10px;text-decoration:underline;text-underline-offset:3px">Leaderboard →</div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M4.6 4.6h5.8v5.8H4.6z"></path><path d="M13.6 4.6h5.8v5.8h-5.8z"></path><path d="M4.6 13.6h5.8v5.8H4.6z"></path><path d="M13.6 13.6h5.8v5.8h-5.8z"></path></svg><span style="margin-left:6px">WEEK 3</span></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px">2/5</span>
+            </div>
+            <div style="display:grid;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;border-radius:50%;background:#0B0B0C;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center">✓</span><span style="font-size:14px;flex:1">M05 Planning &amp; scripting</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;border-radius:50%;border:1.5px solid #0B0B0C"></span><span style="font-size:14px;flex:1;font-weight:700">M06 Hooks</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;border-radius:50%;background:#0B0B0C;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center">✓</span><span style="font-size:14px;flex:1">M05 assignment</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;border-radius:50%;border:1.5px dashed #8A8D93"></span><span style="font-size:14px;flex:1;color:#56585C">M06 assignment</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;border-radius:50%;border:1.5px dashed #8A8D93"></span><span style="font-size:14px;flex:1;color:#56585C">Weekly task</span></div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M12 4.6a4.8 4.8 0 0 1 4.8 4.8v3.3l1.9 3.2H5.3l1.9-3.2V9.4A4.8 4.8 0 0 1 12 4.6z"></path><path d="M10.1 18.6a1.9 1.9 0 0 0 3.8 0"></path></svg><span style="margin-left:6px">ANNOUNCEMENTS</span></div>
+              <span style="font-size:16px;color:#8A8D93;line-height:1">×</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <span style="width:6px;height:6px;border-radius:50%;background:#0B0B0C;margin-top:6px;flex:0 0 auto"></span>
+              <div>
+                <div style="font-size:14px;font-weight:600;line-height:1.3">Week 3 is live — hooks clinic Thursday</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:4px">PINNED · 2D</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px;display:flex;gap:12px;align-items:center">
+            <div style="width:44px;height:44px;border-radius:8px;background:repeating-linear-gradient(135deg,#F0F0F1 0 6px,#E3E4E6 6px 12px);flex:0 0 auto"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M4 7.6h10.4v8.8H4z"></path><path d="M14.4 12.3l5.6-3v7.4l-5.6-3z"></path></svg><span style="margin-left:6px">NEXT SESSION</span></div>
+              <div style="font-size:14px;font-weight:600;margin-top:3px">Hooks clinic · Ife A.</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:2px">THU 9 OCT · 18:00 WAT</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #E8E8EA;padding:8px 8px 12px;display:flex">
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 10.8 12 4l8 6.8V20H4z"></path><path d="M9.5 20v-5.6h5V20"></path></svg><span style="font-size:10px;font-weight:700">Home</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 6.6C10.5 5 8.2 4.5 4.6 4.8V18c3.6-.3 5.9.2 7.4 1.7 1.5-1.5 3.8-2 7.4-1.7V4.8c-3.6-.3-5.9.2-7.4 1.8z"></path><path d="M12 6.6v13.1"></path></svg><span style="font-size:10px;color:#8A8D93">Learn</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg><span style="font-size:10px;color:#8A8D93">Tasks</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 20v-8.5"></path><path d="M12 20V4.6"></path><path d="M19 20v-6"></path></svg><span style="font-size:10px;color:#8A8D93">Board</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6 12h.01"></path><path d="M12 12h.01"></path><path d="M18 12h.01"></path></svg><span style="font-size:10px;color:#8A8D93">More</span></span>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;border-left:2px solid #0B0B0C;padding:2px 0 2px 12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93">F9 · BLOCK ORDER IS FIXED</div>
+          <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:6px">Continue-learning falls back: next incomplete module in current week → earliest incomplete in any released week → caught-up state. Outstanding block renders only when non-empty. Session card renders only within 7 days of start.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑02</span>
+        <span style="font-size:15px;font-weight:700">Dashboard · caught up</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <sc-if value="{{ showStatusBar }}" hint-placeholder-val="{{ true }}">
+          <div style="height:32px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#fff;font-family:'IBM Plex Mono',monospace;font-size:10px"><span>9:41</span><span style="color:#8A8D93">learn.pipeops.io</span></div>
+        </sc-if>
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;background:#0B0B0C;border-radius:3px"></div><span style="font-size:13px;font-weight:600">UGC Programme</span></div>
+          <span style="width:28px;height:28px;border-radius:50%;background:#0B0B0C;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">PA</span>
+        </div>
+        <div style="padding:16px;display:grid;gap:12px">
+          <div>
+            <div style="font-size:22px;font-weight:700;letter-spacing:-0.018em">Welcome back, Precious</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;margin-top:6px;letter-spacing:0.04em">WEEK 3 OF 6 · 60% · 18/30</div>
+            <div style="height:8px;background:#E3E4E6;border-radius:99px;overflow:hidden;margin-top:8px"><div style="width:60%;height:100%;background:#0B0B0C"></div></div>
+          </div>
+          <div style="border:1px dashed #D6D7D9;border-radius:14px;padding:26px 18px;text-align:center;background:#fff">
+            <div style="width:34px;height:34px;border-radius:50%;background:#0B0B0C;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><svg viewBox="0 0 24 24" style="width:18px;height:18px;flex:0 0 auto;fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12.6l4.6 4.6L19 7.2"></path></svg></div>
+            <div style="font-size:17px;font-weight:700;letter-spacing:-0.008em;line-height:1.3">You're all caught up for Week 3</div>
+            <div style="font-size:13px;color:#56585C;margin-top:8px;line-height:1.5">Week 4 opens Mon 12 Oct. We'll email you.</div>
+            <button style="margin-top:16px;border:1px solid #0B0B0C;background:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:12px 18px;border-radius:8px;cursor:pointer;min-height:44px">Review Week 3</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M12 3.6l1.9 4.9 4.9 1.9-4.9 1.9L12 17.1l-1.9-4.8-4.9-1.9 4.9-1.9z"></path></svg><span style="margin-left:6px">STREAK</span></div>
+              <div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:30px;font-weight:700;letter-spacing:-0.04em">3</span><span style="font-size:13px;font-weight:600">weeks</span></div>
+            </div>
+            <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C">POINTS</div>
+              <div style="display:flex;align-items:baseline;gap:5px;margin-top:6px"><span style="font-size:30px;font-weight:700;letter-spacing:-0.04em">310</span><span style="font-size:13px;color:#56585C">/660</span></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:12px">WEEK 4 PREVIEW · LOCKED</div>
+            <div style="display:flex;align-items:center;gap:10px;color:#8A8D93">
+              <span style="width:8px;height:3px;background:#8A8D93"></span>
+              <span style="font-size:14px;font-weight:600;flex:1">Filming, lighting &amp; audio</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px">12 OCT</span>
+            </div>
+          </div>
+        </div>
+        <div style="background:#fff;border-top:1px solid #E8E8EA;padding:8px 8px 12px;display:flex">
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 10.8 12 4l8 6.8V20H4z"></path><path d="M9.5 20v-5.6h5V20"></path></svg><span style="font-size:10px;font-weight:700">Home</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 6.6C10.5 5 8.2 4.5 4.6 4.8V18c3.6-.3 5.9.2 7.4 1.7 1.5-1.5 3.8-2 7.4-1.7V4.8c-3.6-.3-5.9.2-7.4 1.8z"></path><path d="M12 6.6v13.1"></path></svg><span style="font-size:10px;color:#8A8D93">Learn</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg><span style="font-size:10px;color:#8A8D93">Tasks</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 20v-8.5"></path><path d="M12 20V4.6"></path><path d="M19 20v-6"></path></svg><span style="font-size:10px;color:#8A8D93">Board</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6 12h.01"></path><path d="M12 12h.01"></path><path d="M18 12h.01"></path></svg><span style="font-size:10px;color:#8A8D93">More</span></span>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;border-left:2px solid #0B0B0C;padding:2px 0 2px 12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93">DESIGNED, NOT ACCIDENTAL</div>
+          <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:6px">When nothing is outstanding the primary CTA disappears rather than degrading to a weak one. The week-4 preview keeps the rhythm visible without leaking content.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑03</span>
+        <span style="font-size:15px;font-weight:700">Learn</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/learn</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:14px 16px">
+          <div style="font-size:19px;font-weight:700;letter-spacing:-0.014em">Learn</div>
+          <div style="display:flex;gap:6px;margin-top:12px">
+            <span style="font-size:13px;font-weight:600;padding:7px 12px;border-radius:999px;background:#0B0B0C;color:#fff">By week</span>
+            <span style="font-size:13px;font-weight:500;padding:7px 12px;border-radius:999px;background:#F0F0F1;color:#56585C">All 12 modules</span>
+          </div>
+        </div>
+        <div style="padding:16px;display:grid;gap:10px">
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px">
+            <div style="display:flex;gap:12px;align-items:center">
+              <span style="width:6px;height:6px;border-radius:50%;background:#0B0B0C"></span>
+              <div style="flex:1;min-width:0"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">WEEK 1 · 21–27 SEP · COMPLETE</div><div style="font-size:15px;font-weight:700;margin-top:3px">Creator economy &amp; your niche</div></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">5/5</span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px">
+            <div style="display:flex;gap:12px;align-items:center">
+              <span style="width:6px;height:6px;border-radius:50%;background:linear-gradient(90deg,#0B0B0C 50%,#fff 50%);border:1.5px solid #0B0B0C"></span>
+              <div style="flex:1;min-width:0"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">WEEK 2 · 28 SEP–4 OCT · 1 OUTSTANDING</div><div style="font-size:15px;font-weight:700;margin-top:3px">Algorithms, research &amp; ideas</div></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">4/5</span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1.5px solid #0B0B0C;border-radius:12px;padding:14px">
+            <div style="display:flex;gap:12px;align-items:center">
+              <span style="width:6px;height:6px;border-radius:50%;border:1.5px solid #0B0B0C"></span>
+              <div style="flex:1;min-width:0"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500">WEEK 3 · CURRENT · DUE SUN 11 OCT</div><div style="font-size:15px;font-weight:700;margin-top:3px">Planning, scripting &amp; hooks</div></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">2/5</span>
+            </div>
+            <div style="height:1px;background:#E3E4E6;margin:12px 0"></div>
+            <div style="display:grid;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;border-radius:50%;background:#0B0B0C;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center">✓</span><span style="font-size:14px;flex:1">M05 Planning &amp; scripting</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">14m</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;border-radius:50%;border:1.5px solid #0B0B0C"></span><span style="font-size:14px;flex:1;font-weight:700">M06 Hooks</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">11m</span></div>
+            </div>
+            <button style="width:100%;margin-top:14px;border:0;background:#0B0B0C;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:13px;border-radius:8px;cursor:pointer;min-height:48px">Open Week 3 →</button>
+          </div>
+          <div style="background:#F6F6F7;border:1px solid #E8E8EA;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center">
+            <span style="width:8px;height:3px;background:#8A8D93"></span>
+            <div style="flex:1;min-width:0"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">WEEK 4 · LOCKED</div><div style="font-size:15px;font-weight:700;margin-top:3px;color:#8A8D93">Opens Mon 12 October</div></div>
+          </div>
+          <div style="background:#F6F6F7;border:1px solid #E8E8EA;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center">
+            <span style="width:8px;height:3px;background:#8A8D93"></span>
+            <div style="flex:1;min-width:0"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">WEEK 5 · LOCKED</div><div style="font-size:15px;font-weight:700;margin-top:3px;color:#8A8D93">Opens Mon 19 October</div></div>
+          </div>
+          <div style="background:#F6F6F7;border:1px solid #E8E8EA;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center">
+            <span style="width:8px;height:3px;background:#8A8D93"></span>
+            <div style="flex:1;min-width:0"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">WEEK 6 · LOCKED · FINAL PROJECT</div><div style="font-size:15px;font-weight:700;margin-top:3px;color:#8A8D93">Opens Mon 26 October</div></div>
+          </div>
+        </div>
+        <div style="background:#fff;border-top:1px solid #E8E8EA;padding:8px 8px 12px;display:flex">
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 10.8 12 4l8 6.8V20H4z"></path><path d="M9.5 20v-5.6h5V20"></path></svg><span style="font-size:10px;color:#8A8D93">Home</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 6.6C10.5 5 8.2 4.5 4.6 4.8V18c3.6-.3 5.9.2 7.4 1.7 1.5-1.5 3.8-2 7.4-1.7V4.8c-3.6-.3-5.9.2-7.4 1.8z"></path><path d="M12 6.6v13.1"></path></svg><span style="font-size:10px;font-weight:700">Learn</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg><span style="font-size:10px;color:#8A8D93">Tasks</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 20v-8.5"></path><path d="M12 20V4.6"></path><path d="M19 20v-6"></path></svg><span style="font-size:10px;color:#8A8D93">Board</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6 12h.01"></path><path d="M12 12h.01"></path><path d="M18 12h.01"></path></svg><span style="font-size:10px;color:#8A8D93">More</span></span>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;border-left:2px solid #0B0B0C;padding:2px 0 2px 12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93">F3 · WEEKS ARE THE PRIMARY PATH</div>
+          <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:6px">Only the current week expands by default. Course parts live in the "All 12 modules" tab as grouping metadata, not as navigation.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑04</span>
+        <span style="font-size:15px;font-weight:700">Week overview</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/learn/week/3</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#0B0B0C;color:#fff;padding:16px">
+          <div style="display:flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93"><span>←</span><span>WEEK 3 OF 6</span></div>
+          <div style="font-size:24px;font-weight:700;letter-spacing:-0.018em;margin-top:10px;line-height:1.1">Planning, scripting &amp; hooks</div>
+          <p style="margin:10px 0 0;font-size:14px;line-height:1.5;color:#C9CBCE">Stop consuming. Start shipping.</p>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;border:1px solid #56585C;border-radius:5px;padding:4px 8px">DUE SUN 11 OCT 23:59 WAT</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#fff;color:#0B0B0C;border-radius:5px;padding:4px 8px">IN 3 DAYS</span>
+          </div>
+          <div style="height:6px;background:#333639;border-radius:99px;overflow:hidden;margin-top:16px"><div style="width:40%;height:100%;background:#fff"></div></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:6px">2/5 DONE</div>
+        </div>
+        <div style="padding:16px;display:grid;gap:16px">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:10px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M12 4 20 8.2 12 12.4 4 8.2z"></path><path d="M4 12.4 12 16.6l8-4.2"></path></svg><span style="margin-left:6px">MODULES</span></div>
+            <div style="display:grid;gap:8px">
+              <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:12px;display:flex;gap:12px;align-items:center">
+                <div style="width:56px;height:38px;border-radius:6px;background:repeating-linear-gradient(135deg,#F0F0F1 0 6px,#E3E4E6 6px 12px);flex:0 0 auto"></div>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">M05 Planning &amp; scripting</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:3px">14 MIN · COMPLETE</div></div>
+                <span style="width:20px;height:20px;border-radius:50%;background:#0B0B0C;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex:0 0 auto">✓</span>
+              </div>
+              <div style="background:#fff;border:1.5px solid #0B0B0C;border-radius:12px;padding:12px;display:flex;gap:12px;align-items:center">
+                <div style="width:56px;height:38px;border-radius:6px;background:repeating-linear-gradient(135deg,#F0F0F1 0 6px,#E3E4E6 6px 12px);flex:0 0 auto"></div>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">M06 Hooks that stop the scroll</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:3px">11 MIN · RESUME 4:12</div></div>
+                <span style="font-size:14px;font-weight:600">→</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:10px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M6.4 4.6V20"></path><path d="M6.4 5.2h11l-1.8 3.6 1.8 3.6h-11z"></path></svg><span style="margin-left:6px">PROGRAMME TASK</span></div>
+            <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px">
+              <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                <div style="font-size:15px;font-weight:700;line-height:1.3">3 scripts, 5 hooks, 1 published video</div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;border:1px solid #0B0B0C;border-radius:4px;padding:3px 6px;white-space:nowrap">+20 PTS</span>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:8px">URL · TEXT · FILE · REQUIRED</div>
+              <button style="width:100%;margin-top:12px;border:0;background:#0B0B0C;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:13px;border-radius:8px;cursor:pointer;min-height:48px">Open task</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:10px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg><span style="margin-left:6px">COURSE ASSIGNMENTS</span></div>
+            <div style="display:grid;gap:8px">
+              <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center">
+                <span style="width:6px;height:6px;border-radius:50%;background:#0B0B0C"></span>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Script skeleton</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">SUBMITTED ON TIME · +20</div></div>
+              </div>
+              <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center">
+                <span style="width:6px;height:6px;border-radius:50%;border:1.5px dashed #8A8D93"></span>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Five hooks, one topic</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">REQUIRED · NOT STARTED</div></div>
+                <span style="font-size:14px;font-weight:600">→</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:10px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M4 7.6h5l2 2.2h9v9.2H4z"></path><path d="M4 7.6V5h5l2 2.6"></path></svg><span style="margin-left:6px">BONUS RESOURCES</span></div>
+            <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:4px 14px">
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #E8E8EA"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:2px 4px;color:#56585C">PDF</span><span style="font-size:14px;flex:1">Hook library · 50 openers</span><svg viewBox="0 0 24 24" style="width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4.6v9.8"></path><path d="M8.2 10.9 12 14.6l3.8-3.7"></path><path d="M5.2 19.4h13.6"></path></svg></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 0"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:2px 4px;color:#56585C">SHEET</span><span style="font-size:14px;flex:1">Script template</span><svg viewBox="0 0 24 24" style="width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M14.2 5H19v4.8"></path><path d="M19 5l-7.4 7.4"></path><path d="M16.8 13.4V19H5V7.2h5.6"></path></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;border-left:2px solid #0B0B0C;padding:2px 0 2px 12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93">F6.4 · SIGNED URLS</div>
+          <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:6px">Downloads (↓) resolve through a 15-minute signed URL; external links (↗) open in a new tab. Both emit MATERIAL_OPENED.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑05</span>
+        <span style="font-size:15px;font-weight:700">Week locked</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/learn/week/4</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:14px 16px;display:flex;align-items:center;gap:10px"><span style="font-size:14px">←</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">WEEK 4 OF 6</span></div>
+        <div style="padding:16px">
+          <div style="border:1px dashed #D6D7D9;background:#fff;border-radius:14px;padding:30px 20px;text-align:center">
+            <div style="display:flex;justify-content:center;margin-bottom:16px"><svg viewBox="0 0 24 24" style="width:30px;height:30px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6.4 11h11.2v8.6H6.4z"></path><path d="M9 11V8.6a3 3 0 0 1 6 0V11"></path></svg></div>
+            <div style="font-size:19px;font-weight:700;letter-spacing:-0.012em">Week 4 opens Monday 12 October</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;margin-top:8px">00:00 WAT · IN 4 DAYS</div>
+            <p style="margin:14px auto 0;font-size:13px;line-height:1.55;color:#56585C;max-width:30ch;text-wrap:pretty">Filming, lighting and audio. We'll email you when it opens.</p>
+            <div style="height:1px;background:#E3E4E6;margin:20px 0"></div>
+            <div style="font-size:13px;font-weight:600">2 items outstanding in Week 2</div>
+            <button style="margin-top:12px;border:1px solid #0B0B0C;background:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:12px 18px;border-radius:8px;cursor:pointer;min-height:44px">Go to Week 2 →</button>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;border-left:2px solid #0B0B0C;padding:2px 0 2px 12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93">F3.3 · SERVER-ENFORCED</div>
+          <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:6px">The API returns number, title and release_at only. Module titles, briefs and video refs are not in the payload — this screen physically cannot leak them.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑06</span>
+        <span style="font-size:15px;font-weight:700">Module</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/learn/module/hooks</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#1A1C1F;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#C9CBCE">← WEEK 3</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">M06 · PART 2</span>
+        </div>
+        <div style="background:#1A1C1F;aspect-ratio:16/9;background-image:repeating-linear-gradient(135deg,#232528 0 7px,#1A1C1F 7px 14px);display:flex;align-items:center;justify-content:center;position:relative">
+          <span style="width:54px;height:54px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" style="width:21px;height:21px;flex:0 0 auto;fill:#0B0B0C;stroke:none"><path d="M8.6 5.9 18.6 12 8.6 18.1z"></path></svg></span>
+          <span style="position:absolute;bottom:0;left:0;right:0;height:3px;background:#333639"><span style="display:block;width:38%;height:100%;background:#fff"></span></span>
+          <span style="position:absolute;bottom:12px;left:14px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">youtube · unlisted</span>
+        </div>
+        <div style="background:#1A1C1F;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <span style="font-size:13px;color:#C9CBCE">Resume from <span style="font-family:'IBM Plex Mono',monospace;color:#fff">4:12</span>?</span>
+          <div style="display:flex;gap:8px"><button style="border:0;background:#fff;color:#0B0B0C;font-family:inherit;font-size:13px;font-weight:600;padding:9px 13px;border-radius:6px;cursor:pointer">Resume</button><button style="border:1px solid #56585C;background:transparent;color:#fff;font-family:inherit;font-size:13px;padding:9px 13px;border-radius:6px;cursor:pointer">Start over</button></div>
+        </div>
+        <div style="padding:16px;display:grid;gap:16px">
+          <div>
+            <div style="font-size:22px;font-weight:700;letter-spacing:-0.018em;line-height:1.12">Hooks that stop the scroll</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:8px">11 MIN · WATCHED 38% · PART 2</div>
+            <p style="margin:12px 0 0;font-size:15px;line-height:1.55;color:#56585C;text-wrap:pretty">The first three seconds decide whether the other eleven minutes exist.</p>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:16px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:12px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M6.4 4.6V20"></path><path d="M6.4 5.2h11l-1.8 3.6 1.8 3.6h-11z"></path></svg><span style="margin-left:6px">WHAT YOU'LL LEARN</span></div>
+            <div style="display:grid;gap:9px">
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:5px;height:5px;background:#0B0B0C;margin-top:7px;flex:0 0 auto"></span><span style="font-size:14px;line-height:1.45">Four hook patterns for technical content</span></div>
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:5px;height:5px;background:#0B0B0C;margin-top:7px;flex:0 0 auto"></span><span style="font-size:14px;line-height:1.45">Rewriting a boring first line in a minute</span></div>
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:5px;height:5px;background:#0B0B0C;margin-top:7px;flex:0 0 auto"></span><span style="font-size:14px;line-height:1.45">Why hook and thumbnail must disagree</span></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:10px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M4 7.6h5l2 2.2h9v9.2H4z"></path><path d="M4 7.6V5h5l2 2.6"></path></svg><span style="margin-left:6px">LEARNING MATERIALS</span></div>
+            <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:4px 14px">
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #E8E8EA"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:2px 4px;color:#56585C">PDF</span><span style="font-size:14px;flex:1">Hook worksheet</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;background:#0B0B0C;color:#fff;border-radius:3px;padding:2px 5px">REQ</span></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 0"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:2px 4px;color:#56585C">LINK</span><span style="font-size:14px;flex:1">Hooks teardown thread</span><svg viewBox="0 0 24 24" style="width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M14.2 5H19v4.8"></path><path d="M19 5l-7.4 7.4"></path><path d="M16.8 13.4V19H5V7.2h5.6"></path></svg></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M6.6 3.9h6.8L18 8.4v11.7H6.6z"></path><path d="M13.2 3.9v4.7H18"></path></svg><span style="margin-left:6px">ASSIGNMENT</span></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;border:1px solid #0B0B0C;border-radius:4px;padding:3px 6px">+15 PTS</span>
+            </div>
+            <div style="font-size:16px;font-weight:700;margin-top:8px;line-height:1.3">Five hooks, one topic</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:6px">TEXT · DUE SUN 11 OCT 23:59 WAT</div>
+            <button style="width:100%;margin-top:12px;border:1px solid #0B0B0C;background:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:12px;border-radius:8px;cursor:pointer;min-height:44px">Start assignment</button>
+          </div>
+          <div style="background:#0B0B0C;border-radius:12px;padding:16px;color:#fff">
+            <div style="font-size:14px;font-weight:600">Watch 90% to auto-enable</div>
+            <div style="font-size:13px;color:#C9CBCE;margin-top:5px;line-height:1.5">Manual marking always available.</div>
+            <button style="width:100%;margin-top:12px;border:1px solid #56585C;background:transparent;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:13px;border-radius:8px;cursor:pointer;min-height:48px">Mark module complete</button>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button style="flex:1;border:1px solid #E8E8EA;background:#fff;font-family:inherit;font-size:13px;font-weight:600;padding:12px;border-radius:8px;cursor:pointer;min-height:44px">← M05</button>
+            <button style="flex:1;border:1px solid #E8E8EA;background:#F6F6F7;color:#8A8D93;font-family:inherit;font-size:13px;font-weight:600;padding:12px;border-radius:8px;min-height:44px;cursor:not-allowed">M07 · 12 Oct</button>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;border-left:2px solid #0B0B0C;padding:2px 0 2px 12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93">F4.4 · ORDER IS FIXED · F5.8 · DEGRADES</div>
+          <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:6px">Video → what you'll learn → materials → assignment → completion. If the IFrame API is blocked the shell becomes a plain embed and the completion button turns primary immediately.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑07</span>
+        <span style="font-size:15px;font-weight:700">Tasks</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/tasks</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <div style="font-size:19px;font-weight:700;letter-spacing:-0.014em">Tasks</div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C">9 OF 18 DONE</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:12px;overflow-x:auto">
+            <span style="font-size:13px;font-weight:600;padding:7px 12px;border-radius:999px;background:#0B0B0C;color:#fff;white-space:nowrap">All</span>
+            <span style="font-size:13px;padding:7px 12px;border-radius:999px;background:#F0F0F1;color:#56585C;white-space:nowrap">Outstanding 4</span>
+            <span style="font-size:13px;padding:7px 12px;border-radius:999px;background:#F0F0F1;color:#56585C;white-space:nowrap">Submitted</span>
+            <span style="font-size:13px;padding:7px 12px;border-radius:999px;background:#F0F0F1;color:#56585C;white-space:nowrap">Needs revision 1</span>
+          </div>
+        </div>
+        <div style="padding:16px;display:grid;gap:18px">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:10px">WEEK 3 · CURRENT</div>
+            <div style="display:grid;gap:8px">
+              <div style="background:#fff;border:1.5px solid #0B0B0C;border-radius:12px;padding:14px">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                  <div style="font-size:15px;font-weight:700;line-height:1.3">Programme task · 3 scripts + 5 hooks</div>
+                  <span style="display:inline-flex;align-items:center;gap:5px;border:1px dashed #D6D7D9;border-radius:999px;padding:3px 8px;font-size:11px;color:#56585C;white-space:nowrap">Not started</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px">DUE SUN 11 OCT</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;background:#0B0B0C;color:#fff;border-radius:4px;padding:2px 5px">3 DAYS</span></div>
+              </div>
+              <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                  <div style="font-size:15px;font-weight:700;line-height:1.3">M06 · Five hooks, one topic</div>
+                  <span style="display:inline-flex;align-items:center;gap:5px;border:1px dashed #D6D7D9;border-radius:999px;padding:3px 8px;font-size:11px;color:#56585C;white-space:nowrap">Not started</span>
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:8px">TEXT · REQUIRED · DUE SUN 11 OCT</div>
+              </div>
+              <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                  <div style="font-size:15px;font-weight:700;line-height:1.3">M05 · Script skeleton</div>
+                  <span style="display:inline-flex;align-items:center;gap:5px;border:1px solid #0B0B0C;background:#0B0B0C;color:#fff;border-radius:999px;padding:3px 8px;font-size:11px;white-space:nowrap"><span style="width:5px;height:5px;border-radius:50%;background:#fff"></span>Approved</span>
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:8px">6 OCT · ON TIME · +20</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:10px">WEEK 2</div>
+            <div style="display:grid;gap:8px">
+              <div style="background:#F0F0F1;border:1.5px solid #0B0B0C;border-radius:12px;padding:14px">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                  <div style="font-size:15px;font-weight:700;line-height:1.3">Programme task · Idea bank</div>
+                  <span style="display:inline-flex;align-items:center;gap:5px;border:1px solid #0B0B0C;background:#F0F0F1;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:600;white-space:nowrap"><span style="width:5px;height:5px;background:#0B0B0C"></span>Needs revision</span>
+                </div>
+                <div style="font-size:13px;color:#56585C;margin-top:8px;line-height:1.45">"Split the ideas into your three Week 1 pillars and resubmit."</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:6px">REVIEWED BY PRECIOUS · 5 OCT</div>
+              </div>
+              <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                  <div style="font-size:15px;font-weight:700;line-height:1.3">M04 · Research doc</div>
+                  <span style="display:inline-flex;align-items:center;gap:5px;border:1px solid #0B0B0C;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:600;text-decoration:line-through;white-space:nowrap">Late</span>
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:8px">DEADLINE PASSED 4 OCT · NO BONUS</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:10px">WEEK 4–6 · LOCKED</div>
+            <div style="background:#F6F6F7;border:1px dashed #D6D7D9;border-radius:12px;padding:16px;text-align:center">
+              <div style="display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" style="width:17px;height:17px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6.4 11h11.2v8.6H6.4z"></path><path d="M9 11V8.6a3 3 0 0 1 6 0V11"></path></svg><span style="font-size:13px;color:#56585C">3 tasks unlock with their weeks</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#fff;border-top:1px solid #E8E8EA;padding:8px 8px 12px;display:flex">
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 10.8 12 4l8 6.8V20H4z"></path><path d="M9.5 20v-5.6h5V20"></path></svg><span style="font-size:10px;color:#8A8D93">Home</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 6.6C10.5 5 8.2 4.5 4.6 4.8V18c3.6-.3 5.9.2 7.4 1.7 1.5-1.5 3.8-2 7.4-1.7V4.8c-3.6-.3-5.9.2-7.4 1.8z"></path><path d="M12 6.6v13.1"></path></svg><span style="font-size:10px;color:#8A8D93">Learn</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg><span style="font-size:10px;font-weight:700">Tasks</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 20v-8.5"></path><path d="M12 20V4.6"></path><path d="M19 20v-6"></path></svg><span style="font-size:10px;color:#8A8D93">Board</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6 12h.01"></path><path d="M12 12h.01"></path><path d="M18 12h.01"></path></svg><span style="font-size:10px;color:#8A8D93">More</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑08</span>
+        <span style="font-size:15px;font-weight:700">Task detail · submit</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/tasks/w3</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:14px 16px;display:flex;align-items:center;gap:10px"><span style="font-size:14px">←</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">WEEK 3 · PROGRAMME TASK</span></div>
+        <div style="padding:16px;display:grid;gap:14px">
+          <div>
+            <div style="font-size:21px;font-weight:700;letter-spacing:-0.018em;line-height:1.15">3 scripts, 5 hooks, 1 published video</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;border:1px solid #C9CBCE;border-radius:5px;padding:4px 8px">DUE SUN 11 OCT 23:59 WAT</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#0B0B0C;color:#fff;border-radius:5px;padding:4px 8px">IN 3 DAYS</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;border:1px solid #0B0B0C;border-radius:5px;padding:4px 8px">+20 PTS · +5 ON TIME</span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:16px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:10px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M6.6 3.9h6.8L18 8.4v11.7H6.6z"></path><path d="M13.2 3.9v4.7H18"></path></svg><span style="margin-left:6px">THE BRIEF</span></div>
+            <p style="margin:0;font-size:15px;line-height:1.55;color:#0B0B0C;text-wrap:pretty">Pick one topic from your idea bank. Write three scripts and five hooks, then publish the strongest as a dev video.</p>
+            <div style="display:grid;gap:8px;margin-top:14px">
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;flex:0 0 auto">01</span><span style="font-size:14px;line-height:1.45">Paste the public post URL</span></div>
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;flex:0 0 auto">02</span><span style="font-size:14px;line-height:1.45">Attach or paste your scripts</span></div>
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;flex:0 0 auto">03</span><span style="font-size:14px;line-height:1.45">Two lines: which hook, and why</span></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1.5px solid #0B0B0C;border-radius:12px;padding:16px;display:grid;gap:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M12 19.4V9.6"></path><path d="M8.2 13.3 12 9.5l3.8 3.8"></path><path d="M5.2 5h13.6"></path></svg><span style="margin-left:6px">YOUR SUBMISSION</span></div>
+              <span style="display:inline-flex;align-items:center;gap:6px;border:1px solid #0B0B0C;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:500">Draft saved <span style="font-family:'IBM Plex Mono',monospace;color:#8A8D93">12:04</span></span>
+            </div>
+            <label style="display:block">
+              <span style="display:block;font-size:13px;font-weight:600;margin-bottom:7px">Post URL <span style="color:#8A8D93;font-weight:400">· required</span></span>
+              <input type="text" value="https://x.com/ada/status/1837..." style="width:100%;border:2px solid #4F21EA;border-radius:8px;padding:12px 13px;font-family:inherit;font-size:15px;min-height:48px;outline:none" />
+              <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#56585C;margin-top:7px"><span style="width:12px;height:12px;border-radius:50%;border:1.5px solid #0B0B0C;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700">i</span>X is an accepted platform</span>
+              <button style="margin-top:10px;border:1px solid #E8E8EA;background:#fff;font-family:inherit;font-size:13px;font-weight:600;padding:9px 13px;border-radius:6px;cursor:pointer">+ Add another URL</button>
+            </label>
+            <label style="display:block">
+              <span style="display:block;font-size:13px;font-weight:600;margin-bottom:7px">Which hook, and why?</span>
+              <textarea style="width:100%;border:1px solid #C9CBCE;border-radius:8px;padding:13px 14px;font-family:inherit;font-size:15px;min-height:84px;resize:vertical">Went with the "I deleted my Dockerfile" open — it front-loads the mistake…</textarea>
+              <span style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93;margin-top:7px"><span>MIN 100 · MAX 1500</span><span>214</span></span>
+            </label>
+            <div>
+              <span style="display:block;font-size:13px;font-weight:600;margin-bottom:7px">Scripts</span>
+              <div style="border:1px solid #E8E8EA;border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:2px 4px;color:#56585C">PDF</span>
+                <span style="font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">scripts-week3.pdf</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">1.2MB</span>
+                <span style="font-size:14px;color:#56585C">×</span>
+              </div>
+              <div style="border:1px dashed #D6D7D9;border-radius:8px;padding:18px;text-align:center;background:#F6F6F7">
+                <div style="font-size:14px;font-weight:600">Drop a file or browse</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:5px">PDF DOCX · MAX 25MB · 4 SLOTS LEFT</div>
+              </div>
+            </div>
+            <button style="width:100%;border:0;background:#0B0B0C;color:#fff;font-family:inherit;font-size:16px;font-weight:700;padding:15px;border-radius:8px;cursor:pointer;min-height:52px">Submit task</button>
+            <div style="font-size:12px;color:#56585C;text-align:center;line-height:1.5">Editable until approved.</div>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;border-left:2px solid #0B0B0C;padding:2px 0 2px 12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93">F7.2–F7.5 · ONE ENGINE, TWO OBJECTS</div>
+          <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:6px">Course assignments render the identical form with only the enabled submission types shown. Non-matching hosts warn, never block. Autosave every 10s and on blur; submit is idempotent on (enrollment, item, version) so a double tap creates one submission.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑09</span>
+        <span style="font-size:15px;font-weight:700">Task · after submit &amp; late</span>
+      </div>
+      <div style="display:grid;gap:12px">
+        <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden;padding:16px">
+          <div style="display:grid;gap:12px">
+            <div style="background:#0B0B0C;color:#fff;border-radius:12px;padding:16px">
+              <div style="display:flex;align-items:center;gap:8px"><span style="width:20px;height:20px;border-radius:50%;background:#fff;color:#0B0B0C;font-size:11px;display:flex;align-items:center;justify-content:center">✓</span><span style="font-size:15px;font-weight:700">Submitted · on time</span></div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:8px">SUN 11 OCT 21:14 WAT · VERSION 2 · +25 PTS</div>
+              <div style="font-size:13px;color:#C9CBCE;margin-top:10px;line-height:1.5">In the review queue. We'll email you.</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:16px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:12px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M4 12.6h4.2l1.4 2.4h4.8l1.4-2.4H20"></path><path d="M4 12.6 6.6 5h10.8L20 12.6v6.6H4z"></path></svg><span style="margin-left:6px">WHAT YOU SENT</span></div>
+              <div style="display:grid;gap:10px">
+                <div style="display:flex;gap:10px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:2px 4px;color:#56585C">URL</span><a href="#" style="font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">x.com/ada/status/1837…</a><span style="font-size:12px">↗</span></div>
+                <div style="display:flex;gap:10px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:2px 4px;color:#56585C">PDF</span><span style="font-size:14px;flex:1">scripts-week3.pdf</span><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4.6v9.8"></path><path d="M8.2 10.9 12 14.6l3.8-3.7"></path><path d="M5.2 19.4h13.6"></path></svg></div>
+                <div style="font-size:14px;line-height:1.5;color:#56585C;border-top:1px solid #E8E8EA;padding-top:10px">Went with the "I deleted my Dockerfile" open — it front-loads the mistake…</div>
+              </div>
+              <div style="height:1px;background:#E3E4E6;margin:14px 0"></div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">V1 · 10 OCT 18:02</div>
+                <span style="font-size:12px;font-weight:600;text-decoration:underline;text-underline-offset:3px">History</span>
+              </div>
+            </div>
+            <button style="width:100%;border:1px solid #0B0B0C;background:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:13px;border-radius:8px;cursor:pointer;min-height:48px">Edit and resubmit</button>
+          </div>
+        </div>
+        <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden;padding:16px">
+          <div style="background:#F0F0F1;border:1.5px solid #0B0B0C;border-radius:12px;padding:16px">
+            <div style="display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;background:#0B0B0C"></span><span style="font-size:15px;font-weight:700">This is now late</span></div>
+            <div style="font-size:13px;color:#56585C;margin-top:8px;line-height:1.5">Deadline passed Sun 4 Oct. Still accepted and reviewed — no +5 on-time bonus.</div>
+            <button style="width:100%;margin-top:14px;border:0;background:#0B0B0C;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:14px;border-radius:8px;cursor:pointer;min-height:48px">Submit anyway</button>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:16px;margin-top:12px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:10px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M4.6 6h14.8v9.4h-8.9L5.6 19v-3.6z"></path></svg><span style="margin-left:6px">REVIEWER FEEDBACK · NEEDS REVISION</span></div>
+            <div style="font-size:14px;line-height:1.55">"Split the ideas into your three Week 1 pillars and resubmit."</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:10px">PRECIOUS A. · 5 OCT 09:12</div>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;border-left:2px solid #0B0B0C;padding:2px 0 2px 12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93">F7.7 · LATENESS IS A FLAG, NOT A WALL</div>
+          <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:6px">The late warning appears before the participant commits, computed at submit time and frozen on that version. Tone is deliberately non-punitive — we want the work, not the shame.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑10</span>
+        <span style="font-size:15px;font-weight:700">Leaderboard</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/leaderboard</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:14px 16px">
+          <div style="font-size:19px;font-weight:700;letter-spacing:-0.014em">Leaderboard</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:4px">BEHAVIOUR, NOT AUDIENCE SIZE</div>
+          <div style="display:flex;gap:6px;margin-top:12px">
+            <span style="font-size:13px;font-weight:600;padding:7px 12px;border-radius:999px;background:#0B0B0C;color:#fff">Points</span>
+            <span style="font-size:13px;padding:7px 12px;border-radius:999px;background:#F0F0F1;color:#56585C">Most consistent</span>
+          </div>
+        </div>
+        <div style="padding:16px;display:grid;gap:12px">
+          <div style="background:#0B0B0C;color:#fff;border-radius:14px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#8A8D93"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><circle cx="12" cy="12" r="7.6"></circle><circle cx="12" cy="12" r="3"></circle></svg><span style="margin-left:6px">YOUR POSITION</span></div>
+                <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px"><span style="font-size:34px;font-weight:700;letter-spacing:-0.04em">#12</span><span style="font-size:14px;color:#C9CBCE">of 87 active</span></div>
+              </div>
+              <div style="text-align:right"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">POINTS</div><div style="font-size:24px;font-weight:700;letter-spacing:-0.018em">310</div></div>
+            </div>
+            <div style="height:1px;background:#333639;margin:14px 0"></div>
+            <div style="display:grid;gap:7px">
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#C9CBCE">Modules · 7</span><span style="font-family:'IBM Plex Mono',monospace">70</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#C9CBCE">Assignments · 6</span><span style="font-family:'IBM Plex Mono',monospace">90</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#C9CBCE">Programme tasks · 2</span><span style="font-family:'IBM Plex Mono',monospace">40</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#C9CBCE">On-time bonuses · 8</span><span style="font-family:'IBM Plex Mono',monospace">40</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#C9CBCE">Week bonuses · 5</span><span style="font-family:'IBM Plex Mono',monospace">50</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#C9CBCE">Sessions attended · 4</span><span style="font-family:'IBM Plex Mono',monospace">20</span></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:6px 14px">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #E8E8EA">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;width:26px">01</span>
+              <span style="width:28px;height:28px;border-radius:50%;background:#0B0B0C;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">AO</span>
+              <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Ada Okafor</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">3 WK STREAK</div></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500">415</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #E8E8EA">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;width:26px">02</span>
+              <span style="width:28px;height:28px;border-radius:50%;border:1.5px solid #0B0B0C;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">KE</span>
+              <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Kelechi E.</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">3 WK STREAK</div></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500">400</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #E8E8EA">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;width:26px">03</span>
+              <span style="width:28px;height:28px;border-radius:50%;border:1.5px solid #0B0B0C;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">MS</span>
+              <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Musa S.</div></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500">385</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;opacity:0.45">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;width:26px">…</span>
+              <div style="flex:1;font-size:13px;color:#56585C">ranks 4–9</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #E8E8EA">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;width:26px;color:#56585C">10</span>
+              <span style="width:28px;height:28px;border-radius:50%;border:1.5px solid #C9CBCE;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;color:#56585C">ZB</span>
+              <div style="flex:1;min-width:0"><div style="font-size:14px">Zainab B.</div></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:14px">315</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;background:#0B0B0C;color:#fff;margin:0 -14px;padding-left:14px;padding-right:14px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;width:26px">12</span>
+              <span style="width:28px;height:28px;border-radius:50%;background:#fff;color:#0B0B0C;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">PA</span>
+              <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">You</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">3 WK STREAK</div></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500">310</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;width:26px;color:#56585C">13</span>
+              <span style="width:28px;height:28px;border-radius:50%;border:1.5px solid #C9CBCE;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;color:#56585C">EN</span>
+              <div style="flex:1;min-width:0"><div style="font-size:14px">Emeka N.</div></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:14px">305</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#56585C;line-height:1.5;text-align:center">12 points from #10.</div>
+        </div>
+        <div style="background:#fff;border-top:1px solid #E8E8EA;padding:8px 8px 12px;display:flex">
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 10.8 12 4l8 6.8V20H4z"></path><path d="M9.5 20v-5.6h5V20"></path></svg><span style="font-size:10px;color:#8A8D93">Home</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 6.6C10.5 5 8.2 4.5 4.6 4.8V18c3.6-.3 5.9.2 7.4 1.7 1.5-1.5 3.8-2 7.4-1.7V4.8c-3.6-.3-5.9.2-7.4 1.8z"></path><path d="M12 6.6v13.1"></path></svg><span style="font-size:10px;color:#8A8D93">Learn</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg><span style="font-size:10px;color:#8A8D93">Tasks</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#0B0B0C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 20v-8.5"></path><path d="M12 20V4.6"></path><path d="M19 20v-6"></path></svg><span style="font-size:10px;font-weight:700">Board</span></span>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px;flex:1"><svg viewBox="0 0 24 24" style="width:19px;height:19px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M6 12h.01"></path><path d="M12 12h.01"></path><path d="M18 12h.01"></path></svg><span style="font-size:10px;color:#8A8D93">More</span></span>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;border-left:2px solid #0B0B0C;padding:2px 0 2px 12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93">F10.6 · YOU ALWAYS SEE YOURSELF</div>
+          <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:6px">Opted-out participants are removed from the public rows but keep this personal card. Day-one empty state: "Nobody has scored yet — first module completed takes #1."</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑11</span>
+        <span style="font-size:15px;font-weight:700">Sessions</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/sessions</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:14px 16px">
+          <div style="font-size:19px;font-weight:700;letter-spacing:-0.014em">Live sessions</div>
+          <div style="display:flex;gap:6px;margin-top:12px">
+            <span style="font-size:13px;font-weight:600;padding:7px 12px;border-radius:999px;background:#0B0B0C;color:#fff">Upcoming 2</span>
+            <span style="font-size:13px;padding:7px 12px;border-radius:999px;background:#F0F0F1;color:#56585C">Past 4</span>
+          </div>
+        </div>
+        <div style="padding:16px;display:grid;gap:10px">
+          <div style="background:#0B0B0C;color:#fff;border-radius:14px;padding:16px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:44px;height:44px;border-radius:8px;background:repeating-linear-gradient(135deg,#333639 0 6px,#232528 6px 12px);flex:0 0 auto"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;letter-spacing:0.06em">STARTS IN 34 MIN</div>
+                <div style="font-size:16px;font-weight:700;margin-top:4px;line-height:1.25">Hooks clinic: rewrite your opener</div>
+                <div style="font-size:13px;color:#C9CBCE;margin-top:4px">Ife Adeyemi · PipeOps</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:6px">THU 9 OCT · 18:00 WAT · 60 MIN · WEEK 3</div>
+              </div>
+            </div>
+            <button style="width:100%;margin-top:14px;border:0;background:#fff;color:#0B0B0C;font-family:inherit;font-size:15px;font-weight:700;padding:14px;border-radius:8px;cursor:pointer;min-height:48px">Join session →</button>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:44px;height:44px;border-radius:8px;background:repeating-linear-gradient(135deg,#F0F0F1 0 6px,#E3E4E6 6px 12px);flex:0 0 auto"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:16px;font-weight:700;line-height:1.25">Editing teardown · 3 videos</div>
+                <div style="font-size:13px;color:#56585C;margin-top:4px">Dara O. · Video Editor</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:6px">THU 23 OCT · 18:00 WAT · WEEK 5</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px">
+              <button style="flex:1;border:1px solid #0B0B0C;background:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:12px;border-radius:8px;cursor:pointer;min-height:44px">Add to calendar</button>
+              <span style="display:flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;max-width:110px;line-height:1.4">Link opens 30 min before</span>
+            </div>
+          </div>
+          <div style="height:1px;background:#E3E4E6;margin:6px 0"></div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:16px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:44px;height:44px;border-radius:8px;background:repeating-linear-gradient(135deg,#F0F0F1 0 6px,#E3E4E6 6px 12px);flex:0 0 auto"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:16px;font-weight:700;line-height:1.25">Niche kickoff Q&amp;A</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:6px">THU 25 SEP · REPLAY 52 MIN</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:8px"><span style="width:6px;height:6px;border-radius:50%;background:#0B0B0C"></span><span style="font-size:12px;font-weight:600">You attended · +5</span></div>
+              </div>
+            </div>
+            <button style="width:100%;margin-top:14px;border:1px solid #E8E8EA;background:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:12px;border-radius:8px;cursor:pointer;min-height:44px">Watch replay</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑12</span>
+        <span style="font-size:15px;font-weight:700">Resources</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/resources</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:14px 16px">
+          <div style="font-size:19px;font-weight:700;letter-spacing:-0.014em">Resources</div>
+          <input type="text" placeholder="Search resources" style="width:100%;margin-top:12px;border:1px solid #C9CBCE;border-radius:8px;padding:12px 13px;font-family:inherit;font-size:14px;min-height:44px" />
+          <div style="display:flex;gap:6px;margin-top:10px;overflow-x:auto">
+            <span style="font-size:12px;font-weight:600;padding:6px 11px;border-radius:999px;background:#0B0B0C;color:#fff;white-space:nowrap">All 24</span>
+            <span style="font-size:12px;padding:6px 11px;border-radius:999px;background:#F0F0F1;color:#56585C;white-space:nowrap">Templates</span>
+            <span style="font-size:12px;padding:6px 11px;border-radius:999px;background:#F0F0F1;color:#56585C;white-space:nowrap">Hooks</span>
+            <span style="font-size:12px;padding:6px 11px;border-radius:999px;background:#F0F0F1;color:#56585C;white-space:nowrap">Tools</span>
+            <span style="font-size:12px;padding:6px 11px;border-radius:999px;background:#F0F0F1;color:#56585C;white-space:nowrap">Brand</span>
+          </div>
+        </div>
+        <div style="padding:16px;display:grid;gap:8px">
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:3px 5px;color:#56585C;flex:0 0 auto">PDF</span>
+            <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Hook library · 50 openers</div><div style="font-size:12px;color:#56585C;margin-top:2px">Swipe file</div></div>
+            <svg viewBox="0 0 24 24" style="width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4.6v9.8"></path><path d="M8.2 10.9 12 14.6l3.8-3.7"></path><path d="M5.2 19.4h13.6"></path></svg>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:3px 5px;color:#56585C;flex:0 0 auto">SHEET</span>
+            <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Content calendar template</div><div style="font-size:12px;color:#56585C;margin-top:2px">Copy to Drive</div></div>
+            <svg viewBox="0 0 24 24" style="width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M14.2 5H19v4.8"></path><path d="M19 5l-7.4 7.4"></path><path d="M16.8 13.4V19H5V7.2h5.6"></path></svg>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:3px 5px;color:#56585C;flex:0 0 auto">ZIP</span>
+            <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">PipeOps brand assets</div><div style="font-size:12px;color:#56585C;margin-top:2px">Logos + usage rules</div></div>
+            <svg viewBox="0 0 24 24" style="width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4.6v9.8"></path><path d="M8.2 10.9 12 14.6l3.8-3.7"></path><path d="M5.2 19.4h13.6"></path></svg>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;border:1px solid #C9CBCE;border-radius:3px;padding:3px 5px;color:#56585C;flex:0 0 auto">LINK</span>
+            <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Free editing tools</div><div style="font-size:12px;color:#56585C;margin-top:2px">Mobile-first picks</div></div>
+            <svg viewBox="0 0 24 24" style="width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M14.2 5H19v4.8"></path><path d="M19 5l-7.4 7.4"></path><path d="M16.8 13.4V19H5V7.2h5.6"></path></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑13</span>
+        <span style="font-size:15px;font-weight:700">Announcements</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/announcements</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:14px 16px">
+          <div style="font-size:19px;font-weight:700;letter-spacing:-0.014em">Announcements</div>
+        </div>
+        <div style="padding:16px;display:grid;gap:10px">
+          <div style="background:#fff;border:1.5px solid #0B0B0C;border-radius:12px;padding:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.06em;color:#56585C">PINNED · UNREAD</span>
+              <span style="width:7px;height:7px;border-radius:50%;background:#0B0B0C"></span>
+            </div>
+            <div style="font-size:16px;font-weight:700;margin-top:8px;line-height:1.3">Week 3 is live · hooks clinic Thursday</div>
+            <p style="margin:8px 0 0;font-size:14px;line-height:1.5;color:#56585C">Two modules, two assignments, one published video. Bring a draft opener to Thursday's clinic.</p>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">PRECIOUS · MON 5 OCT</span>
+              <span style="font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px">Open week →</span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px">
+            <div style="font-size:16px;font-weight:700;line-height:1.3">Week 2 idea banks close Sunday</div>
+            <p style="margin:8px 0 0;font-size:14px;line-height:1.5;color:#56585C">Late is accepted — on-time gets the bonus.</p>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:12px">PRECIOUS · FRI 2 OCT · READ</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:14px">
+            <div style="font-size:16px;font-weight:700;line-height:1.3">Welcome to Cohort 01</div>
+            <p style="margin:8px 0 0;font-size:14px;line-height:1.5;color:#56585C">Six weeks, twelve modules, one published body of work.</p>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;margin-top:12px">PRECIOUS · MON 21 SEP · READ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:390px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">P‑14</span>
+        <span style="font-size:15px;font-weight:700">Settings</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8D93">/settings</span>
+      </div>
+      <div style="border:1px solid #C9CBCE;border-radius:24px;background:#F6F6F7;overflow:hidden">
+        <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:14px 16px">
+          <div style="font-size:19px;font-weight:700;letter-spacing:-0.014em">Settings</div>
+        </div>
+        <div style="padding:16px;display:grid;gap:12px">
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:16px;display:grid;gap:14px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><circle cx="9.4" cy="9" r="3.2"></circle><path d="M3.8 19.2c.6-3 2.9-4.7 5.6-4.7s5 1.7 5.6 4.7"></path><path d="M16.2 7.3a3 3 0 0 1 0 5.5"></path><path d="M17.4 14.8c2 .6 3.3 2 3.7 4.4"></path></svg><span style="margin-left:6px">PROFILE</span></div>
+            <label style="display:block"><span style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Display name</span><input type="text" value="Precious A." style="width:100%;border:1px solid #C9CBCE;border-radius:8px;padding:12px 13px;font-family:inherit;font-size:15px;min-height:46px" /></label>
+            <label style="display:block"><span style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Timezone</span><input type="text" value="Africa/Lagos (WAT)" style="width:100%;border:1px solid #C9CBCE;border-radius:8px;padding:12px 13px;font-family:inherit;font-size:15px;min-height:46px" /></label>
+            <div>
+              <span style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">Email</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;background:#F0F0F1;border-radius:8px;padding:12px 13px"><span style="font-size:14px;color:#56585C">precious@pipeops.io</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">LOCKED</span></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:16px;display:grid;gap:12px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M10.4 13.6a3.4 3.4 0 0 1 0-4.8l2.4-2.4a3.4 3.4 0 0 1 4.8 4.8l-1.2 1.2"></path><path d="M13.6 10.4a3.4 3.4 0 0 1 0 4.8l-2.4 2.4a3.4 3.4 0 0 1-4.8-4.8l1.2-1.2"></path></svg><span style="margin-left:6px">PUBLISHING HANDLES</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:62px;color:#56585C">X</span><input type="text" value="@preciousa" style="flex:1;border:1px solid #C9CBCE;border-radius:8px;padding:10px 12px;font-family:inherit;font-size:14px;min-height:44px" /></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:62px;color:#56585C">LINKEDIN</span><input type="text" value="/in/preciousa" style="flex:1;border:1px solid #C9CBCE;border-radius:8px;padding:10px 12px;font-family:inherit;font-size:14px;min-height:44px" /></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:62px;color:#56585C">TIKTOK</span><input type="text" placeholder="@handle" style="flex:1;border:1px solid #C9CBCE;border-radius:8px;padding:10px 12px;font-family:inherit;font-size:14px;min-height:44px" /></div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:16px;display:grid;gap:14px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M3.8 6.6h16.4v10.8H3.8z"></path><path d="M3.8 7.2 12 12.8l8.2-5.6"></path></svg><span style="margin-left:6px">EMAIL PREFERENCES</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><div style="font-size:14px;font-weight:600">Deadline reminders</div><div style="font-size:12px;color:#56585C;margin-top:2px">48h and 12h before</div></div><span style="width:44px;height:26px;border-radius:99px;background:#0B0B0C;position:relative;flex:0 0 auto"><span style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff"></span></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><div style="font-size:14px;font-weight:600">Weekly digest</div><div style="font-size:12px;color:#56585C;margin-top:2px">Monday morning</div></div><span style="width:44px;height:26px;border-radius:99px;background:#E3E4E6;border:1px solid #C9CBCE;position:relative;flex:0 0 auto"><span style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;border:1px solid #C9CBCE"></span></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;opacity:0.6"><div><div style="font-size:14px;font-weight:600">Login &amp; review emails</div><div style="font-size:12px;color:#56585C;margin-top:2px">Transactional · can't be muted</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">ALWAYS ON</span></div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8E8EA;border-radius:12px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div style="flex:1"><div style="font-size:14px;font-weight:600">Hide me from the leaderboard</div><div style="font-size:12px;color:#56585C;margin-top:2px;line-height:1.45">You still see your own rank.</div></div><span style="width:44px;height:26px;border-radius:99px;background:#E3E4E6;border:1px solid #C9CBCE;position:relative;flex:0 0 auto"><span style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;border:1px solid #C9CBCE"></span></span></div>
+          </div>
+          <div style="display:grid;gap:8px">
+            <button style="width:100%;border:0;background:#0B0B0C;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:14px;border-radius:8px;cursor:pointer;min-height:48px">Save changes</button>
+            <button style="width:100%;border:1px solid #C9CBCE;background:#fff;color:#0B0B0C;font-family:inherit;font-size:14px;font-weight:600;padding:13px;border-radius:8px;cursor:pointer;min-height:46px">Sign out</button>
+          </div>
+          <div style="font-size:12px;color:#56585C;text-align:center;line-height:1.5"><a href="#">Message the team</a> · <a href="#">Discord ↗</a></div>
+        </div>
+      </div>
+      <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:12px;border-left:2px solid #0B0B0C;padding:2px 0 2px 12px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;color:#8A8D93">F1.8 · SHARED DEVICES</div>
+          <div style="font-size:13px;line-height:1.55;color:#56585C;margin-top:6px">Sessions are 30-day sliding, so explicit sign-out is a first-class control here — two participants sharing a phone is an expected case, not an edge one.</div>
+        </div>
+      </sc-if>
+    </div>
+
+  </div>
+
+  <div style="max-width:1140px;margin:80px auto 0">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #0B0B0C;padding-top:16px;margin-bottom:22px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93">P‑15</span>
+      <h2 style="margin:0;font-size:24px;letter-spacing:-0.014em;font-weight:700">Desktop is the same app</h2>
+    </div>
+    <div style="border:1px solid #C9CBCE;border-radius:14px;overflow:hidden;background:#F6F6F7">
+      <div style="background:#fff;border-bottom:1px solid #E8E8EA;padding:10px 16px;display:flex;align-items:center;gap:8px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93">learn.pipeops.io</span>
+      </div>
+      <div style="display:flex;min-height:400px">
+        <div style="width:212px;flex:0 0 212px;background:#fff;border-right:1px solid #E8E8EA;padding:18px 14px;display:none" style-hover=""></div>
+        <div style="width:212px;flex:0 0 212px;background:#fff;border-right:1px solid #E8E8EA;padding:18px 14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:22px"><div style="width:18px;height:18px;background:#0B0B0C;border-radius:3px"></div><span style="font-size:13px;font-weight:600">PipeOps Learn</span></div>
+          <div style="display:grid;gap:3px">
+            <span style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;background:#0B0B0C;color:#fff;font-size:13px;font-weight:600"><svg viewBox="0 0 24 24" style="width:17px;height:17px;flex:0 0 auto;fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 10.8 12 4l8 6.8V20H4z"></path><path d="M9.5 20v-5.6h5V20"></path></svg>Home</span>
+            <span style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;font-size:13px;color:#56585C"><svg viewBox="0 0 24 24" style="width:17px;height:17px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M12 6.6C10.5 5 8.2 4.5 4.6 4.8V18c3.6-.3 5.9.2 7.4 1.7 1.5-1.5 3.8-2 7.4-1.7V4.8c-3.6-.3-5.9.2-7.4 1.8z"></path><path d="M12 6.6v13.1"></path></svg>Learn</span>
+            <span style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;font-size:13px;color:#56585C"><svg viewBox="0 0 24 24" style="width:17px;height:17px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg>Tasks<span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;background:#0B0B0C;color:#fff;border-radius:4px;padding:1px 5px">4</span></span>
+            <span style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;font-size:13px;color:#56585C"><svg viewBox="0 0 24 24" style="width:17px;height:17px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 20v-8.5"></path><path d="M12 20V4.6"></path><path d="M19 20v-6"></path></svg>Leaderboard</span>
+            <span style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;font-size:13px;color:#56585C"><svg viewBox="0 0 24 24" style="width:17px;height:17px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 7.6h10.4v8.8H4z"></path><path d="M14.4 12.3l5.6-3v7.4l-5.6-3z"></path></svg>Sessions</span>
+            <span style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;font-size:13px;color:#56585C"><svg viewBox="0 0 24 24" style="width:17px;height:17px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4 7.6h5l2 2.2h9v9.2H4z"></path><path d="M4 7.6V5h5l2 2.6"></path></svg>Resources</span>
+            <span style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;font-size:13px;color:#56585C"><svg viewBox="0 0 24 24" style="width:17px;height:17px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M4.6 6h14.8v9.4h-8.9L5.6 19v-3.6z"></path></svg>Community ↗</span>
+          </div>
+          <div style="margin-top:24px;border-top:1px solid #E8E8EA;padding-top:16px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A8D93;letter-spacing:0.06em">COHORT 01</div>
+            <div style="font-size:12px;color:#56585C;margin-top:5px;line-height:1.45">Week 3 of 6 · ends 1 Nov</div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0;padding:28px;display:grid;gap:14px;align-content:start">
+          <div style="max-width:720px;display:grid;gap:14px">
+            <div>
+              <div style="font-size:28px;font-weight:700;letter-spacing:-0.018em">Welcome back, Precious</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#56585C;margin-top:6px;letter-spacing:0.04em">WEEK 3 OF 6 · 45% · 14/30</div>
+              <div style="height:8px;background:#E3E4E6;border-radius:99px;overflow:hidden;margin-top:10px"><div style="width:45%;height:100%;background:#0B0B0C"></div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div style="background:#0B0B0C;color:#fff;border-radius:14px;padding:20px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#8A8D93"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#8A8D93;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M8.6 5.9 18.6 12 8.6 18.1z"></path></svg><span style="margin-left:6px">CONTINUE LEARNING</span></div>
+                <div style="font-size:19px;font-weight:700;margin-top:8px;line-height:1.2">M06 · Hooks that stop the scroll</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#C9CBCE;margin-top:8px">RESUME 4:12</div>
+                <button style="width:100%;margin-top:16px;border:0;background:#fff;color:#0B0B0C;font-family:inherit;font-size:15px;font-weight:700;padding:13px;border-radius:8px;cursor:pointer">Resume module →</button>
+              </div>
+              <div style="background:#fff;border:1.5px solid #0B0B0C;border-radius:14px;padding:20px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C"><svg viewBox="0 0 24 24" style="width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#56585C;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;display:inline-block"><path d="M5 5h14v14H5z"></path><path d="M8.6 12.2l2.4 2.4 4.5-5.2"></path></svg><span style="margin-left:6px">THIS WEEK'S TASK</span></div>
+                <div style="font-size:17px;font-weight:700;margin-top:8px;line-height:1.25">3 scripts, 5 hooks, 1 published video</div>
+                <div style="display:flex;gap:8px;align-items:center;margin-top:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px">DUE SUN 11 OCT</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#0B0B0C;color:#fff;border-radius:4px;padding:2px 6px">3 DAYS</span></div>
+                <button style="width:100%;margin-top:16px;border:0;background:#0B0B0C;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:13px;border-radius:8px;cursor:pointer">Submit task</button>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #E8E8EA;border-radius:14px;padding:20px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#56585C;margin-bottom:12px">WEEK 3 AT A GLANCE · 2/5</div>
+              <div style="display:flex;gap:6px">
+                <div style="flex:1;height:34px;border-radius:5px;background:#0B0B0C"></div>
+                <div style="flex:1;height:34px;border-radius:5px;background:#0B0B0C"></div>
+                <div style="flex:1;height:34px;border-radius:5px;background:#F0F0F1;border:1px dashed #D6D7D9"></div>
+                <div style="flex:1;height:34px;border-radius:5px;background:#F0F0F1;border:1px dashed #D6D7D9"></div>
+                <div style="flex:1;height:34px;border-radius:5px;background:#F0F0F1;border:1px dashed #D6D7D9"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:13px;line-height:1.6;color:#56585C;margin-top:14px;max-width:70ch;text-wrap:pretty">Same components, same order, same copy. The tab bar becomes a rail, content caps at 720px. No desktop-only features.</div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Presentation&quot;},&quot;showStatusBar&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Presentation&quot;}}"></script>
+</body>
+</html>
