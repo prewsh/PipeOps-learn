@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unwrap } from "@/lib/data/query";
 import { getSupabase } from "@/lib/supabase/server";
 
 export type Announcement = {
@@ -15,7 +16,7 @@ export type Announcement = {
 export const getAnnouncements = cache(async (): Promise<Announcement[]> => {
   const supabase = await getSupabase();
 
-  const [{ data: rows }, { data: reads }] = await Promise.all([
+  const [rowsRes, readsRes] = await Promise.all([
     supabase
       .from("announcements")
       .select("id, title, body, link_url, is_pinned, publish_at")
@@ -24,6 +25,8 @@ export const getAnnouncements = cache(async (): Promise<Announcement[]> => {
       .order("publish_at", { ascending: false }),
     supabase.from("announcement_reads").select("announcement_id"),
   ]);
+  const rows = unwrap(rowsRes, "announcements");
+  const reads = unwrap(readsRes, "announcement reads");
 
   const readIds = new Set((reads ?? []).map((r) => r.announcement_id));
 

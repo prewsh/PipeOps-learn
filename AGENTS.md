@@ -81,6 +81,7 @@ is not finished — say so rather than reporting success.
 | Email | Resend, queued |
 | E2E | Playwright |
 | Hosting | PipeOps |
+| Request gating | `proxy.ts` — `middleware.ts` is deprecated in Next 16 |
 
 Add a dependency only when the code that needs it is being written in the same
 change. Prefer platform APIs: `Intl` over a date library, `fetch` over a client,
@@ -151,6 +152,28 @@ numbers for real participants. Treat them as non-negotiable.
   Privilege-bearing columns (`role`, `email`, `id`) are protected by
   column-level `GRANT` plus a trigger. If you add a sensitive column, protect
   it the same way and add a check to `scripts/verify-security.mjs`.
+- **A grant is not an authorisation check.** Postgres gives EXECUTE on every
+  new function to PUBLIC, and Supabase exposes `public` over PostgREST, so a
+  new function is callable from a browser the moment it exists.
+  `compute_health(uuid)` and `compute_streak(uuid)` ran as owner, took a
+  caller-supplied enrolment id, and returned a value — any participant could
+  read anyone's health and streak. Every function taking an enrolment id now
+  calls `assert_enrollment_access()` in its own body. Migration …0023 revokes
+  and re-grants an explicit allowlist, and **must stay the last migration in
+  that series**: a revoke only covers functions that already exist.
+- **Validate where it cannot be skipped.** `submissions.item_id` is polymorphic
+  and has no foreign key, and nothing checked it pointed at a real item, so
+  `submit_work` with a random UUID minted points. The item, the cohort freeze,
+  the accepted submission types and the link protocol are all checked inside
+  the RPC. A server action is a usability layer, never the boundary — the same
+  reasoning applies to hidden form fields, which is why there are none left.
+- **Points and progress count only what joins back to a real item.** See
+  `scorable_submissions()`. It deliberately ignores release state: released
+  weeks never re-lock, so a schedule edit must not reverse earned points.
+- **Watch time is capped by the wall clock.** Duration comes from
+  `lessons.duration_seconds`, not the caller, and a delta may not exceed the
+  time actually elapsed. `p_ended` lowers the completion bar, it does not set
+  it — otherwise one call completes an unwatched video.
 - Participants read only their own submissions, progress, points and activity.
 - `points_events` and `activity_events` are **server-write-only**. Never expose
   a client path that inserts them.
@@ -205,6 +228,15 @@ easiest to break:
 - Icons: 24px grid, 1.7px stroke, `currentColor` only, never filled except the
   play triangle.
 - Use tokens from `app/globals.css`. Never introduce a raw hex value.
+- **Motion has three durations and one easing**, all tokens: `--motion-fast`
+  (hover, focus, a marker changing), `--motion-state` (progress, disclosure,
+  saved/submitted feedback), `--motion-enter` (one content region arriving).
+  Use `.motion-enter` once per screen, never staggered across cards. Never
+  animate a deadline, an error or a locked state — motion that delays
+  understanding is a defect. `prefers-reduced-motion` is honoured globally in
+  `globals.css`, so do not re-implement it per component.
+- **Imagery is a placeholder slot, not a brand asset.** Week covers are
+  editable per week in `/admin/content`.
 
 ## 10. Testing
 

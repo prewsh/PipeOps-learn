@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button, Card, Meta } from "@/components/ui";
-import { setAdminNote, setEnrollmentStatus } from "@/lib/actions/admin";
+import { resendLoginLink, setAdminNote, setEnrollmentStatus } from "@/lib/actions/admin";
 
 /** Status changes require a reason, and every change is audited (F12.6). */
 export function ParticipantAdminControls({
@@ -79,7 +79,31 @@ export function ParticipantAdminControls({
         </div>
       </div>
 
-      <div className="mt-5 flex flex-col gap-3">
+      <div className="mt-5 flex flex-col gap-3 border-t border-line pt-5">
+        <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3">
+          Sign-in
+        </span>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            variant="secondary"
+            disabled={busy || currentStatus !== "active"}
+            onClick={async () => {
+              setBusy(true);
+              const result = await resendLoginLink(enrollmentId);
+              setBusy(false);
+              setMessage(result.error ?? result.ok ?? null);
+            }}
+          >
+            Resend sign-in email
+          </Button>
+          <span className="text-sm text-ink-2">
+            Sends a fresh code and link to their enrolled address. Supabase rate-limits repeat sends
+            to the same address.
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-5 flex flex-col gap-3 border-t border-line pt-5">
         <label
           htmlFor="note"
           className="font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3"

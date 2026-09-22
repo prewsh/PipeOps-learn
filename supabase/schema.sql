@@ -2680,128 +2680,1190 @@ from (values
 where w.number = v.number
   and w.cohort_id = '22222222-2222-2222-2222-222222222222';
 
--- >>> supabase/seed.sql
+-- >>> supabase/migrations/20260922000020_sec_function_privileges.sql
 -- ============================================================================
--- Cohort 01 seed. Idempotent — safe to re-run after editing.
+-- Function execution privileges.
 --
--- TODO(content): replace every 'REPLACE_ME' video_ref with the real YouTube
--- video id (the 11-character id, NOT the full URL). Modules without a video id
--- still render; the player shows a "video coming soon" state.
+-- Postgres grants EXECUTE on every new function to PUBLIC. Supabase exposes
+-- `public` over PostgREST, so every function in this schema — including the
+-- SECURITY DEFINER helpers that run as the owner and bypass RLS — has been
+-- callable by `anon` and `authenticated` since it was created.
+--
+-- Two of them leaked. `compute_health(uuid)` and `compute_streak(uuid)` take
+-- an arbitrary enrolment id, run as owner, and RETURN a value: any signed-in
+-- participant could read any other participant's health state and streak.
+-- That breaks the invariant in AGENTS.md section 7 — participants read only
+-- their own progress and activity.
+--
+-- This migration adds the ownership checks. The privilege lockdown itself is
+-- the LAST migration in the series (…0023), because a revoke can only cover
+-- functions that already exist — running it here would miss everything the
+-- two migrations after it create.
+--
+-- The two function bodies below are reproduced from their current definitions
+-- with ONE line added. Health and streak feed live cohort operations and the
+-- points ledger; rewriting either from memory would corrupt real numbers
+-- quietly (AGENTS.md section 6).
 -- ============================================================================
 
-insert into public.programs (id, slug, name, description) values
-  ('11111111-1111-1111-1111-111111111111', 'ugc', 'PipeOps UGC Program',
-   'Six-week creator programme: learn, create, submit, publish, measure, improve.')
-on conflict (slug) do update set name = excluded.name;
+-- ----------------------------------------------- ownership checks ----
 
-insert into public.cohorts (id, program_id, name, code, starts_on, ends_on, timezone, status, discord_url) values
-  ('22222222-2222-2222-2222-222222222222',
-   '11111111-1111-1111-1111-111111111111',
-   'Cohort 01', 'ugc-01', '2026-09-21', '2026-11-01', 'Africa/Lagos', 'active', null)
-on conflict (code) do update set status = excluded.status, ends_on = excluded.ends_on;
+-- Guard shared by every function that accepts an enrolment id. Admins may act
+-- on anyone; a participant may act only on themselves. Raising (rather than
+-- returning null) makes a probe fail loudly instead of looking like an empty
+-- result.
+create or replace function public.assert_enrollment_access(p_enrollment_id uuid)
+returns void
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if p_enrollment_id is null then
+    raise exception 'enrolment id is required';
+  end if;
+  -- No JWT means the service role, a migration or the nightly job — never a
+  -- browser, because `anon` no longer holds EXECUTE on any of this. Same
+  -- convention as protect_user_columns().
+  if auth.uid() is null then return; end if;
+  if public.is_admin() then return; end if;
+  if p_enrollment_id = public.my_enrollment_id() then return; end if;
+  raise exception 'not authorised for that enrolment';
+end $$;
 
-insert into public.courses (id, slug, title, description) values
-  ('33333333-3333-3333-3333-333333333333', 'ugc-creator-course',
-   'The Complete UGC Creator Course',
-   'From creator mindset to a repeatable growth system.')
-on conflict (slug) do update set title = excluded.title;
+-- compute_health: unchanged from 20260922000006 except for the guard.
+create or replace function public.compute_health(p_enrollment_id uuid)
+returns health_state
+language plpgsql stable security definer set search_path = public as $$
+declare
+  v_last     timestamptz;
+  v_days     numeric;
+  v_missed   integer;
+  v_cohort   uuid;
+  v_enrolled timestamptz;
+  v_week1    timestamptz;
+  v_baseline timestamptz;
+begin
+  perform public.assert_enrollment_access(p_enrollment_id);
 
-insert into public.course_parts (id, course_id, "order", title) values
-  ('44444444-0000-0000-0000-000000000001', '33333333-3333-3333-3333-333333333333', 1, 'Creator Mindset & Content Strategy'),
-  ('44444444-0000-0000-0000-000000000002', '33333333-3333-3333-3333-333333333333', 2, 'Content Production'),
-  ('44444444-0000-0000-0000-000000000003', '33333333-3333-3333-3333-333333333333', 3, 'Editing, Publishing & Growth')
-on conflict (id) do update set title = excluded.title;
+  select e.last_active_at, e.cohort_id, e.enrolled_at
+    into v_last, v_cohort, v_enrolled
+    from public.enrollments e where e.id = p_enrollment_id;
 
--- ------------------------------------------------------------- modules ----
-insert into public.modules (id, course_id, part_id, "order", number, slug, title, summary, what_you_will_learn, estimated_minutes) values
-  ('55555555-0000-0000-0000-000000000001','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000001',1,1,'creator-economy','The Creator Economy','Why developer-creators are in demand, and what the opportunity actually looks like.','["How the creator economy pays","Why developers have an unfair advantage","What to expect from the next six weeks"]',12),
-  ('55555555-0000-0000-0000-000000000002','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000001',2,2,'finding-your-niche','Finding Your Niche','Choose the lane you will publish in for the rest of the programme.','["How to pick a niche you will not abandon","Writing a niche statement","Choosing three to five content pillars"]',14),
-  ('55555555-0000-0000-0000-000000000003','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000001',3,3,'algorithms','How Algorithms Actually Work','What each platform rewards, and what it quietly punishes.','["Watch time, retention and shares","Why the first three seconds decide everything","Platform-by-platform differences"]',13),
-  ('55555555-0000-0000-0000-000000000004','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000001',4,4,'research-and-ideas','Research & Idea Generation','Build an idea bank you can pull from every week.','["Where to find proven ideas","Turning research into an idea bank","Never staring at a blank page again"]',15),
-  ('55555555-0000-0000-0000-000000000005','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000002',5,5,'planning-and-scripting','Content Planning & Scripting','The Hook, Interest, Value, Action framework.','["Structuring a short-form script","The HIVA framework","Writing for the ear, not the page"]',14),
-  ('55555555-0000-0000-0000-000000000006','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000002',6,6,'hooks','Hooks That Stop the Scroll','The first three seconds, and how to write ten of them fast.','["Hook patterns that work","Writing five hooks per idea","Testing hooks before you film"]',11),
-  ('55555555-0000-0000-0000-000000000007','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000002',7,7,'filming','Filming on a Phone','Everything you need is already in your pocket.','["Framing and composition","Shooting to edit","Common filming mistakes"]',16),
-  ('55555555-0000-0000-0000-000000000008','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000002',8,8,'lighting-and-audio','Lighting & Audio','The two things viewers notice before your content.','["Free lighting that works","Audio on a budget","Fixing a bad room"]',13),
-  ('55555555-0000-0000-0000-000000000009','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000003',9,9,'editing','Editing That Keeps Attention','Pace, cuts and the rhythm of a watchable video.','["Cutting for retention","Pacing and silence","A repeatable edit workflow"]',18),
-  ('55555555-0000-0000-0000-000000000010','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000003',10,10,'captions-and-graphics','Captions & Graphics','Most people watch on mute.','["Caption styles that read fast","On-screen text hierarchy","Simple motion that adds meaning"]',12),
-  ('55555555-0000-0000-0000-000000000011','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000003',11,11,'publishing','Publishing & Distribution','Posting is a skill, not an afterthought.','["Platform-native publishing","Titles, descriptions and tags","Repurposing one idea across platforms"]',14),
-  ('55555555-0000-0000-0000-000000000012','33333333-3333-3333-3333-333333333333','44444444-0000-0000-0000-000000000003',12,12,'growth-system','Your Growth System','Turning six weeks into a habit that outlives the programme.','["Reading your analytics honestly","The weekly improvement loop","Building a system you will keep"]',17)
-on conflict (id) do update set
-  title = excluded.title, summary = excluded.summary,
-  what_you_will_learn = excluded.what_you_will_learn,
-  estimated_minutes = excluded.estimated_minutes;
+  select min(w.release_at) into v_week1
+    from public.program_weeks w where w.cohort_id = v_cohort;
 
--- One lesson per module (PRD F4.3). Fill in video_ref.
-insert into public.lessons (module_id, "order", video_provider, video_ref, duration_seconds)
-select m.id, 1, 'youtube', null, m.estimated_minutes * 60
-from public.modules m
-on conflict (module_id, "order") do nothing;
+  v_baseline := greatest(coalesce(v_week1, v_enrolled), v_enrolled);
 
--- --------------------------------------------------------------- weeks ----
--- Africa/Lagos is UTC+1 year-round. Releases Monday 00:00, deadlines Sunday 23:59.
-insert into public.program_weeks (id, cohort_id, number, title, theme, release_at, deadline_at, overview) values
-  ('77777777-0000-0000-0000-000000000001','22222222-2222-2222-2222-222222222222',1,'Creator economy & niche','Strategy','2026-09-21 00:00+01','2026-09-27 23:59+01','Decide what you are going to be known for. By Sunday you should have a niche statement and three to five content pillars.'),
-  ('77777777-0000-0000-0000-000000000002','22222222-2222-2222-2222-222222222222',2,'Algorithms & research','Strategy','2026-09-28 00:00+01','2026-10-04 23:59+01','Understand what the platforms reward, then build an idea bank you can pull from every week.'),
-  ('77777777-0000-0000-0000-000000000003','22222222-2222-2222-2222-222222222222',3,'Planning, scripting & hooks','Production','2026-10-05 00:00+01','2026-10-11 23:59+01','Turn ideas into scripts, and scripts into hooks that stop the scroll.'),
-  ('77777777-0000-0000-0000-000000000004','22222222-2222-2222-2222-222222222222',4,'Filming','Production','2026-10-12 00:00+01','2026-10-18 23:59+01','Record real content with the phone you already own.'),
-  ('77777777-0000-0000-0000-000000000005','22222222-2222-2222-2222-222222222222',5,'Editing & captions','Post-production','2026-10-19 00:00+01','2026-10-25 23:59+01','Cut for retention, caption for mute, and finish something you are proud of.'),
-  ('77777777-0000-0000-0000-000000000006','22222222-2222-2222-2222-222222222222',6,'Publishing & growth','Launch','2026-10-26 00:00+01','2026-11-01 23:59+01','Publish, measure honestly, and leave with a system you will keep using.')
-on conflict (cohort_id, number) do update set
-  title = excluded.title, theme = excluded.theme, overview = excluded.overview,
-  release_at = excluded.release_at, deadline_at = excluded.deadline_at;
+  -- Never signed in: judge against the baseline, not against week 1 alone.
+  if v_last is null then
+    return case
+      when now() > v_baseline + interval '14 days' then 'dormant'::health_state
+      when now() > v_baseline + interval '7 days'  then 'at_risk'::health_state
+      when now() > v_baseline + interval '4 days'  then 'needs_attention'::health_state
+      else 'active'::health_state
+    end;
+  end if;
 
--- Two modules per week, in order.
-insert into public.week_modules (week_id, module_id, "order")
-select w.id, m.id, case when m.number % 2 = 1 then 1 else 2 end
+  v_days := extract(epoch from (now() - v_last)) / 86400.0;
+
+  select count(*) into v_missed
+    from (
+      select t.id as item_id, coalesce(t.deadline_at, w.deadline_at) as due
+        from public.program_tasks t
+        join public.program_weeks w on w.id = t.week_id
+       where w.cohort_id = v_cohort and t.is_required and t.status = 'published'
+      union all
+      select a.id, coalesce(a.deadline_at, w.deadline_at)
+        from public.assignments a
+        join public.week_modules wm on wm.module_id = a.module_id
+        join public.program_weeks w on w.id = wm.week_id
+       where w.cohort_id = v_cohort and a.is_required and a.status = 'published'
+    ) items
+   where items.due < now()
+     and not exists (
+       select 1 from public.submissions s
+        where s.enrollment_id = p_enrollment_id
+          and s.item_id = items.item_id
+          and s.status <> 'draft');
+
+  if v_days >= 14 then return 'dormant'; end if;
+  if v_days >= 7 or v_missed >= 2 then return 'at_risk'; end if;
+  if v_days >= 4 then return 'needs_attention'; end if;
+  return 'active';
+end $$;
+
+-- compute_streak: unchanged from 20260922000011 except for the guard.
+create or replace function public.compute_streak(p_enrollment_id uuid) returns integer
+language plpgsql stable security definer set search_path = public as $$
+declare
+  v_cohort uuid;
+  r        record;
+  v_run    integer := 0;
+begin
+  perform public.assert_enrollment_access(p_enrollment_id);
+
+  select cohort_id into v_cohort from public.enrollments where id = p_enrollment_id;
+  if v_cohort is null then return 0; end if;
+
+  for r in
+    select w.number, coalesce(wp.is_complete, false) as done
+      from public.program_weeks w
+      left join public.week_progress wp
+        on wp.week_id = w.id and wp.enrollment_id = p_enrollment_id
+     where w.cohort_id = v_cohort and w.release_at <= now()
+     order by w.number
+  loop
+    if r.done then v_run := v_run + 1; else v_run := 0; end if;
+  end loop;
+
+  return v_run;
+end $$;
+
+-- ------------------------------------------------ 3. mutable search_path ----
+-- Both are flagged by the Supabase linter. Neither reads a table, so this is
+-- hardening rather than a live hole — but a trigger function without a pinned
+-- search_path is a standing invitation.
+create or replace function public.touch_updated_at() returns trigger
+language plpgsql set search_path = public as $$
+begin
+  new.updated_at = now();
+  return new;
+end $$;
+
+create or replace function public.points_for(p_rule points_rule) returns integer
+language sql immutable set search_path = public as $$
+  select case p_rule
+    when 'MODULE_COMPLETED'       then 10
+    when 'ASSIGNMENT_SUBMITTED'   then 15
+    when 'TASK_SUBMITTED'         then 20
+    when 'ON_TIME_BONUS'          then 5
+    when 'WEEK_MODULES_COMPLETE'  then 10
+    when 'WEEK_COMPLETE'          then 10
+    when 'SESSION_ATTENDED'       then 5
+    when 'FINAL_PROJECT_APPROVED' then 30
+  end;
+$$;
+
+
+-- >>> supabase/migrations/20260922000021_sec_submission_integrity.sql
+-- ============================================================================
+-- Submission and scoring integrity.
+--
+-- `submissions.item_id` is polymorphic, so it carries no foreign key. Nothing
+-- downstream checked that it pointed at a real thing:
+--
+--   submit_work(p_type => 'program_task', p_item_id => gen_random_uuid())
+--
+-- inserted a submission for an item that does not exist, and recompute_points
+-- then awarded TASK_SUBMITTED + ON_TIME_BONUS for it, because it grouped
+-- submissions by item_id without ever joining back to a task. Repeat in a
+-- loop for an arbitrary score.
+--
+-- The submissions freeze had the same shape of hole. `submissions_open` was
+-- checked in the server action only, so a direct RPC call wrote straight past
+-- the freeze the cohort is currently under.
+--
+-- Three fixes, all in the database, because "which client called this" is not
+-- a security boundary:
+--
+--   1. resolve the item for the CALLER before writing — it must exist, be
+--      published, belong to their cohort, and sit in a released week;
+--   2. enforce the item's own rules (accepted types, text bounds, link
+--      protocol) and the cohort freeze in the same transaction;
+--   3. award points only for submissions that join back to a real item.
+--
+-- Point 3 also cleans up: any award already sitting in the ledger for a
+-- fabricated item is reversed by a compensating row on the next recompute.
+-- The ledger stays append-only (AGENTS.md section 6) — nothing is deleted.
+-- ============================================================================
+
+-- ------------------------------------------------------------ helpers ----
+
+-- Is the caller's cohort accepting submissions? A freeze is cohort data, not
+-- a UI state.
+create or replace function public.submissions_are_open()
+returns boolean
+language sql stable security definer set search_path = public as $$
+  select coalesce(
+    (select c.submissions_open
+       from public.cohorts c
+      where c.id = public.my_cohort_id()),
+    false);
+$$;
+
+-- Link policy (PRD F7.3). Zod's z.url() accepts `javascript:` and `data:`;
+-- these links are rendered as anchors in the review queue, so the protocol
+-- has to be checked where it cannot be bypassed.
+create or replace function public.is_safe_url(p_url text)
+returns boolean
+language sql immutable set search_path = public as $$
+  select p_url ~ '^https?://[^[:space:]<>"]+$' and length(p_url) between 8 and 2000;
+$$;
+
+create or replace function public.assert_safe_urls(p_urls jsonb)
+returns void
+language plpgsql immutable set search_path = public as $$
+declare v_url text;
+begin
+  if p_urls is null or jsonb_typeof(p_urls) <> 'array' then
+    raise exception 'links must be a list';
+  end if;
+  if jsonb_array_length(p_urls) > 10 then
+    raise exception 'at most 10 links';
+  end if;
+
+  for v_url in select jsonb_array_elements_text(p_urls) loop
+    if not public.is_safe_url(v_url) then
+      raise exception 'link must start with http:// or https://: %', left(v_url, 60);
+    end if;
+  end loop;
+end $$;
+
+-- The item, resolved for the caller. Returns no row when the item does not
+-- exist, is not published, belongs to another cohort, or sits in a week that
+-- has not released — which is exactly the set of things submit_work must
+-- refuse. One definition, used by both write paths.
+create or replace function public.work_item_for_caller(
+  p_type    work_item_type,
+  p_item_id uuid
+)
+returns table (
+  submission_types jsonb,
+  text_min         integer,
+  text_max         integer,
+  max_files        integer,
+  file_extensions  text[],
+  deadline_at      timestamptz
+)
+language sql stable security definer set search_path = public as $$
+  select a.submission_types, a.text_min, a.text_max, a.max_files,
+         a.file_extensions, coalesce(a.deadline_at, w.deadline_at)
+    from public.assignments a
+    join public.week_modules wm on wm.module_id = a.module_id
+    join public.program_weeks w on w.id = wm.week_id
+   where p_type = 'assignment'
+     and a.id = p_item_id
+     and a.status = 'published'
+     and (a.cohort_id is null or a.cohort_id = public.my_cohort_id())
+     and w.cohort_id = public.my_cohort_id()
+     and w.release_at <= now()
+  union all
+  select t.submission_types, t.text_min, t.text_max, t.max_files,
+         t.file_extensions, coalesce(t.deadline_at, w.deadline_at)
+    from public.program_tasks t
+    join public.program_weeks w on w.id = t.week_id
+   where p_type = 'program_task'
+     and t.id = p_item_id
+     and t.status = 'published'
+     and w.cohort_id = public.my_cohort_id()
+     and w.release_at <= now()
+  limit 1;
+$$;
+
+-- Shared gate for save_draft and submit_work. `p_final` distinguishes a draft
+-- (which may be incomplete) from a submission (which may not).
+create or replace function public.assert_submittable(
+  p_type    work_item_type,
+  p_item_id uuid,
+  p_urls    jsonb,
+  p_text    text,
+  p_final   boolean
+)
+returns void
+language plpgsql stable security definer set search_path = public as $$
+declare
+  v_item   record;
+  v_types  text[];
+  v_len    integer := coalesce(length(btrim(coalesce(p_text, ''))), 0);
+  v_links  integer := case when p_urls is null then 0 else jsonb_array_length(p_urls) end;
+begin
+  if not public.submissions_are_open() then
+    raise exception 'submissions are closed for this cohort';
+  end if;
+
+  select * into v_item from public.work_item_for_caller(p_type, p_item_id);
+  if not found then
+    raise exception 'no such item in this cohort, or it has not been released';
+  end if;
+
+  perform public.assert_safe_urls(coalesce(p_urls, '[]'::jsonb));
+
+  select array_agg(value) into v_types
+    from jsonb_array_elements_text(v_item.submission_types);
+
+  if v_links > 0 and not ('url' = any(v_types)) then
+    raise exception 'this item does not accept links';
+  end if;
+  if v_len > 0 and not ('text' = any(v_types)) then
+    raise exception 'this item does not accept a written response';
+  end if;
+  if v_item.text_max is not null and v_len > v_item.text_max then
+    raise exception 'response is longer than the % character limit', v_item.text_max;
+  end if;
+
+  -- Required fields are a submit-time rule. A draft is allowed to be empty —
+  -- that is what autosave produces on the first keystroke.
+  if p_final then
+    if 'url' = any(v_types) and v_links = 0 then
+      raise exception 'a public link is required';
+    end if;
+    if 'text' = any(v_types) and v_item.text_min is not null and v_len < v_item.text_min then
+      raise exception 'response must be at least % characters', v_item.text_min;
+    end if;
+  end if;
+end $$;
+
+-- ------------------------------------------------- save_draft, guarded ----
+-- Body unchanged from 20260922000002 except for the gate.
+create or replace function public.save_draft(
+  p_type work_item_type,
+  p_item_id uuid,
+  p_urls jsonb default '[]'::jsonb,
+  p_text text default null
+) returns uuid
+language plpgsql security invoker set search_path = public as $$
+declare
+  v_enrollment uuid := public.my_enrollment_id();
+  v_latest     public.submissions;
+  v_id         uuid;
+begin
+  if v_enrollment is null then raise exception 'no active enrollment'; end if;
+  perform public.assert_submittable(p_type, p_item_id, p_urls, p_text, false);
+
+  select * into v_latest
+    from public.submissions
+   where enrollment_id = v_enrollment and item_type = p_type and item_id = p_item_id
+   order by version desc limit 1;
+
+  -- Reuse an open draft; otherwise start the next version.
+  if v_latest.id is not null and v_latest.status = 'draft' then
+    update public.submissions
+       set urls = p_urls, text_response = p_text
+     where id = v_latest.id
+    returning id into v_id;
+  else
+    insert into public.submissions
+      (enrollment_id, item_type, item_id, version, status, urls, text_response)
+    values
+      (v_enrollment, p_type, p_item_id, coalesce(v_latest.version, 0) + 1, 'draft', p_urls, p_text)
+    returning id into v_id;
+  end if;
+
+  return v_id;
+end $$;
+
+-- ------------------------------------------------ submit_work, guarded ----
+-- Body unchanged from 20260922000002 except for the gate. Lateness is still
+-- computed here and frozen on this version (F7.7).
+create or replace function public.submit_work(
+  p_type work_item_type,
+  p_item_id uuid,
+  p_urls jsonb default '[]'::jsonb,
+  p_text text default null
+) returns table (submission_id uuid, version integer, is_late boolean)
+language plpgsql security invoker set search_path = public as $$
+declare
+  v_enrollment uuid := public.my_enrollment_id();
+  v_deadline   timestamptz;
+  v_latest     public.submissions;
+  v_row        public.submissions;
+begin
+  if v_enrollment is null then raise exception 'no active enrollment'; end if;
+  perform public.assert_submittable(p_type, p_item_id, p_urls, p_text, true);
+
+  select * into v_latest
+    from public.submissions
+   where enrollment_id = v_enrollment and item_type = p_type and item_id = p_item_id
+   order by version desc limit 1;
+
+  -- Idempotent under a double-click: an identical submission within 5 seconds
+  -- returns the existing row rather than opening a new version.
+  if v_latest.id is not null
+     and v_latest.status <> 'draft'
+     and v_latest.submitted_at > now() - interval '5 seconds'
+     and coalesce(v_latest.text_response, '') = coalesce(p_text, '')
+     and v_latest.urls = p_urls then
+    return query select v_latest.id, v_latest.version, v_latest.is_late;
+    return;
+  end if;
+
+  v_deadline := public.item_deadline(p_type, p_item_id);
+
+  if v_latest.id is not null and v_latest.status = 'draft' then
+    update public.submissions
+       set urls = p_urls,
+           text_response = p_text,
+           status = 'submitted',
+           submitted_at = now(),
+           -- computed at submit time and frozen on this version (F7.7)
+           is_late = (v_deadline is not null and now() > v_deadline)
+     where id = v_latest.id
+    returning * into v_row;
+  else
+    insert into public.submissions
+      (enrollment_id, item_type, item_id, version, status, urls, text_response,
+       submitted_at, is_late)
+    values
+      (v_enrollment, p_type, p_item_id, coalesce(v_latest.version, 0) + 1, 'submitted',
+       p_urls, p_text, now(), (v_deadline is not null and now() > v_deadline))
+    returning * into v_row;
+  end if;
+
+  perform public.recompute_progress(v_enrollment);
+
+  return query select v_row.id, v_row.version, v_row.is_late;
+end $$;
+
+-- --------------------------------------------- scoring: real items only ----
+-- Submissions that join back to an item that actually exists in the
+-- enrolment's cohort. Deliberately does NOT test release_at: released weeks
+-- never re-lock, and moving a release date is display-only (AGENTS.md
+-- section 6), so a schedule edit must never reverse points already earned.
+create or replace function public.scorable_submissions(p_enrollment_id uuid)
+returns table (item_type work_item_type, item_id uuid, first_submitted_at timestamptz,
+               on_time boolean)
+language sql stable security definer set search_path = public as $$
+  with cohort as (
+    select e.cohort_id from public.enrollments e where e.id = p_enrollment_id
+  ),
+  real_items as (
+    select 'assignment'::work_item_type as t, a.id
+      from public.assignments a
+      join public.week_modules wm on wm.module_id = a.module_id
+      join public.program_weeks w on w.id = wm.week_id
+      join cohort c on c.cohort_id = w.cohort_id
+     where a.status = 'published'
+       and (a.cohort_id is null or a.cohort_id = c.cohort_id)
+    union all
+    select 'program_task'::work_item_type, t.id
+      from public.program_tasks t
+      join public.program_weeks w on w.id = t.week_id
+      join cohort c on c.cohort_id = w.cohort_id
+     where t.status = 'published'
+  )
+  select s.item_type, s.item_id, min(s.submitted_at), bool_and(s.is_late) = false
+    from public.submissions s
+    join real_items ri on ri.t = s.item_type and ri.id = s.item_id
+   where s.enrollment_id = p_enrollment_id
+     and s.status <> 'draft'
+   group by s.item_type, s.item_id;
+$$;
+
+-- recompute_points, with sections 2 and 4 joined to real items. Everything
+-- else is unchanged from 20260922000011.
+create or replace function public.recompute_points(p_enrollment_id uuid) returns integer
+language plpgsql security definer set search_path = public as $$
+declare
+  v_cohort uuid;
+  v_total  integer;
+begin
+  perform public.assert_enrollment_access(p_enrollment_id);
+
+  select cohort_id into v_cohort from public.enrollments where id = p_enrollment_id;
+  if v_cohort is null then return 0; end if;
+
+  -- 1. completed modules
+  insert into public.points_events (enrollment_id, rule, target_type, target_id, points, occurred_at)
+  select p_enrollment_id, 'MODULE_COMPLETED', 'module', mp.module_id,
+         public.points_for('MODULE_COMPLETED'), mp.completed_at
+    from public.module_progress mp
+    join public.week_modules wm on wm.module_id = mp.module_id
+    join public.program_weeks w on w.id = wm.week_id and w.cohort_id = v_cohort
+    join public.modules m on m.id = mp.module_id and m.is_bonus = false
+   where mp.enrollment_id = p_enrollment_id and mp.status = 'completed'
+  on conflict do nothing;
+
+  -- 2. submitted work, and the on-time bonus that goes with it — for items
+  --    that exist. A fabricated item_id earns nothing.
+  insert into public.points_events (enrollment_id, rule, target_type, target_id, points, occurred_at)
+  select p_enrollment_id,
+         case when sc.item_type = 'assignment' then 'ASSIGNMENT_SUBMITTED'::points_rule
+              else 'TASK_SUBMITTED'::points_rule end,
+         sc.item_type::text, sc.item_id,
+         case when sc.item_type = 'assignment'
+              then public.points_for('ASSIGNMENT_SUBMITTED')
+              else public.points_for('TASK_SUBMITTED') end,
+         sc.first_submitted_at
+    from public.scorable_submissions(p_enrollment_id) sc
+  on conflict do nothing;
+
+  insert into public.points_events (enrollment_id, rule, target_type, target_id, points, occurred_at)
+  select p_enrollment_id, 'ON_TIME_BONUS', sc.item_type::text, sc.item_id,
+         public.points_for('ON_TIME_BONUS'), sc.first_submitted_at
+    from public.scorable_submissions(p_enrollment_id) sc
+   where sc.on_time
+  on conflict do nothing;
+
+  -- 3. week bonuses
+  insert into public.points_events (enrollment_id, rule, target_type, target_id, points, occurred_at)
+  select p_enrollment_id, 'WEEK_MODULES_COMPLETE', 'week', wp.week_id,
+         public.points_for('WEEK_MODULES_COMPLETE'), now()
+    from public.week_progress wp
+   where wp.enrollment_id = p_enrollment_id
+     and wp.modules_total > 0
+     and wp.modules_completed >= wp.modules_total
+  on conflict do nothing;
+
+  insert into public.points_events (enrollment_id, rule, target_type, target_id, points, occurred_at)
+  select p_enrollment_id, 'WEEK_COMPLETE', 'week', wp.week_id,
+         public.points_for('WEEK_COMPLETE'), coalesce(wp.completed_at, now())
+    from public.week_progress wp
+   where wp.enrollment_id = p_enrollment_id and wp.is_complete
+  on conflict do nothing;
+
+  -- 4. reversals — an award whose source no longer holds is cancelled, once.
+  --    The submission clause now tests SCORABLE submissions, so an award made
+  --    against a fabricated item before this migration is reversed here.
+  insert into public.points_events
+    (enrollment_id, rule, target_type, target_id, points, reversal_of, note)
+  select e.enrollment_id, e.rule, e.target_type, e.target_id, -e.points, e.id,
+         'source no longer satisfies the rule'
+    from public.points_events e
+   where e.enrollment_id = p_enrollment_id
+     and e.reversal_of is null
+     and not exists (
+       select 1 from public.points_events r where r.reversal_of = e.id)
+     and (
+       (e.rule = 'MODULE_COMPLETED' and not exists (
+          select 1 from public.module_progress mp
+           where mp.enrollment_id = e.enrollment_id
+             and mp.module_id = e.target_id and mp.status = 'completed'))
+       or (e.rule in ('ASSIGNMENT_SUBMITTED', 'TASK_SUBMITTED', 'ON_TIME_BONUS')
+           and not exists (
+          select 1 from public.scorable_submissions(e.enrollment_id) sc
+           where sc.item_id = e.target_id))
+       or (e.rule = 'WEEK_COMPLETE' and not exists (
+          select 1 from public.week_progress wp
+           where wp.enrollment_id = e.enrollment_id
+             and wp.week_id = e.target_id and wp.is_complete))
+     );
+
+  select coalesce(sum(points), 0) into v_total
+    from public.points_events where enrollment_id = p_enrollment_id;
+
+  update public.enrollments
+     set points_total = v_total,
+         streak_weeks = public.compute_streak(p_enrollment_id)
+   where id = p_enrollment_id;
+
+  return v_total;
+end $$;
+
+-- Execute grants for everything in this file are issued by the lockdown
+-- migration (…0023), which runs last and revokes before it grants. Granting
+-- here as well would be dead code that reads like a second source of truth.
+
+-- >>> supabase/migrations/20260922000022_sec_progress_integrity.sql
+-- ============================================================================
+-- Progress integrity.
+--
+-- Three ways to earn completion without watching anything:
+--
+--   1. record_video_progress trusted `p_ended`, so a single call with
+--      p_ended => true completed the module instantly;
+--   2. it trusted `p_duration_seconds` from the caller, so a claimed duration
+--      of 10 made any delta 100% of the video;
+--   3. it trusted `p_delta_seconds`, so one call could claim an hour of watch
+--      time in the same second.
+--
+-- And complete_module took any module id, released or not — a participant
+-- could complete all of weeks 3 to 7 today and take the points.
+--
+-- The fixes lean on facts the server already holds. Duration comes from
+-- `lessons.duration_seconds` (populated for every lesson). Watch time is
+-- capped by the wall clock: you cannot accumulate more seconds of viewing
+-- than have actually elapsed. `p_ended` stops being a completion signal in
+-- its own right and becomes an allowance for tracking loss near the end.
+--
+-- What does NOT change: watched_seconds still accumulates and is still not
+-- the playhead, max_position is still monotonic, and manual completion still
+-- exists, because video tracking must never block completion (PRD F5.8).
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION public.recompute_progress(p_enrollment_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  v_cohort uuid;
+  v_total  integer;
+  v_done   integer;
+begin
+  perform public.assert_enrollment_access(p_enrollment_id);
+  select cohort_id into v_cohort from public.enrollments where id = p_enrollment_id;
+  if v_cohort is null then return; end if;
+
+  select
+      (select count(*) from public.week_modules wm
+         join public.program_weeks w on w.id = wm.week_id
+         join public.modules m on m.id = wm.module_id
+        where w.cohort_id = v_cohort and m.is_bonus = false)
+    + (select count(*) from public.assignments a
+         join public.week_modules wm on wm.module_id = a.module_id
+         join public.program_weeks w on w.id = wm.week_id
+        where w.cohort_id = v_cohort and a.is_required and a.status = 'published'
+          and (a.cohort_id is null or a.cohort_id = v_cohort))
+    + (select count(*) from public.program_tasks t
+         join public.program_weeks w on w.id = t.week_id
+        where w.cohort_id = v_cohort and t.is_required and t.status = 'published')
+  into v_total;
+
+  select
+      (select count(*) from public.module_progress mp
+         join public.week_modules wm on wm.module_id = mp.module_id
+         join public.program_weeks w on w.id = wm.week_id and w.cohort_id = v_cohort
+         join public.modules m on m.id = mp.module_id and m.is_bonus = false
+        where mp.enrollment_id = p_enrollment_id and mp.status = 'completed')
+    + (select count(*) from public.scorable_submissions(p_enrollment_id))
+  into v_done;
+
+  update public.enrollments
+     set progress_pct = case when v_total = 0 then 0
+                        else round((least(v_done, v_total)::numeric / v_total) * 100, 2) end,
+         health = public.compute_health(p_enrollment_id)
+   where id = p_enrollment_id;
+
+  -- Week progress first: the week bonuses read from it.
+  perform public.recompute_week_progress(p_enrollment_id);
+  perform public.recompute_points(p_enrollment_id);
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.recompute_week_progress(p_enrollment_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_cohort uuid;
+begin
+  perform public.assert_enrollment_access(p_enrollment_id);
+  select cohort_id into v_cohort from public.enrollments where id = p_enrollment_id;
+  if v_cohort is null then return; end if;
+
+  insert into public.week_progress (
+    enrollment_id, week_id, modules_completed, modules_total,
+    assignments_submitted, assignments_total, tasks_submitted, tasks_total,
+    task_submitted, is_complete, completed_at, updated_at
+  )
+  select
+    p_enrollment_id,
+    w.id,
+    coalesce(mods.done, 0),
+    coalesce(mods.total, 0),
+    coalesce(asg.done, 0),
+    coalesce(asg.total, 0),
+    coalesce(tsk.done, 0),
+    coalesce(tsk.total, 0),
+    coalesce(tsk.total, 0) > 0 and coalesce(tsk.done, 0) >= coalesce(tsk.total, 0),
+    coalesce(mods.done, 0) >= coalesce(mods.total, 0)
+      and coalesce(asg.done, 0) >= coalesce(asg.total, 0)
+      and coalesce(tsk.done, 0) >= coalesce(tsk.total, 0),
+    case when coalesce(mods.done, 0) >= coalesce(mods.total, 0)
+              and coalesce(asg.done, 0) >= coalesce(asg.total, 0)
+              and coalesce(tsk.done, 0) >= coalesce(tsk.total, 0)
+         then now() end,
+    now()
   from public.program_weeks w
-  join public.modules m on m.number in (w.number * 2 - 1, w.number * 2)
- where w.cohort_id = '22222222-2222-2222-2222-222222222222'
-on conflict (week_id, module_id) do nothing;
+  left join lateral (
+    select count(*) filter (where m.is_bonus = false) as total,
+           count(*) filter (where m.is_bonus = false and mp.status = 'completed') as done
+      from public.week_modules wm
+      join public.modules m on m.id = wm.module_id
+      left join public.module_progress mp
+        on mp.module_id = m.id and mp.enrollment_id = p_enrollment_id
+     where wm.week_id = w.id
+  ) mods on true
+  left join lateral (
+    select count(*) as total,
+           count(*) filter (where s.id is not null) as done
+      from public.assignments a
+      join public.week_modules wm on wm.module_id = a.module_id
+      left join public.submissions s
+        on s.item_id = a.id and s.enrollment_id = p_enrollment_id and s.status <> 'draft'
+     where wm.week_id = w.id and a.is_required and a.status = 'published'
+  ) asg on true
+  left join lateral (
+    select count(*) as total,
+           count(*) filter (where s.id is not null) as done
+      from public.program_tasks t
+      left join public.submissions s
+        on s.item_id = t.id and s.enrollment_id = p_enrollment_id and s.status <> 'draft'
+     where t.week_id = w.id and t.is_required and t.status = 'published'
+  ) tsk on true
+  where w.cohort_id = v_cohort
+  on conflict (enrollment_id, week_id) do update set
+    modules_completed = excluded.modules_completed,
+    modules_total = excluded.modules_total,
+    assignments_submitted = excluded.assignments_submitted,
+    assignments_total = excluded.assignments_total,
+    tasks_submitted = excluded.tasks_submitted,
+    tasks_total = excluded.tasks_total,
+    task_submitted = excluded.task_submitted,
+    is_complete = excluded.is_complete,
+    completed_at = coalesce(public.week_progress.completed_at, excluded.completed_at),
+    updated_at = now();
 
--- ----------------------------------------------- Week 1 bonus resources ----
-insert into public.learning_materials (id, owner_type, owner_id, "order", title, description, type, url, is_required) values
-  ('88888888-0000-0000-0000-000000000001','week','77777777-0000-0000-0000-000000000001',1,'Niche statement worksheet','Fill this in as you watch Module 2.','template','https://pipeops.io','false'),
-  ('88888888-0000-0000-0000-000000000002','week','77777777-0000-0000-0000-000000000001',2,'Content pillar examples','Twelve real developer-creator pillar sets.','doc','https://pipeops.io','false')
-on conflict (id) do update set title = excluded.title, url = excluded.url;
+  update public.enrollments
+     set weeks_completed = (
+       select count(*) from public.week_progress
+        where enrollment_id = p_enrollment_id and is_complete)
+   where id = p_enrollment_id;
+end $function$;
 
--- >>> supabase/seed_p2.sql
+-- ------------------------------------------------- video, honest clock ----
+-- The grace allowance above the measured gap. The player flushes every 15s
+-- (components/VideoPlayer.tsx), so a legitimate call never carries more than
+-- that plus a little jitter; 20s leaves room for a slow network without
+-- leaving room to fabricate a viewing.
+create or replace function public.record_video_progress(
+  p_lesson_id        uuid,
+  p_position_seconds integer,
+  p_delta_seconds    integer default 0,
+  p_duration_seconds integer default null,
+  p_ended            boolean default false
+) returns table (percentage numeric, completed boolean)
+language plpgsql security invoker set search_path = public as $$
+declare
+  v_enrollment uuid := public.my_enrollment_id();
+  v_module     uuid;
+  v_stored_dur integer;
+  v_duration   integer;
+  v_prev       public.video_progress;
+  v_elapsed    integer;
+  v_delta      integer;
+  v_row        public.video_progress;
+  v_was_done   boolean;
+begin
+  if v_enrollment is null then
+    raise exception 'no active enrollment';
+  end if;
+
+  -- The lesson must belong to a module released for THIS caller. Without
+  -- this, progress could be banked against week 7 in week 1.
+  select l.module_id, l.duration_seconds into v_module, v_stored_dur
+    from public.lessons l where l.id = p_lesson_id;
+  if v_module is null then
+    raise exception 'no such lesson';
+  end if;
+  if not public.module_is_released(v_module) then
+    raise exception 'that module has not been released';
+  end if;
+
+  -- The stored duration wins. A caller-supplied one is only a fallback for a
+  -- lesson whose length has not been recorded yet.
+  v_duration := nullif(coalesce(v_stored_dur, p_duration_seconds, 0), 0);
+
+  select * into v_prev
+    from public.video_progress
+   where enrollment_id = v_enrollment and lesson_id = p_lesson_id;
+
+  -- You cannot watch more seconds than have passed. On the first flush the
+  -- gap is measured from now, so the allowance alone applies.
+  v_elapsed := case
+    when v_prev.lesson_id is null then 0
+    else greatest(0, ceil(extract(epoch from (now() - v_prev.last_seen_at))))::integer
+  end;
+  v_delta := least(greatest(coalesce(p_delta_seconds, 0), 0), v_elapsed + 20);
+
+  insert into public.video_progress (
+    enrollment_id, lesson_id, max_position_seconds, watched_seconds,
+    duration_seconds, started_at, last_seen_at
+  )
+  values (
+    v_enrollment, p_lesson_id, greatest(p_position_seconds, 0),
+    v_delta, v_duration, now(), now()
+  )
+  on conflict (enrollment_id, lesson_id) do update set
+    -- monotonic: a late flush with a lower position never lowers the maximum
+    max_position_seconds = greatest(
+      public.video_progress.max_position_seconds, excluded.max_position_seconds),
+    watched_seconds = least(
+      public.video_progress.watched_seconds + v_delta,
+      coalesce(v_duration, public.video_progress.duration_seconds, 2147483647)),
+    duration_seconds = coalesce(v_duration, public.video_progress.duration_seconds),
+    last_seen_at = now()
+  returning * into v_row;
+
+  v_was_done := v_prev.completed_at is not null;
+  v_duration := nullif(coalesce(v_row.duration_seconds, 0), 0);
+
+  update public.video_progress vp
+     set percentage_watched = case
+           when v_duration is null then 0
+           else least(round((v_row.watched_seconds::numeric / v_duration) * 100, 2), 100)
+         end,
+         completed_at = case
+           when vp.completed_at is not null then vp.completed_at
+           when v_duration is null then null
+           -- 90% genuinely watched completes. `p_ended` no longer completes on
+           -- its own — it lowers the bar to 75%, which covers playback the
+           -- tracker lost without covering a scrub to the end.
+           when (v_row.watched_seconds::numeric / v_duration) >= 0.90 then now()
+           when p_ended and (v_row.watched_seconds::numeric / v_duration) >= 0.75 then now()
+           else null
+         end
+   where vp.enrollment_id = v_enrollment and vp.lesson_id = p_lesson_id
+  returning * into v_row;
+
+  -- Crossing the threshold completes the module, once.
+  if v_row.completed_at is not null and not v_was_done then
+    insert into public.module_progress (
+      enrollment_id, module_id, status, started_at, completed_at, completed_via
+    )
+    values (v_enrollment, v_module, 'completed', now(), now(), 'auto')
+    on conflict (enrollment_id, module_id) do update set
+      status = 'completed',
+      completed_at = coalesce(public.module_progress.completed_at, now()),
+      completed_via = coalesce(public.module_progress.completed_via, 'auto');
+
+    perform public.recompute_progress(v_enrollment);
+  end if;
+
+  return query select v_row.percentage_watched, v_row.completed_at is not null;
+end $$;
+
+-- ------------------------------------------ manual completion, gated ----
+-- Still available — if the IFrame API is blocked, tracking yields nothing and
+-- the participant would otherwise be stuck forever (F5.8). But it is now
+-- limited to modules that have actually been released to them.
+create or replace function public.complete_module(
+  p_module_id uuid,
+  p_via       text default 'manual'
+) returns void
+language plpgsql security invoker set search_path = public as $$
+declare
+  v_enrollment uuid := public.my_enrollment_id();
+begin
+  if v_enrollment is null then
+    raise exception 'no active enrollment';
+  end if;
+  if not public.module_is_released(p_module_id) then
+    raise exception 'that module has not been released';
+  end if;
+
+  insert into public.module_progress (
+    enrollment_id, module_id, status, started_at, completed_at, completed_via
+  )
+  values (v_enrollment, p_module_id, 'completed', now(), now(), p_via)
+  on conflict (enrollment_id, module_id) do update set
+    status = 'completed',
+    -- idempotent: re-completing never moves the original timestamp
+    completed_at = coalesce(public.module_progress.completed_at, now()),
+    completed_via = coalesce(public.module_progress.completed_via, p_via);
+
+  perform public.recompute_progress(v_enrollment);
+end $$;
+
+create or replace function public.start_module(p_module_id uuid) returns void
+language plpgsql security invoker set search_path = public as $$
+declare
+  v_enrollment uuid := public.my_enrollment_id();
+begin
+  if v_enrollment is null then return; end if;
+  if not public.module_is_released(p_module_id) then return; end if;
+
+  insert into public.module_progress (enrollment_id, module_id, status, started_at)
+  values (v_enrollment, p_module_id, 'in_progress', now())
+  on conflict (enrollment_id, module_id) do nothing;
+end $$;
+
+grant execute on function public.record_video_progress(uuid, integer, integer, integer, boolean)
+  to authenticated;
+grant execute on function public.complete_module(uuid, text) to authenticated;
+grant execute on function public.start_module(uuid) to authenticated;
+
+-- >>> supabase/migrations/20260922000023_sec_privilege_lockdown.sql
 -- ============================================================================
--- Week 1 work items. Idempotent.
+-- Privilege lockdown. This migration runs LAST on purpose.
 --
--- TODO(content): weeks 2-6 briefs still needed from the programme team.
+-- Postgres grants EXECUTE on every new function to PUBLIC, and a Supabase
+-- project additionally carries a default privilege granting functions to
+-- `anon` and `authenticated`. Together that means every function in `public`
+-- — including the SECURITY DEFINER helpers that run as the owner and bypass
+-- RLS — is callable from a browser the moment it is created.
+--
+-- A revoke can only cover functions that exist when it runs, so this has to be
+-- the final migration in the security series. The ownership checks it relies
+-- on are added in …0020, …0021 and …0022.
 -- ============================================================================
 
--- Course assignment: attached to M02 (Finding Your Niche), which is where the
--- niche statement and content pillars are taught.
-insert into public.assignments
-  (id, module_id, title, brief, submission_types, text_min, text_max, is_required, points)
-select
-  '99999999-0000-0000-0000-000000000001',
-  m.id,
-  'Your niche statement and content pillars',
-  E'Write a single clear niche statement, then list three to five content pillars you will publish against for the rest of the programme.\n\nYour niche statement should finish this sentence: "I help ___ do ___ so they can ___."\n\nFor each pillar, give the pillar name and one example of a post you could make under it.',
-  '["text"]'::jsonb,
-  200, 2000, true, 15
-from public.modules m where m.slug = 'finding-your-niche'
-on conflict (id) do update set
-  title = excluded.title, brief = excluded.brief,
-  submission_types = excluded.submission_types;
+-- ------------------------------------------------------- 1. revoke all ----
+-- NOT `revoke execute on all functions in schema public`. The citext extension
+-- installs its operator functions into `public`, and `users.email` /
+-- `enrollments.email` are citext columns — revoking execute on citext_eq would
+-- make every email comparison fail with a permission error, which is to say it
+-- would take sign-in down. Extension-owned functions (pg_depend.deptype = 'e')
+-- are therefore skipped; only functions this project created are revoked.
+do $$
+declare r record;
+begin
+  for r in
+    select p.oid::regprocedure as sig
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+     where n.nspname = 'public'
+       and not exists (
+         select 1 from pg_depend d
+          where d.objid = p.oid and d.deptype = 'e')
+  loop
+    execute format('revoke execute on function %s from public, anon, authenticated', r.sig);
+  end loop;
+end $$;
 
--- Weekly programme task: the thing that replaces Discord links.
-insert into public.program_tasks
-  (id, week_id, title, brief, submission_types, allowed_platforms,
-   text_min, text_max, is_required, requires_review, points)
-select
-  'aaaaaaaa-0000-0000-0000-000000000001',
-  w.id,
-  'Introduce yourself as a creator',
-  E'Publish one short piece of content introducing yourself as a developer-creator: who you are, what you build, and what you are going to be posting about for the next six weeks.\n\nPost it on LinkedIn, X, TikTok, Instagram, Facebook or YouTube, then paste the public link below.\n\nKeep it short. Done beats perfect — this one exists to get you publishing.',
-  '["url","text"]'::jsonb,
-  array['linkedin.com','x.com','twitter.com','tiktok.com','instagram.com','facebook.com','youtube.com','youtu.be'],
-  0, 500, true, true, 20
-from public.program_weeks w
-where w.cohort_id = '22222222-2222-2222-2222-222222222222' and w.number = 1
-on conflict (id) do update set
-  title = excluded.title, brief = excluded.brief,
-  allowed_platforms = excluded.allowed_platforms;
+-- The default has to name the role that creates the objects, and has to name
+-- anon and authenticated explicitly — the Supabase project default grants to
+-- both, so revoking from PUBLIC alone leaves them. This is what stops the next
+-- migration quietly reopening the hole.
+alter default privileges for role postgres in schema public
+  revoke execute on functions from public;
+alter default privileges for role postgres in schema public
+  revoke execute on functions from anon;
+alter default privileges for role postgres in schema public
+  revoke execute on functions from authenticated;
+
+-- The service role keeps everything: admin scripts, the nightly health job and
+-- the verification suites all run through it, and it is never reachable from a
+-- browser.
+grant execute on all functions in schema public to service_role;
+alter default privileges for role postgres in schema public
+  grant execute on functions to service_role;
+
+-- -------------------------------------------------------- grant back ----
+-- The participant RPC surface. Anything not listed here is unreachable from
+-- a browser, including every trigger function and every internal helper.
+
+-- RLS policy expressions are evaluated as the querying role, so the policy
+-- helpers must stay executable. All four are safe by construction: they take
+-- no caller-supplied identity and return only facts about the caller.
+grant execute on function public.is_admin() to authenticated;
+grant execute on function public.my_enrollment_id() to authenticated;
+grant execute on function public.my_cohort_id() to authenticated;
+grant execute on function public.module_is_released(uuid) to authenticated;
+grant execute on function public.assert_enrollment_access(uuid) to authenticated;
+
+-- Learning and progress.
+grant execute on function public.start_module(uuid) to authenticated;
+grant execute on function public.complete_module(uuid, text) to authenticated;
+grant execute on function public.record_video_progress(uuid, integer, integer, integer, boolean)
+  to authenticated;
+
+-- Submissions. item_deadline is reachable only through these two, but
+-- submit_work is SECURITY INVOKER — deliberately, so RLS stays a second layer
+-- under the checks in the RPC — which means the caller needs execute on it.
+-- A deadline is not sensitive: it is printed on the locked week card.
+grant execute on function public.item_deadline(work_item_type, uuid) to authenticated;
+grant execute on function public.save_draft(work_item_type, uuid, jsonb, text) to authenticated;
+grant execute on function public.submit_work(work_item_type, uuid, jsonb, text) to authenticated;
+
+-- The validation gate those two call. Everything IT calls in turn runs inside a
+-- SECURITY DEFINER body as the owner and stays unreachable from a browser:
+-- submissions_are_open, is_safe_url, assert_safe_urls, work_item_for_caller
+-- and scorable_submissions are all deliberately ungranted.
+grant execute on function public.assert_submittable(work_item_type, uuid, jsonb, text, boolean)
+  to authenticated;
+
+-- Denominators. No arguments, cohort-scoped internally.
+grant execute on function public.program_item_count() to authenticated;
+grant execute on function public.program_module_count() to authenticated;
+
+-- Motivation surface. Cohort-scoped internally; exposes display name, points
+-- and streak only.
+grant execute on function public.leaderboard(integer) to authenticated;
+grant execute on function public.leaderboard_consistent(integer) to authenticated;
+grant execute on function public.active_creator_count() to authenticated;
+
+-- Own-enrolment recomputation, reachable from the RPCs above. Ownership is
+-- enforced inside each one by 20260922000022.
+grant execute on function public.recompute_progress(uuid) to authenticated;
+grant execute on function public.recompute_week_progress(uuid) to authenticated;
+grant execute on function public.recompute_points(uuid) to authenticated;
+grant execute on function public.compute_health(uuid) to authenticated;
+grant execute on function public.compute_streak(uuid) to authenticated;
+
+-- Admin operations. Each one already checks is_admin() in its body; the grant
+-- lets a reviewer reach it, the body decides whether they may.
+-- mark_attendance is admin-only and stays that way: it writes SESSION_ATTENDED
+-- into the points ledger, so self-service would be self-scoring.
+grant execute on function public.mark_attendance(uuid, uuid, boolean) to authenticated;
+grant execute on function public.review_submission(uuid, submission_status, text) to authenticated;
+grant execute on function public.set_enrollment_status(uuid, enrollment_status, text)
+  to authenticated;
+grant execute on function public.set_admin_note(uuid, text) to authenticated;
+grant execute on function public.refresh_cohort_health(uuid) to authenticated;
+grant execute on function public.recompute_cohort(uuid) to authenticated;
+grant execute on function public.reconcile_lateness(work_item_type, uuid) to authenticated;
+
+-- Deliberately NOT granted, and each is reachable only as a trigger or from
+-- inside another function running as owner:
+--   handle_new_user()        auth.users trigger
+--   protect_user_columns()   public.users trigger
+--   touch_updated_at()       updated_at trigger on every content table
+--   points_for(points_rule)  called by recompute_points as owner
+
+-- >>> supabase/migrations/20260922000024_cohort_feature_flags.sql
+-- ============================================================================
+-- Feature flags, and an audit trail for content changes.
+--
+-- The leaderboard and the sessions list are both built and both currently
+-- show a "coming soon" page. That decision lived in the page source, which
+-- meant switching either on required a code change and a deploy — and made
+-- docs/TASKBOARD.md read as though neither existed.
+--
+-- They become cohort data instead. Default false, so nothing changes for
+-- participants today; flipping one is an admin action with an audit row.
+--
+-- The second half closes a gap flagged in review: enrolment RPCs write to
+-- audit_log, but content edits went straight to the tables and left no trace
+-- of who moved a deadline or unpublished a task. A trigger records all of it
+-- without every action having to remember to.
+-- ============================================================================
+
+alter table public.cohorts
+  add column if not exists leaderboard_visible boolean not null default false,
+  add column if not exists sessions_visible    boolean not null default false;
+
+-- ------------------------------------------------------------- toggles ----
+create or replace function public.set_cohort_flag(
+  p_cohort_id uuid,
+  p_flag      text,
+  p_value     boolean
+) returns void
+language plpgsql security definer set search_path = public as $$
+declare v_before jsonb;
+begin
+  if not public.is_admin() then raise exception 'not authorised'; end if;
+  if p_flag not in ('leaderboard_visible', 'sessions_visible', 'submissions_open') then
+    raise exception 'unknown flag: %', p_flag;
+  end if;
+
+  select to_jsonb(c) into v_before from public.cohorts c where c.id = p_cohort_id;
+  if v_before is null then raise exception 'no such cohort'; end if;
+
+  execute format('update public.cohorts set %I = $1 where id = $2', p_flag)
+    using p_value, p_cohort_id;
+
+  insert into public.audit_log (actor_user_id, action, target_type, target_id, before, after)
+  values (auth.uid(), 'cohort.flag', 'cohort', p_cohort_id,
+          jsonb_build_object(p_flag, v_before -> p_flag),
+          jsonb_build_object(p_flag, p_value));
+end $$;
+
+-- ------------------------------------------------- content audit trail ----
+-- Generic row-level record of who changed what. `before` is null on insert and
+-- `after` is null on delete, which is how the reader tells them apart.
+create or replace function public.audit_content_change() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare
+  v_before jsonb := case when tg_op = 'INSERT' then null else to_jsonb(old) end;
+  v_after  jsonb := case when tg_op = 'DELETE' then null else to_jsonb(new) end;
+  v_id     uuid  := case when tg_op = 'DELETE' then old.id else new.id end;
+begin
+  -- An UPDATE that changes nothing is noise, not history.
+  if tg_op = 'UPDATE' and v_before - 'updated_at' = v_after - 'updated_at' then
+    return new;
+  end if;
+
+  insert into public.audit_log (actor_user_id, action, target_type, target_id, before, after)
+  values (auth.uid(), lower(tg_table_name || '.' || tg_op), tg_table_name, v_id,
+          v_before, v_after);
+
+  return case when tg_op = 'DELETE' then old else new end;
+end $$;
+
+do $$
+declare t text;
+begin
+  foreach t in array array[
+    'program_weeks', 'modules', 'lessons', 'assignments', 'program_tasks',
+    'learning_materials', 'sessions', 'announcements'
+  ]
+  loop
+    if to_regclass('public.' || t) is null then continue; end if;
+    execute format('drop trigger if exists %I_audit on public.%I', t, t);
+    execute format(
+      'create trigger %I_audit after insert or update or delete on public.%I
+       for each row execute function public.audit_content_change()', t, t);
+  end loop;
+end $$;
+
+-- Grants are centralised in the lockdown migration; this one is issued here
+-- because it is created after it. audit_content_change is trigger-only and
+-- deliberately stays ungranted.
+grant execute on function public.set_cohort_flag(uuid, text, boolean) to authenticated;
+
+-- >>> supabase/migrations/20260922000025_advisor_cleanup.sql
+-- ============================================================================
+-- Supabase advisor cleanup: unindexed foreign keys, and per-row auth.uid().
+--
+-- Neither is a vulnerability. Both become one kind of problem or another once
+-- 114 people are generating rows, and both are cheap to fix now and awkward to
+-- fix during a live cohort.
+--
+-- 1. Sixteen foreign keys had no covering index. The cost shows up on the
+--    admin screens that join across them and, more sharply, on any cascading
+--    delete — removing an enrolment has to scan every referencing table.
+--
+-- 2. Six policies called auth.uid() directly. Postgres re-evaluates that for
+--    every candidate row; wrapping it in a scalar subquery makes it an
+--    InitPlan, evaluated once per statement. On a 114-row enrolment table the
+--    difference is invisible; on points_events and activity_events, which grow
+--    without bound, it is not.
+--
+-- Deliberately NOT done: moving `citext` out of `public`. Two live columns
+-- (users.email, enrollments.email) are citext, so relocating the extension
+-- means dropping and recreating types that real data depends on. The advisor
+-- flags it as hygiene; the migration to fix it is riskier than the finding.
+-- Recorded in docs/DEPLOYMENT.md as accepted.
+-- ============================================================================
+
+-- ------------------------------------------------- 1. foreign key indexes ----
+create index if not exists activity_events_user_idx      on public.activity_events (user_id);
+create index if not exists announcement_reads_enr_idx    on public.announcement_reads (enrollment_id);
+create index if not exists announcements_created_by_idx  on public.announcements (created_by);
+create index if not exists assignments_cohort_idx        on public.assignments (cohort_id);
+create index if not exists audit_log_actor_idx           on public.audit_log (actor_user_id);
+create index if not exists cohorts_program_idx           on public.cohorts (program_id);
+create index if not exists live_sessions_week_idx        on public.live_sessions (week_id);
+create index if not exists module_progress_module_idx    on public.module_progress (module_id);
+create index if not exists modules_part_idx              on public.modules (part_id);
+create index if not exists points_events_reversal_idx    on public.points_events (reversal_of);
+create index if not exists session_attendance_enr_idx    on public.session_attendance (enrollment_id);
+create index if not exists session_attendance_marked_idx on public.session_attendance (marked_by);
+create index if not exists submissions_reviewed_by_idx   on public.submissions (reviewed_by);
+create index if not exists video_progress_lesson_idx     on public.video_progress (lesson_id);
+create index if not exists week_modules_module_idx       on public.week_modules (module_id);
+create index if not exists week_progress_week_idx        on public.week_progress (week_id);
+
+-- ------------------------------------------------ 2. auth.uid() init plan ----
+-- Rewrites `auth.uid()` to `(select auth.uid())` in every policy that calls it
+-- directly. Done as a loop over pg_policies rather than by hand so that it
+-- cannot miss one, and so re-running it is a no-op.
+do $$
+declare
+  r      record;
+  v_qual text;
+  v_chk  text;
+begin
+  for r in
+    select schemaname, tablename, policyname, cmd, roles, qual, with_check
+      from pg_policies
+     where schemaname = 'public'
+       and (qual like '%auth.uid()%' or with_check like '%auth.uid()%')
+       and coalesce(qual, '') not like '%( SELECT auth.uid()%'
+       and coalesce(with_check, '') not like '%( SELECT auth.uid()%'
+  loop
+    v_qual := replace(r.qual, 'auth.uid()', '(select auth.uid())');
+    v_chk  := replace(r.with_check, 'auth.uid()', '(select auth.uid())');
+
+    if v_qual is not null then
+      execute format('alter policy %I on %I.%I using (%s)',
+                     r.policyname, r.schemaname, r.tablename, v_qual);
+    end if;
+
+    if v_chk is not null then
+      execute format('alter policy %I on %I.%I with check (%s)',
+                     r.policyname, r.schemaname, r.tablename, v_chk);
+    end if;
+  end loop;
+end $$;
 

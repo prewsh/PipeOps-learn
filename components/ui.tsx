@@ -16,7 +16,7 @@ const BUTTON: Record<ButtonVariant, string> = {
 
 // 44px tap-target floor — a hard rule, not a suggestion.
 const BUTTON_BASE =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 text-[15px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40";
+  "motion-fast inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 text-[15px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40";
 
 export function Button({
   variant = "secondary",
@@ -63,7 +63,10 @@ export function EmptyState({ title, detail }: { title: string; detail?: string }
 export function ProgressBar({ pct }: { pct: number }) {
   return (
     <div className="h-1 w-full overflow-hidden rounded-full bg-line-strong">
-      <div className="h-full rounded-full bg-ink" style={{ width: `${Math.min(pct, 100)}%` }} />
+      <div
+        className="motion-state h-full rounded-full bg-ink transition-[width]"
+        style={{ width: `${Math.min(pct, 100)}%` }}
+      />
     </div>
   );
 }

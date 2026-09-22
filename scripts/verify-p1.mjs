@@ -163,15 +163,34 @@ check("participant CANNOT write activity_events", Boolean(activityErr), true);
 
 // -------------------------------------------------------- video progress ----
 const requiredModuleIds = new Set(visibleModules.filter((m) => !m.is_bonus).map((m) => m.id));
-const lesson = visibleLessons.find((l) => requiredModuleIds.has(l.module_id));
+const lessons = visibleLessons.filter((l) => requiredModuleIds.has(l.module_id));
+const lesson = lessons[0];
 await admin.from("video_progress").delete().eq("enrollment_id", enr.id);
 
+// Watch time is capped by the wall clock — you cannot accumulate more seconds
+// of viewing than have actually elapsed. To exercise genuine playback the
+// suite has to age the row rather than claim an impossible delta, which is
+// the same thing a real participant does by waiting.
+const age = async (seconds) =>
+  admin
+    .from("video_progress")
+    .update({ last_seen_at: new Date(Date.now() - seconds * 1000).toISOString() })
+    .eq("enrollment_id", enr.id)
+    .eq("lesson_id", lesson.id);
+
+// A first flush claiming five minutes of viewing in the first second.
 await as.rpc("record_video_progress", {
   p_lesson_id: lesson.id,
   p_position_seconds: 300,
   p_delta_seconds: 300,
   p_duration_seconds: 720,
 });
+const { data: capped } = await as
+  .from("video_progress")
+  .select("watched_seconds")
+  .eq("lesson_id", lesson.id)
+  .single();
+check("an impossible delta is clamped to elapsed time", capped.watched_seconds, 20);
 
 // An out-of-order flush arriving late with a LOWER position must not regress.
 await as.rpc("record_video_progress", {
@@ -188,10 +207,11 @@ const { data: vp } = await as
   .single();
 
 check("max_position is monotonic (300 not 10)", vp.max_position_seconds, 300);
-check("watched_seconds accumulates (300 + 5)", vp.watched_seconds, 305);
-check("not complete at 42% watched", vp.completed_at, null);
+check("watched_seconds accumulates (20 + 5)", vp.watched_seconds, 25);
+check("not complete at 3% watched", vp.completed_at, null);
 
 // Scrub to the end without watching: position jumps, watched does not.
+await age(400);
 await as.rpc("record_video_progress", {
   p_lesson_id: lesson.id,
   p_position_seconds: 719,
@@ -205,11 +225,35 @@ const { data: vp2 } = await as
   .single();
 check("scrubbing to the end is NOT watching", vp2.completed_at, null);
 
-// Genuine playback past 90%.
+// The player's own "ended" event cannot stand in for watching either.
+const second = lessons[1];
+if (second) {
+  await admin
+    .from("video_progress")
+    .delete()
+    .eq("enrollment_id", enr.id)
+    .eq("lesson_id", second.id);
+  await as.rpc("record_video_progress", {
+    p_lesson_id: second.id,
+    p_position_seconds: 0,
+    p_delta_seconds: 1,
+    p_duration_seconds: 720,
+    p_ended: true,
+  });
+  const { data: ended } = await as
+    .from("video_progress")
+    .select("completed_at")
+    .eq("lesson_id", second.id)
+    .single();
+  check("p_ended alone does not complete an unwatched video", ended.completed_at, null);
+}
+
+// Genuine playback: time really passes, and the viewing is real.
+await age(700);
 await as.rpc("record_video_progress", {
   p_lesson_id: lesson.id,
   p_position_seconds: 700,
-  p_delta_seconds: 400,
+  p_delta_seconds: 700,
   p_duration_seconds: 720,
 });
 const { data: vp3 } = await as

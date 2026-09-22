@@ -1,3 +1,4 @@
+import { unwrap, unwrapCount } from "@/lib/data/query";
 import { getSupabase } from "@/lib/supabase/server";
 
 /** Admin reads. RLS lets admin/reviewer roles see across the cohort. */
@@ -48,7 +49,7 @@ export async function getReviewQueue(filter: "pending" | "all" = "pending"): Pro
   const assignmentIds = rows.filter((r) => r.item_type === "assignment").map((r) => r.item_id);
   const taskIds = rows.filter((r) => r.item_type === "program_task").map((r) => r.item_id);
 
-  const [{ data: assignments }, { data: tasks }] = await Promise.all([
+  const [assignmentsRes, tasksRes] = await Promise.all([
     assignmentIds.length
       ? supabase
           .from("assignments")
@@ -59,6 +60,8 @@ export async function getReviewQueue(filter: "pending" | "all" = "pending"): Pro
       ? supabase.from("program_tasks").select("id, title, program_weeks(number)").in("id", taskIds)
       : Promise.resolve({ data: [] }),
   ]);
+  const assignments = unwrap(assignmentsRes, "assignments");
+  const tasks = unwrap(tasksRes, "tasks");
 
   const titles = new Map<string, { title: string; week: number | null }>();
   for (const a of (assignments ?? []) as unknown as Record<string, unknown>[]) {
@@ -105,7 +108,7 @@ export async function getReviewQueue(filter: "pending" | "all" = "pending"): Pro
 export async function getCohortStats() {
   const supabase = await getSupabase();
 
-  const [{ count: participants }, { count: pending }, { count: submitted }] = await Promise.all([
+  const [participantsRes, pendingRes, submittedRes] = await Promise.all([
     supabase.from("enrollments").select("*", { count: "exact", head: true }).eq("status", "active"),
     supabase
       .from("submissions")
@@ -113,6 +116,9 @@ export async function getCohortStats() {
       .in("status", ["submitted", "under_review"]),
     supabase.from("submissions").select("*", { count: "exact", head: true }).neq("status", "draft"),
   ]);
+  const participants = unwrapCount(participantsRes, "participants");
+  const pending = unwrapCount(pendingRes, "pending");
+  const submitted = unwrapCount(submittedRes, "submitted");
 
   return {
     participants: participants ?? 0,
@@ -157,7 +163,7 @@ export async function getParticipants(filter: ParticipantFilter = {}): Promise<P
   if (filter.status) query = query.eq("status", filter.status);
   if (filter.q) query = query.or(`email.ilike.%${filter.q}%,name.ilike.%${filter.q}%`);
 
-  const [{ data: rows }, { data: subs }, { data: currentTask }] = await Promise.all([
+  const [rowsRes, subsRes, currentTaskRes] = await Promise.all([
     query,
     supabase.from("submissions").select("enrollment_id, item_id").neq("status", "draft"),
     // The task for the week that is current right now.
@@ -168,6 +174,9 @@ export async function getParticipants(filter: ParticipantFilter = {}): Promise<P
       .order("program_weeks(release_at)", { ascending: false })
       .limit(1),
   ]);
+  const rows = unwrap(rowsRes, "participants");
+  const subs = unwrap(subsRes, "submissions");
+  const currentTask = unwrap(currentTaskRes, "current task");
 
   const currentTaskId = (currentTask as unknown as { id: string }[] | null)?.[0]?.id ?? null;
 
@@ -197,36 +206,39 @@ export async function getParticipants(filter: ParticipantFilter = {}): Promise<P
 export async function getParticipantDetail(enrollmentId: string) {
   const supabase = await getSupabase();
 
-  const [{ data: enrollment }, { data: activity }, { data: submissions }, { data: weeks }] =
-    await Promise.all([
-      supabase
-        .from("enrollments")
-        .select(
-          "id, name, email, status, status_reason, health, progress_pct, weeks_completed, " +
-            "last_active_at, enrolled_at, admin_notes",
-        )
-        .eq("id", enrollmentId)
-        .maybeSingle(),
-      supabase
-        .from("activity_events")
-        .select("id, type, occurred_at, metadata")
-        .eq("enrollment_id", enrollmentId)
-        .order("occurred_at", { ascending: false })
-        .limit(50),
-      supabase
-        .from("submissions")
-        .select("id, item_type, item_id, version, status, is_late, submitted_at, review_note")
-        .eq("enrollment_id", enrollmentId)
-        .order("submitted_at", { ascending: false }),
-      supabase
-        .from("week_progress")
-        .select(
-          "week_id, modules_completed, modules_total, assignments_submitted, " +
-            "assignments_total, tasks_submitted, tasks_total, is_complete, " +
-            "program_weeks(number, title)",
-        )
-        .eq("enrollment_id", enrollmentId),
-    ]);
+  const [enrollmentRes, activityRes, submissionsRes, weeksRes] = await Promise.all([
+    supabase
+      .from("enrollments")
+      .select(
+        "id, name, email, status, status_reason, health, progress_pct, weeks_completed, " +
+          "last_active_at, enrolled_at, admin_notes",
+      )
+      .eq("id", enrollmentId)
+      .maybeSingle(),
+    supabase
+      .from("activity_events")
+      .select("id, type, occurred_at, metadata")
+      .eq("enrollment_id", enrollmentId)
+      .order("occurred_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("submissions")
+      .select("id, item_type, item_id, version, status, is_late, submitted_at, review_note")
+      .eq("enrollment_id", enrollmentId)
+      .order("submitted_at", { ascending: false }),
+    supabase
+      .from("week_progress")
+      .select(
+        "week_id, modules_completed, modules_total, assignments_submitted, " +
+          "assignments_total, tasks_submitted, tasks_total, is_complete, " +
+          "program_weeks(number, title)",
+      )
+      .eq("enrollment_id", enrollmentId),
+  ]);
+  const enrollment = unwrap(enrollmentRes, "enrollment");
+  const activity = unwrap(activityRes, "activity");
+  const submissions = unwrap(submissionsRes, "submissions");
+  const weeks = unwrap(weeksRes, "the programme");
 
   if (!enrollment) return null;
 
@@ -287,13 +299,16 @@ export async function getParticipantDetail(enrollmentId: string) {
 export async function getWeekFunnel() {
   const supabase = await getSupabase();
 
-  const [{ data: weeks }, { data: progress }, { count: total }] = await Promise.all([
+  const [weeksRes, progressRes, totalRes] = await Promise.all([
     supabase.from("program_weeks").select("id, number, title, release_at").order("number"),
     supabase
       .from("week_progress")
       .select("week_id, is_complete, task_submitted, modules_completed"),
     supabase.from("enrollments").select("*", { count: "exact", head: true }).eq("status", "active"),
   ]);
+  const weeks = unwrap(weeksRes, "the programme");
+  const progress = unwrap(progressRes, "participant progress");
+  const total = unwrapCount(totalRes, "total");
 
   const byWeek = new Map<string, { complete: number; task: number; started: number }>();
   for (const p of progress ?? []) {
@@ -333,11 +348,14 @@ export async function getHealthCounts(): Promise<Record<HealthState, number>> {
 export async function getWeekForEdit(number: number) {
   const supabase = await getSupabase();
 
-  const { data: week } = await supabase
-    .from("program_weeks")
-    .select("id, cohort_id, number, title, theme, overview, release_at, deadline_at, image_url")
-    .eq("number", number)
-    .maybeSingle();
+  const week = unwrap(
+    await supabase
+      .from("program_weeks")
+      .select("id, cohort_id, number, title, theme, overview, release_at, deadline_at, image_url")
+      .eq("number", number)
+      .maybeSingle(),
+    "week",
+  );
 
   if (!week) return null;
   const w = week as unknown as {
@@ -352,7 +370,7 @@ export async function getWeekForEdit(number: number) {
     image_url: string | null;
   };
 
-  const [{ data: links }, { data: task }, { data: materials }] = await Promise.all([
+  const [linksRes, taskRes, materialsRes] = await Promise.all([
     supabase
       .from("week_modules")
       .select(
@@ -372,6 +390,9 @@ export async function getWeekForEdit(number: number) {
       .eq("owner_id", w.id)
       .order("order"),
   ]);
+  const links = unwrap(linksRes, "the week's modules");
+  const task = unwrap(taskRes, "task");
+  const materials = unwrap(materialsRes, "resources");
 
   type LinkRow = {
     modules: {
@@ -436,12 +457,15 @@ export async function getModuleForEdit(slug: string) {
     week_modules: { program_weeks: { number: number } | null }[];
   };
 
-  const { data: materials } = await supabase
-    .from("learning_materials")
-    .select("id, title, description, type, url")
-    .eq("owner_type", "module")
-    .eq("owner_id", m.id)
-    .order("order");
+  const materials = unwrap(
+    await supabase
+      .from("learning_materials")
+      .select("id, title, description, type, url")
+      .eq("owner_type", "module")
+      .eq("owner_id", m.id)
+      .order("order"),
+    "resources",
+  );
 
   return {
     id: m.id,
@@ -467,21 +491,24 @@ export async function getModuleForEdit(slug: string) {
 export async function getContentOverview() {
   const supabase = await getSupabase();
 
-  const [{ data: weeks }, { data: cohort }] = await Promise.all([
+  const [weeksRes, cohortRes] = await Promise.all([
     supabase
       .from("program_weeks")
       .select("id, number, title, theme, release_at, deadline_at")
       .order("number"),
     supabase
       .from("cohorts")
-      .select("id, name, submissions_open")
+      .select("id, name, submissions_open, leaderboard_visible, sessions_visible")
       .eq("code", "ugc-01")
       .maybeSingle(),
   ]);
+  const weeks = unwrap(weeksRes, "the programme");
+  const cohort = unwrap(cohortRes, "cohort");
 
-  const { data: counts } = await supabase
-    .from("week_modules")
-    .select("week_id, modules!inner(lessons(video_ref))");
+  const counts = unwrap(
+    await supabase.from("week_modules").select("week_id, modules!inner(lessons(video_ref))"),
+    "counts",
+  );
 
   const byWeek = new Map<string, { modules: number; missingVideo: number }>();
   for (const row of (counts ?? []) as unknown as {
@@ -494,11 +521,17 @@ export async function getContentOverview() {
     byWeek.set(row.week_id, acc);
   }
 
-  const { data: tasks } = await supabase.from("program_tasks").select("week_id");
+  const tasks = unwrap(await supabase.from("program_tasks").select("week_id"), "tasks");
   const weeksWithTask = new Set((tasks ?? []).map((t) => t.week_id));
 
   return {
-    cohort: cohort as unknown as { id: string; name: string; submissions_open: boolean } | null,
+    cohort: cohort as unknown as {
+      id: string;
+      name: string;
+      submissions_open: boolean;
+      leaderboard_visible: boolean;
+      sessions_visible: boolean;
+    } | null,
     weeks: (
       (weeks ?? []) as unknown as {
         id: string;

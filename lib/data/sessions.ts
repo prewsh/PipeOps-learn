@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unwrap } from "@/lib/data/query";
 import { getSupabase } from "@/lib/supabase/server";
 
 export type Session = {
@@ -20,7 +21,7 @@ export type Session = {
 export const getSessions = cache(async (): Promise<Session[]> => {
   const supabase = await getSupabase();
 
-  const [{ data: rows }, { data: attendance }] = await Promise.all([
+  const [rowsRes, attendanceRes] = await Promise.all([
     supabase
       .from("live_sessions")
       .select(
@@ -30,6 +31,8 @@ export const getSessions = cache(async (): Promise<Session[]> => {
       .order("starts_at", { ascending: true }),
     supabase.from("session_attendance").select("session_id, attended"),
   ]);
+  const rows = unwrap(rowsRes, "live sessions");
+  const attendance = unwrap(attendanceRes, "session attendance");
 
   type SessionRow = {
     id: string;
