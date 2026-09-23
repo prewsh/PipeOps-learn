@@ -95,7 +95,10 @@ export async function ensureAccount(enrollment: Enrollment): Promise<{ error?: s
 export async function sendSignInEmail(email: string): Promise<{ error?: string }> {
   const { error } = await getStatelessSupabase().auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: false },
+    options: {
+      shouldCreateUser: false,
+      emailRedirectTo: `${env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}/auth/confirm`,
+    },
   });
   if (!error) return {};
   if (error.status === 429) return { error: "sent too recently — try again in a minute" };

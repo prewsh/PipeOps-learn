@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { env } from "@/lib/env";
 import { getAdminSupabase } from "@/lib/supabase/admin";
 import { getSupabase } from "@/lib/supabase/server";
 
@@ -65,7 +66,10 @@ export async function requestAccess(_prev: AuthState, formData: FormData): Promi
   // Sends the magic link and the 6-digit code in the same email (F1.3).
   const { error: otpError } = await supabase.auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: false },
+    options: {
+      shouldCreateUser: false,
+      emailRedirectTo: `${env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}/auth/confirm`,
+    },
   });
 
   if (otpError) {
