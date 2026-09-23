@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { Nav } from "@/components/Nav";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { signOut } from "@/lib/auth/actions";
 import { getMe, getWeeks } from "@/lib/data/program";
 import { getSupabase } from "@/lib/supabase/server";
@@ -34,19 +35,23 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3">
             {me.cohortName}
           </span>
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3"
-            >
-              Sign out
-            </button>
-          </form>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <form action={signOut}>
+              <button
+                type="submit"
+                className="min-h-11 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </header>
 
         {/* Desktop keeps the chrome minimal: the rail carries identity, so the
             top bar only holds the account action. */}
-        <header className="sticky top-0 z-30 hidden items-center justify-end border-b border-line bg-surface/95 px-8 py-3 backdrop-blur md:flex">
+        <header className="sticky top-0 z-30 hidden items-center justify-end gap-4 border-b border-line bg-surface/95 px-8 py-1.5 backdrop-blur md:flex">
+          <ThemeToggle />
           <form action={signOut}>
             <button
               type="submit"

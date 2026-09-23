@@ -41,11 +41,19 @@ export default async function ParticipantsPage({
 
   return (
     <div className="flex flex-col gap-5">
-      <header>
-        <Meta>Participants</Meta>
-        <h1 className="mt-2 text-[28px] font-bold leading-[1.15] tracking-[-0.025em] text-ink">
-          {participants.length} shown
-        </h1>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <Meta>Participants</Meta>
+          <h1 className="mt-2 text-[28px] font-bold leading-[1.15] tracking-[-0.025em] text-ink">
+            {participants.length} shown
+          </h1>
+        </div>
+        <Link
+          href="/admin/invites"
+          className="flex min-h-11 items-center rounded-lg border border-line-strong bg-surface px-4 text-[15px] text-ink no-underline hover:bg-fill-subtle"
+        >
+          Invite participants →
+        </Link>
       </header>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">

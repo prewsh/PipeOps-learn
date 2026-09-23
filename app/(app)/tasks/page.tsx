@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { StatusChip } from "@/components/StatusMarker";
 import { Card, EmptyState, Meta } from "@/components/ui";
-import { getWorkItems, type WorkItem } from "@/lib/data/tasks";
+import { externalDestination, getWorkItems, type WorkItem } from "@/lib/data/tasks";
 import { formatDeadline, formatRelative } from "@/lib/time";
 
 /** Every assignment and programme task, grouped by week (PRD F9 section 7.1). */
@@ -14,7 +14,10 @@ export default async function TasksPage() {
     byWeek.set(key, [...(byWeek.get(key) ?? []), item]);
   }
 
-  const done = items.filter((i) => i.submission && i.submission.status !== "draft").length;
+  // Tasks submitted on Discord are invisible to the platform, so they are left
+  // out of the count rather than counted as not done.
+  const tracked = items.filter((i) => !i.externalSubmissionUrl);
+  const done = tracked.filter((i) => i.submission && i.submission.status !== "draft").length;
 
   return (
     <div className="flex flex-col gap-6">
@@ -24,14 +27,16 @@ export default async function TasksPage() {
           Your weekly work
         </h1>
         <p className="mt-2 text-base leading-[1.55] text-ink-2">
-          Your task and assignment for each week. {done} of {items.length} submitted.
+          The task the programme team sets for each week. Module assignments are on each module's
+          page, next to the video.
+          {tracked.length > 0 ? ` ${done} of ${tracked.length} submitted.` : ""}
         </p>
       </header>
 
       {items.length === 0 ? (
         <EmptyState
           title="No tasks yet"
-          detail="Assignments and weekly tasks appear as each week is released."
+          detail="Weekly tasks appear here as the programme team sets them."
         />
       ) : (
         [...byWeek.entries()]
@@ -63,14 +68,20 @@ function TaskRow({ item }: { item: WorkItem }) {
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[15px] font-medium text-ink">{item.title}</span>
         <span className="mt-0.5 block font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3">
-          {item.type === "program_task" ? "Programme task" : "Assignment"}
+          {item.type === "program_task" ? "Weekly task" : "Assignment"}
           {item.deadlineAt
             ? ` · due ${formatDeadline(new Date(item.deadlineAt))} · ${formatRelative(new Date(item.deadlineAt))}`
             : ""}
         </span>
       </span>
       <span className="shrink-0">
-        <StatusChip status={status} late={s?.isLate} />
+        {item.externalSubmissionUrl ? (
+          <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-ink">
+            On {externalDestination(item.externalSubmissionUrl)}
+          </span>
+        ) : (
+          <StatusChip status={status} late={s?.isLate} />
+        )}
       </span>
     </Link>
   );

@@ -380,7 +380,10 @@ export async function getWeekForEdit(number: number) {
       .order("order"),
     supabase
       .from("program_tasks")
-      .select("id, title, brief, submission_types, deadline_at")
+      .select(
+        "id, title, brief, submission_types, deadline_at, " +
+          "external_submission_url, external_submission_note",
+      )
       .eq("week_id", w.id)
       .maybeSingle(),
     supabase
@@ -421,6 +424,8 @@ export async function getWeekForEdit(number: number) {
       brief: string;
       submission_types: string[];
       deadline_at: string | null;
+      external_submission_url: string | null;
+      external_submission_note: string | null;
     } | null,
     materials: (materials ?? []) as unknown as {
       id: string;
@@ -457,15 +462,26 @@ export async function getModuleForEdit(slug: string) {
     week_modules: { program_weeks: { number: number } | null }[];
   };
 
-  const materials = unwrap(
-    await supabase
+  const [materialsRes, assignmentRes] = await Promise.all([
+    supabase
       .from("learning_materials")
-      .select("id, title, description, type, url")
+      .select("id, title, description, type, url, tags")
       .eq("owner_type", "module")
       .eq("owner_id", m.id)
       .order("order"),
-    "resources",
-  );
+    supabase
+      .from("assignments")
+      .select("id, title, brief, document_url")
+      .eq("module_id", m.id)
+      .maybeSingle(),
+  ]);
+  const materials = unwrap(materialsRes, "resources");
+  const assignment = unwrap(assignmentRes, "assignment") as {
+    id: string;
+    title: string;
+    brief: string;
+    document_url: string | null;
+  } | null;
 
   return {
     id: m.id,
@@ -478,12 +494,14 @@ export async function getModuleForEdit(slug: string) {
     lessonId: m.lessons?.[0]?.id ?? null,
     videoRef: m.lessons?.[0]?.video_ref ?? "",
     weekNumber: m.week_modules?.[0]?.program_weeks?.number ?? null,
+    assignment,
     materials: (materials ?? []) as unknown as {
       id: string;
       title: string;
       description: string | null;
       type: string;
       url: string | null;
+      tags: string[];
     }[],
   };
 }

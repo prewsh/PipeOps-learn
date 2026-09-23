@@ -3,8 +3,13 @@ import Image from "next/image";
 /**
  * The PipeOps mark.
  *
- * Two files: the wordmark is ink on light and white on the admin's
- * ink-surface rail, while the rocket keeps its brand purple in both.
+ * Two files: the wordmark is ink on light and white on dark, while the rocket
+ * keeps its brand purple in both.
+ *
+ * `auto` (the default) follows the theme: both files are rendered and CSS
+ * shows the right one, so the server never has to know which theme the
+ * browser will pick. `white` is for surfaces that are dark in every theme —
+ * the admin rail.
  *
  * Intrinsic dimensions are passed so Next can reserve space, and the rendered
  * size comes from CSS with `h-auto` on the counterpart axis — otherwise Next
@@ -13,23 +18,33 @@ import Image from "next/image";
 const INTRINSIC = { width: 901, height: 213 };
 
 export function Logo({
-  variant = "dark",
+  variant = "auto",
   height = 26,
   className = "",
 }: {
-  variant?: "dark" | "white";
+  variant?: "auto" | "white";
   height?: number;
   className?: string;
 }) {
-  return (
+  const mark = (src: string, extra: string, decorative = false) => (
     <Image
-      src={variant === "white" ? "/brand/pipeops-logo-white.svg" : "/brand/pipeops-logo.svg"}
-      alt="PipeOps"
+      src={src}
+      alt={decorative ? "" : "PipeOps"}
+      aria-hidden={decorative || undefined}
       width={INTRINSIC.width}
       height={INTRINSIC.height}
       priority
-      className={`h-auto w-auto ${className}`}
+      className={`h-auto w-auto ${extra} ${className}`}
       style={{ height, width: "auto" }}
     />
+  );
+
+  if (variant === "white") return mark("/brand/pipeops-logo-white.svg", "");
+
+  return (
+    <>
+      {mark("/brand/pipeops-logo.svg", "dark:hidden")}
+      {mark("/brand/pipeops-logo-white.svg", "hidden dark:block", true)}
+    </>
   );
 }

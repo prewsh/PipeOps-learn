@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { Field, Select, Status, TextArea, TextInput } from "@/components/admin/Fields";
 import { RemoveResource } from "@/components/admin/WeekEditor";
 import { Button, Card, Meta } from "@/components/ui";
-import { addResource, type ContentState, saveModule } from "@/lib/actions/content";
+import { addResource, type ContentState, saveAssignment, saveModule } from "@/lib/actions/content";
 
 export function ModuleEditor({
   module: m,
@@ -18,7 +18,8 @@ export function ModuleEditor({
     minutes: number | null;
     lessonId: string | null;
     videoRef: string;
-    materials: { id: string; title: string; url: string | null }[];
+    assignment: { id: string; title: string; brief: string; document_url: string | null } | null;
+    materials: { id: string; title: string; url: string | null; tags: string[] }[];
   };
 }) {
   const [state, action, pending] = useActionState<ContentState, FormData>(
@@ -71,8 +72,14 @@ export function ModuleEditor({
         </form>
       </Card>
 
+      {m.assignment ? <AssignmentEditor assignment={m.assignment} /> : null}
+
       <Card className="px-5 py-5">
         <Meta>Resources for this module</Meta>
+        <p className="mt-1 text-sm text-ink-2">
+          The key-points sheet goes here. The assignment workbook does not — link it from the
+          assignment above, so the two are never confused.
+        </p>
         {m.materials.length > 0 ? (
           <ul className="mt-3 flex flex-col gap-2">
             {m.materials.map((r) => (
@@ -84,6 +91,7 @@ export function ModuleEditor({
                   className="truncate text-sm"
                 >
                   {r.title}
+                  {r.tags.includes("key-points") ? " · key points" : ""}
                 </a>
                 <RemoveResource id={r.id} />
               </li>
@@ -106,11 +114,56 @@ export function ModuleEditor({
           <Button type="submit" disabled={resPending}>
             {resPending ? "Adding…" : "Add"}
           </Button>
+          <label className="flex items-center gap-2 text-sm text-ink md:col-span-4">
+            <input type="checkbox" name="keyPoints" className="h-4 w-4" />
+            This is the module's key-points sheet — the assignment will point to it
+          </label>
           <div className="md:col-span-4">
             <Status state={resState} />
           </div>
         </form>
       </Card>
     </div>
+  );
+}
+
+function AssignmentEditor({
+  assignment: a,
+}: {
+  assignment: { id: string; title: string; brief: string; document_url: string | null };
+}) {
+  const [state, action, pending] = useActionState<ContentState, FormData>(
+    saveAssignment.bind(null, a.id),
+    {},
+  );
+
+  return (
+    <Card className="px-5 py-5">
+      <Meta>Assignment</Meta>
+      <form action={action} className="mt-4 flex flex-col gap-4">
+        <Field label="Title">
+          <TextInput name="title" defaultValue={a.title} required />
+        </Field>
+        <Field label="Assignment" hint="Written out in full — participants read exactly this.">
+          <TextArea name="brief" rows={4} defaultValue={a.brief} required />
+        </Field>
+        <Field
+          label="Assignment workbook"
+          hint="The classwork + assignment PDF. Shown as “Open the assignment workbook”."
+        >
+          <TextInput
+            name="documentUrl"
+            defaultValue={a.document_url ?? ""}
+            placeholder="https://drive.google.com/file/d/…/view"
+          />
+        </Field>
+        <div className="flex items-center gap-3">
+          <Button type="submit" variant="primary" disabled={pending}>
+            {pending ? "Saving…" : "Save assignment"}
+          </Button>
+          <Status state={state} />
+        </div>
+      </form>
+    </Card>
   );
 }

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getSupabase } from "@/lib/supabase/server";
-import { optionalHttpUrl, uuid } from "@/lib/validation";
+import { httpUrl, optionalHttpUrl, uuid } from "@/lib/validation";
 
 /**
  * Content editing for the programme team (PRD F13.4).
@@ -149,9 +149,54 @@ export async function saveModule(
   return { ok: "Module saved." };
 }
 
+const assignmentSchema = z.object({
+  title: z.string().trim().min(2, "Give the assignment a title."),
+  brief: z.string().trim().min(10, "Write the assignment out in full."),
+  documentUrl: optionalHttpUrl,
+});
+
+/**
+ * A module's assignment: the words participants read, and the workbook it
+ * comes from. The workbook is the assessment, so it is linked here — never
+ * added as a module resource, where it would sit beside the key points and
+ * be mistaken for them.
+ */
+export async function saveAssignment(
+  assignmentId: string,
+  _prev: ContentState,
+  formData: FormData,
+): Promise<ContentState> {
+  if (!uuid.safeParse(assignmentId).success) return { error: "Unknown assignment." };
+
+  const parsed = assignmentSchema.safeParse({
+    title: formData.get("title"),
+    brief: formData.get("brief"),
+    documentUrl: String(formData.get("documentUrl") ?? ""),
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Check the form." };
+
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("assignments")
+    .update({
+      title: parsed.data.title,
+      brief: parsed.data.brief,
+      document_url: parsed.data.documentUrl || null,
+    })
+    .eq("id", assignmentId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/content", "layout");
+  revalidatePath("/learn", "layout");
+  return { ok: "Assignment saved." };
+}
+
 const taskSchema = z.object({
   title: z.string().trim().min(2, "Give the task a title."),
   brief: z.string().trim().min(10, "Write a brief."),
+  externalUrl: optionalHttpUrl,
+  externalNote: z.string().trim().max(2000).optional(),
 });
 
 export async function saveTask(
@@ -163,12 +208,16 @@ export async function saveTask(
   const parsed = taskSchema.safeParse({
     title: formData.get("title"),
     brief: formData.get("brief"),
+    externalUrl: String(formData.get("externalUrl") ?? ""),
+    externalNote: String(formData.get("externalNote") ?? ""),
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Check the form." };
 
   const deadlineAt = cohortTime(String(formData.get("deadlineAt") ?? "") || null);
   const types = ["url", "text", "file"].filter((t) => formData.get(`type_${t}`) === "on");
   if (types.length === 0) return { error: "Pick at least one submission type." };
+
+  const externalUrl = parsed.data.externalUrl || null;
 
   const supabase = await getSupabase();
   const payload = {
@@ -178,6 +227,12 @@ export async function saveTask(
     submission_types: types,
     deadline_at: deadlineAt,
     status: "published" as const,
+    external_submission_url: externalUrl,
+    external_submission_note: externalUrl ? parsed.data.externalNote || null : null,
+    // A task submitted on Discord is invisible to the platform. Counting it
+    // would mark every participant as having missed it at the deadline, so it
+    // is untracked — the database enforces the same rule.
+    is_required: externalUrl === null,
   };
 
   const { error } = taskId
@@ -201,7 +256,9 @@ export async function saveTask(
 
 const resourceSchema = z.object({
   title: z.string().trim().min(2, "Give the resource a title."),
-  url: z.url("That isn't a full URL."),
+  // http(s) only: these render as links participants click, and z.url()
+  // alone accepts javascript: and data:.
+  url: httpUrl,
   description: z.string().trim().max(300).optional(),
   type: z.enum(["pdf", "doc", "sheet", "link", "template", "video", "image"]),
 });
@@ -220,6 +277,9 @@ export async function addResource(
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Check the form." };
 
+  // Marks the module's key-points sheet, which the assignment then points to.
+  const isKeyPoints = ownerType === "module" && formData.get("keyPoints") === "on";
+
   const supabase = await getSupabase();
   const { error } = await supabase.from("learning_materials").insert({
     owner_type: ownerType,
@@ -228,6 +288,7 @@ export async function addResource(
     description: parsed.data.description || null,
     type: parsed.data.type,
     url: parsed.data.url,
+    tags: isKeyPoints ? ["key-points"] : [],
   });
 
   if (error) return { error: error.message };

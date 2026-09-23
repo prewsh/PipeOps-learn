@@ -67,9 +67,13 @@ export default async function WeekPage({ params }: { params: Promise<{ number: s
         </Card>
       </section>
 
-      <section>
-        <Meta>Bonus resources</Meta>
-        {materials.length > 0 ? (
+      {/* Extras a week sometimes gets from the team. Course material is not
+          here — each module's key points and workbook live on its own page —
+          so with nothing added, the section does not render at all rather
+          than showing an empty "bonus" shelf nobody asked for. */}
+      {materials.length > 0 ? (
+        <section>
+          <Meta>Week resources</Meta>
           <Card className="mt-3 overflow-hidden">
             {materials.map((m) => (
               <a
@@ -80,11 +84,9 @@ export default async function WeekPage({ params }: { params: Promise<{ number: s
                 className="flex min-h-14 items-center justify-between gap-4 border-b border-line px-5 py-3 no-underline last:border-b-0 hover:bg-fill-subtle"
               >
                 <span className="min-w-0">
-                  <span className="block truncate text-[15px] font-medium text-ink">{m.title}</span>
+                  <span className="block text-[15px] font-medium text-ink">{m.title}</span>
                   {m.description ? (
-                    <span className="mt-0.5 block truncate text-sm text-ink-2">
-                      {m.description}
-                    </span>
+                    <span className="mt-0.5 block text-sm text-ink-2">{m.description}</span>
                   ) : null}
                 </span>
                 <span className="shrink-0 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3">
@@ -93,12 +95,8 @@ export default async function WeekPage({ params }: { params: Promise<{ number: s
               </a>
             ))}
           </Card>
-        ) : (
-          <div className="mt-3">
-            <EmptyState title="No bonus resources for this week yet" />
-          </div>
-        )}
-      </section>
+        </section>
+      ) : null}
     </div>
   );
 }

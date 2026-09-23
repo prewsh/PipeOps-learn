@@ -83,7 +83,12 @@ Two consequences:
 2. Load video ids and week content; open the weeks that should be open
 3. Send yourself a real sign-in email and complete it end to end
 4. Run all five verification suites against production
-5. Announce
+5. **Invite the cohort** from `/admin/invites` → "Invite N people". It emails everyone enrolled who has not signed in, in batches of ten, and asks before sending. It is switched off on any build whose `NEXT_PUBLIC_APP_URL` is localhost, so it only works on the deployed site — and only if that variable is set to `https://learn.pipeops.io` there.
+6. Announce
+
+Late joiners are added one at a time from the same page ("Add a participant"), which enrols them, creates their login account and emails them. `scripts/import-participants.mjs` now creates login accounts as well, so a bulk import can no longer leave people unable to sign in.
+
+**Never run `supabase/seed.sql` or `supabase/seed_p2.sql` against the live project.** They are the original development seed. Their upserts reset week release dates — re-locking weeks that are open — and re-insert placeholder resources that point at `https://pipeops.io`. The migrations are the source of truth.
 
 ## 6. Rollback
 
@@ -112,9 +117,11 @@ It rebuilds every derived value from source and is safe to run repeatedly.
 
 The app checks `enrollments` before requesting a code, but the anon key reaches the browser, so `signInWithOtp` can be called directly. Close it at the project level:
 
-- [ ] Pre-create auth users for the accepted list — `scripts/precreate-auth-users.mjs`
-- [ ] **Disable new-user signup** in Supabase Auth
-- [ ] Confirm both OTP and magic link still work for a pre-created user
-- [ ] Re-run `scripts/verify-auth.mjs`
+- [x] Pre-create auth users for the accepted list — `scripts/precreate-auth-users.mjs` (117 active enrolments linked on 23 Sep 2026)
+- [x] **Disable new-user signup** in Supabase Auth (verified with an anon-key request returning `signup_disabled` and no Auth user)
+- [x] Confirm both OTP and magic link still work for a pre-created user using delivered Gmail SMTP messages
+- [x] Re-run `scripts/verify-auth.mjs` with a delivered OTP (14 passed, 0 failed)
+
+Signup was disabled by the project owner on 23 Sep 2026. A direct anon-key request was rejected without creating an Auth user; the real-session auth suite then passed 16/16 checks for a pre-created participant.
 
 Without this a stranger cannot reach cohort data — RLS sees to that — but they can create an orphan `auth.users` row and burn email quota.

@@ -121,10 +121,48 @@ export const getMe = cache(async (): Promise<Me | null> => {
   };
 });
 
-function stateFor(releaseAt: string, nextReleaseAt: string | undefined, now: Date): WeekState {
+/**
+ * Which week the cohort is on.
+ *
+ * Opening a week and being in it are different things. The programme team
+ * opens weeks early so people can watch ahead, and "current" used to mean
+ * "most recently opened" — so opening Weeks 3 and 4 on a Wednesday of Week 1
+ * put the dashboard on Week 4 and hid the Week 1 task due that Sunday.
+ *
+ * The cohort's pace is set by deadlines, so that is what decides it: the
+ * earliest open week whose work is not yet due. Failure modes this guards,
+ * written before the code:
+ *
+ *   1. an early-opened week becomes current and hides the week actually due
+ *   2. after a deadline passes, current must move on even if the next week
+ *      was opened early
+ *   3. before anything releases, no week is current
+ *   4. after the final deadline, current stays on the last open week rather
+ *      than vanishing and leaving the dashboard without a week
+ *   5. a locked week is never current
+ *   6. a week without a deadline ends when the next one opens; with neither,
+ *      it stays current
+ *
+ * `weeks` must be ordered by number.
+ */
+function currentWeekNumber(
+  weeks: { number: number; release_at: string; deadline_at: string | null }[],
+  now: Date,
+): number | null {
+  const open = weeks.filter((w) => new Date(w.release_at) <= now);
+  if (open.length === 0) return null;
+
+  for (const w of open) {
+    const i = weeks.indexOf(w);
+    const endsAt = w.deadline_at ?? weeks[i + 1]?.release_at ?? null;
+    if (!endsAt || new Date(endsAt) > now) return w.number;
+  }
+  return open[open.length - 1]?.number ?? null;
+}
+
+function stateFor(releaseAt: string, isCurrent: boolean, now: Date): WeekState {
   if (new Date(releaseAt) > now) return "locked";
-  if (nextReleaseAt && new Date(nextReleaseAt) <= now) return "open";
-  return "current";
+  return isCurrent ? "current" : "open";
 }
 
 /** All weeks of the cohort. Locked weeks carry no modules — RLS sees to it. */
@@ -173,8 +211,10 @@ export const getWeeks = cache(async (): Promise<Week[]> => {
   const progressBy = new Map((progress ?? []).map((p) => [p.module_id, p.status]));
   const videoBy = new Map((video ?? []).map((v) => [v.lesson_id, v]));
 
-  return weeks.map((w, i) => {
-    const state = stateFor(w.release_at, weeks[i + 1]?.release_at, now);
+  const current = currentWeekNumber(weeks, now);
+
+  return weeks.map((w) => {
+    const state = stateFor(w.release_at, w.number === current, now);
 
     const modules: ModuleSummary[] = (links ?? [])
       .filter((l) => l.week_id === w.id)
@@ -258,6 +298,8 @@ export type ModuleAssignment = {
   id: string;
   title: string;
   brief: string;
+  /** The workbook: in-lesson classwork plus this assignment. */
+  documentUrl: string | null;
   deadlineAt: string | null;
   submitted: boolean;
 };
@@ -269,6 +311,8 @@ export type Material = {
   type: string;
   url: string | null;
   isRequired: boolean;
+  /** `key-points` marks a module's key-points sheet (migration …0028). */
+  tags: string[];
 };
 
 /** Null when the module does not exist or its week has not released. */
@@ -325,13 +369,13 @@ export async function getModule(slug: string): Promise<ModuleDetail | null> {
       : Promise.resolve({ data: null }),
     supabase
       .from("learning_materials")
-      .select("id, title, description, type, url, is_required")
+      .select("id, title, description, type, url, is_required, tags")
       .eq("owner_type", "module")
       .eq("owner_id", m.id)
       .order("order"),
     supabase
       .from("assignments")
-      .select("id, title, brief, deadline_at")
+      .select("id, title, brief, document_url, deadline_at")
       .eq("module_id", m.id)
       .maybeSingle(),
   ]);
@@ -344,6 +388,7 @@ export async function getModule(slug: string): Promise<ModuleDetail | null> {
     id: string;
     title: string;
     brief: string;
+    document_url: string | null;
     deadline_at: string | null;
   } | null;
 
@@ -406,7 +451,14 @@ export async function getModule(slug: string): Promise<ModuleDetail | null> {
           id: assignment.id,
           title: assignment.title,
           brief: assignment.brief,
-          deadlineAt: assignment.deadline_at,
+          documentUrl: assignment.document_url,
+          // An assignment without its own deadline is due with its week —
+          // the same rule item_deadline() applies when judging lateness, so
+          // the date shown is the date that counts.
+          deadlineAt:
+            assignment.deadline_at ??
+            weeks.find((w) => w.number === (weekLink?.program_weeks?.number ?? -1))?.deadlineAt ??
+            null,
           submitted,
         }
       : null,
@@ -417,18 +469,22 @@ export async function getModule(slug: string): Promise<ModuleDetail | null> {
       type: x.type,
       url: x.url,
       isRequired: x.is_required,
+      tags: Array.isArray(x.tags) ? x.tags : [],
     })),
   };
 }
 
 export async function getWeekMaterials(weekId: string): Promise<Material[]> {
   const supabase = await getSupabase();
-  const { data } = await supabase
-    .from("learning_materials")
-    .select("id, title, description, type, url, is_required")
-    .eq("owner_type", "week")
-    .eq("owner_id", weekId)
-    .order("order");
+  const data = unwrap(
+    await supabase
+      .from("learning_materials")
+      .select("id, title, description, type, url, is_required, tags")
+      .eq("owner_type", "week")
+      .eq("owner_id", weekId)
+      .order("order"),
+    "the week's resources",
+  );
 
   return (data ?? []).map((x) => ({
     id: x.id,
@@ -437,6 +493,7 @@ export async function getWeekMaterials(weekId: string): Promise<Material[]> {
     type: x.type,
     url: x.url,
     isRequired: x.is_required,
+    tags: Array.isArray(x.tags) ? x.tags : [],
   }));
 }
 
@@ -461,15 +518,25 @@ export async function getWeekMaterials(weekId: string): Promise<Material[]> {
 export const getProgramTotals = cache(
   async (): Promise<{ totalItems: number; completedItems: number }> => {
     const supabase = await getSupabase();
+    const me = await getMe();
+    if (!me) return { totalItems: 0, completedItems: 0 };
 
+    // Scoped explicitly. RLS limits a participant to their own rows, but a
+    // staff account can read the whole cohort — unscoped, the header showed
+    // an admin everyone's completions added together (AGENTS.md section 7).
     const [totalRes, modulesDoneRes, submittedRes] = await Promise.all([
       supabase.rpc("program_item_count"),
       supabase
         .from("module_progress")
         .select("modules!inner(is_bonus)", { count: "exact", head: true })
+        .eq("enrollment_id", me.enrollmentId)
         .eq("status", "completed")
         .eq("modules.is_bonus", false),
-      supabase.from("submissions").select("item_id").neq("status", "draft"),
+      supabase
+        .from("submissions")
+        .select("item_id")
+        .eq("enrollment_id", me.enrollmentId)
+        .neq("status", "draft"),
     ]);
     const total = unwrap(totalRes, "total");
     const modulesDone = unwrapCount(modulesDoneRes, "modules done");
@@ -487,11 +554,14 @@ export const getProgramTotals = cache(
 /** Extra resources the team adds for everyone — not tied to a module or week. */
 export async function getLibraryResources(): Promise<Material[]> {
   const supabase = await getSupabase();
-  const { data } = await supabase
-    .from("learning_materials")
-    .select("id, title, description, type, url, is_required")
-    .eq("owner_type", "library")
-    .order("order");
+  const data = unwrap(
+    await supabase
+      .from("learning_materials")
+      .select("id, title, description, type, url, is_required, tags")
+      .eq("owner_type", "library")
+      .order("order"),
+    "the resource library",
+  );
 
   return (data ?? []).map((x) => ({
     id: x.id,
@@ -500,5 +570,6 @@ export async function getLibraryResources(): Promise<Material[]> {
     type: x.type,
     url: x.url,
     isRequired: x.is_required,
+    tags: Array.isArray(x.tags) ? x.tags : [],
   }));
 }

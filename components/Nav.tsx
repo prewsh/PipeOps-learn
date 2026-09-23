@@ -44,11 +44,8 @@ export function Nav({
     <>
       {/* Desktop rail */}
       <nav className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-line bg-surface px-3 py-6 md:flex">
-        <div className="flex flex-col gap-1 px-3 pb-7">
+        <div className="px-3 pb-7">
           <Logo height={26} />
-          <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">
-            Learn
-          </span>
         </div>
 
         <div className="flex flex-col gap-1">
@@ -61,7 +58,7 @@ export function Nav({
                 aria-current={active ? "page" : undefined}
                 className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-[15px] no-underline transition-colors ${
                   active
-                    ? "bg-ink font-semibold text-white"
+                    ? "bg-ink font-semibold text-on-ink"
                     : "text-ink-2 hover:bg-fill-subtle hover:text-ink"
                 }`}
               >

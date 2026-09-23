@@ -21,6 +21,8 @@
   --color-canvas: #f6f6f7; /* app background behind all cards */
   --color-surface: #ffffff; /* cards, sheets, tables, inputs */
   --color-accent: #4f21ea; /* RESTRICTED: links + focus ring only */
+  --color-on-ink: #ffffff; /* text and controls sitting ON an ink fill */
+  --color-ink-hover: #2a2c30; /* an ink fill, hovered */
 
   /* Type — IBM Plex, loaded in app/layout.tsx. Sans carries what a human
      wrote; mono carries every number a participant is judged by. */
@@ -43,6 +45,71 @@
   --motion-enter: 360ms;
 }
 
+/*
+ * Dark mode.
+ *
+ * Still monochrome: the same roles, inverted. Ink becomes near-white and the
+ * surfaces go near-black, so every component written against tokens — which
+ * is every component — changes with no per-component work. The accent is
+ * lightened because #4F21EA on near-black fails contrast for link text; it
+ * remains restricted to links and the focus ring.
+ *
+ * `ink-surface` stays dark in both themes: it is the video shell and the
+ * admin rail, and both are meant to read as dark regardless.
+ *
+ * Choice order: an explicit data-theme on <html> (set from the `theme`
+ * cookie, so the server renders the right theme and nothing flashes), else
+ * the operating system's preference.
+ */
+@layer base {
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --color-ink: #ececed;
+    --color-ink-surface: #1d1f23;
+    --color-ink-2: #a3a6ab;
+    --color-ink-3: #85898f;
+    --color-line-strong: #3a3d43;
+    --color-line: #26282c;
+    --color-fill-subtle: #1c1e21;
+    --color-canvas: #0c0d0f;
+    --color-surface: #141518;
+    --color-accent: #9d8bff;
+    --color-on-ink: #0c0d0f;
+    --color-ink-hover: #d2d3d6;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --color-ink: #ececed;
+      --color-ink-surface: #1d1f23;
+      --color-ink-2: #a3a6ab;
+      --color-ink-3: #85898f;
+      --color-line-strong: #3a3d43;
+      --color-line: #26282c;
+      --color-fill-subtle: #1c1e21;
+      --color-canvas: #0c0d0f;
+      --color-surface: #141518;
+      --color-accent: #9d8bff;
+      --color-on-ink: #0c0d0f;
+      --color-ink-hover: #d2d3d6;
+    }
+  }
+}
+
+/* `dark:` matches the same two conditions as the tokens above. Used only
+   where a token cannot do it — swapping the logo file. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
 @layer base {
   :root {
     color-scheme: light;
@@ -53,6 +120,13 @@
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    /* A long link or address wraps instead of widening its container. */
+    overflow-wrap: break-word;
+    /* Safety net, not the fix: if something is ever too wide, the page must
+       not slide sideways under a thumb. `clip` rather than `hidden` so sticky
+       headers keep working. The page walks in verify-p1/p3 still measure
+       every element at 360px, so a real offender cannot hide behind this. */
+    overflow-x: clip;
   }
 
   /* The only brand colour in the app. */

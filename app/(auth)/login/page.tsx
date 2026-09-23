@@ -10,8 +10,12 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-16">
-      <Logo height={28} />
-      <Meta className="mt-5">UGC Programme</Meta>
+      {/* One centred lockup. The logo used to look centred only because its
+          image box stretched full width and the SVG drew in the middle. */}
+      <div className="flex flex-col items-center text-center">
+        <Logo height={28} />
+        <Meta className="mt-4">UGC Programme</Meta>
+      </div>
       <h1 className="mt-4 text-[28px] font-bold leading-[1.15] tracking-[-0.025em] text-ink">
         Sign in
       </h1>
@@ -53,10 +57,6 @@ export default function LoginPage() {
           {pending ? "Sending…" : "Send me a code"}
         </Button>
       </form>
-
-      <p className="mt-8 text-sm text-ink-2">
-        This programme is invite-only. Access comes from the accepted-participant list.
-      </p>
     </main>
   );
 }

@@ -26,7 +26,9 @@ export default async function AnnouncementsPage() {
               </Meta>
             </div>
             <h2 className="mt-2 text-[20px] font-bold tracking-[-0.012em] text-ink">{a.title}</h2>
-            <p className="mt-2 whitespace-pre-wrap text-base leading-[1.55] text-ink-2">{a.body}</p>
+            <p className="mt-2 whitespace-pre-wrap [overflow-wrap:anywhere] text-base leading-[1.55] text-ink-2">
+              {a.body}
+            </p>
             {a.linkUrl ? (
               <a
                 href={a.linkUrl}

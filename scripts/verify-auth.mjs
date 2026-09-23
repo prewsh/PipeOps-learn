@@ -7,7 +7,8 @@
  *   - Supabase OTP exchange for the numeric code
  *   - the application's /auth/confirm route for the email token hash
  *
- * The OTP must be copied from the configured test mailbox into VERIFY_OTP.
+ * To verify real delivery, request one email through /login and copy its code
+ * into VERIFY_OTP. The suite consumes that code before minting other tokens.
  * The browser checks exercise the server action and therefore do not bypass
  * the invite-only gate with a direct database call.
  *
@@ -114,13 +115,12 @@ async function ensureUser(email) {
   const existing = await findUser(email);
   if (existing) return existing;
   const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: true });
-  if (error || !data.user)
-    throw new Error(`create user ${email}: ${error?.message ?? "missing user"}`);
+  if (error || !data.user) throw new Error(`create test user: ${error?.message ?? "missing user"}`);
   createdUserIds.add(data.user.id);
   return data.user;
 }
 
-async function expectGateMessage(email, expectedText) {
+async function expectGateMessage(label, email, expectedText) {
   const before = await findUser(email);
   const browser = await chromium.launch({ headless: true });
   try {
@@ -138,13 +138,13 @@ async function expectGateMessage(email, expectedText) {
       .waitFor({ timeout: 15_000 })
       .catch(() => {});
     const body = (await page.textContent("body")) ?? "";
-    check(`${email} receives the invite-only rejection`, body.includes(expectedText), true);
+    check(`${label} receives the invite-only rejection`, body.includes(expectedText), true);
   } finally {
     await browser.close();
   }
   const after = await findUser(email);
   check(
-    `${email} does not create an auth user when rejected`,
+    `${label} does not create an auth user when rejected`,
     after?.id ?? null,
     before?.id ?? null,
   );
@@ -160,8 +160,23 @@ async function cleanup() {
 let enrolledUser;
 let enrolledEnrollment;
 try {
-  enrolledEnrollment = await ensureTestEnrollment(enrolledEmail);
-  enrolledUser = await ensureUser(enrolledEmail);
+  if (otpOverride) {
+    const { data, error } = await admin
+      .from("enrollments")
+      .select("id, user_id, status")
+      .eq("email", enrolledEmail)
+      .eq("status", "active")
+      .limit(1);
+    if (error || !data?.[0]) {
+      throw new Error(`real-email verification requires an existing active enrolment`);
+    }
+    enrolledEnrollment = data[0];
+    enrolledUser = await findUser(enrolledEmail);
+    if (!enrolledUser) throw new Error("real-email verification requires a pre-created auth user");
+  } else {
+    enrolledEnrollment = await ensureTestEnrollment(enrolledEmail);
+    enrolledUser = await ensureUser(enrolledEmail);
+  }
 
   const { data: linked } = await admin
     .from("enrollments")
@@ -176,18 +191,18 @@ try {
 
   const otpClient = publicClient();
 
-  // generateLink returns the same artefacts the email carries — the numeric
-  // code and the token hash — without sending anything. That keeps this suite
-  // unattended and repeatable, and avoids burning the auth rate limit on every
-  // run. VERIFY_OTP still overrides it when checking a real delivered message.
-  const { data: issued, error: requestError } = await admin.auth.admin.generateLink({
-    type: "magiclink",
-    email: enrolledEmail,
-  });
-  check("enrolled address receives an OTP request", requestError, null);
-  check("the issued token carries a numeric code", Boolean(issued?.properties?.email_otp), true);
-
-  const otp = otpOverride ?? issued?.properties?.email_otp;
+  // Minting another link would invalidate the code that arrived by email.
+  // Use the delivered code first; only unattended runs generate their own.
+  let otp = otpOverride;
+  if (!otp) {
+    const { data: issued, error: requestError } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: enrolledEmail,
+    });
+    check("enrolled address receives an OTP request", requestError, null);
+    check("the issued token carries a numeric code", Boolean(issued?.properties?.email_otp), true);
+    otp = issued?.properties?.email_otp;
+  }
 
   const { data: otpSession, error: otpError } = await otpClient.auth.verifyOtp({
     email: enrolledEmail,
@@ -251,14 +266,14 @@ try {
   const notEnrolledMessage =
     "We couldn't find this email in the current PipeOps UGC Program cohort. " +
     "If you were accepted, check which address you applied with.";
-  await expectGateMessage(nonEnrolledEmail, notEnrolledMessage);
+  await expectGateMessage("non-enrolled address", nonEnrolledEmail, notEnrolledMessage);
 
   await ensureTestEnrollment(revokedEmail, "revoked");
   await ensureTestEnrollment(withdrawnEmail, "withdrawn");
   const restrictedMessage =
     "Your place in this cohort is no longer active. Contact the programme team.";
-  await expectGateMessage(revokedEmail, restrictedMessage);
-  await expectGateMessage(withdrawnEmail, restrictedMessage);
+  await expectGateMessage("revoked address", revokedEmail, restrictedMessage);
+  await expectGateMessage("withdrawn address", withdrawnEmail, restrictedMessage);
 } catch (error) {
   failed++;
   console.error(

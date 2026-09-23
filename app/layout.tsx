@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 
 /**
@@ -26,12 +27,25 @@ export const metadata: Metadata = {
   description: "PipeOps UGC Program — learn, create, submit, publish, measure, improve.",
 };
 
-// Mobile-first: 360px floor, most participants are on phones.
-export const viewport: Viewport = { width: "device-width", initialScale: 1 };
+// Mobile-first: 360px floor, most participants are on phones. The theme
+// colour follows the OS so the browser chrome matches before any choice.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f6f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0d0f" },
+  ],
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // A saved choice is applied on the server, so the first paint is already in
+  // the right theme. No choice means no attribute, and the OS decides.
+  const saved = (await cookies()).get("theme")?.value;
+  const theme = saved === "light" || saved === "dark" ? saved : undefined;
+
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="en" data-theme={theme} className={`${sans.variable} ${mono.variable}`}>
       {/*
         Browser extensions write their own attributes onto <body> before React
         hydrates — Grammarly adds data-gr-ext-installed, and the resulting

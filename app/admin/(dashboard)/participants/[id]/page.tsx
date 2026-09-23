@@ -24,10 +24,10 @@ export default async function ParticipantDetail({ params }: { params: Promise<{ 
         <Meta>
           {e.health.replace("_", " ")} · {e.status}
         </Meta>
-        <h1 className="mt-2 text-[28px] font-bold leading-[1.15] tracking-[-0.025em] text-ink">
+        <h1 className="mt-2 text-[28px] font-bold leading-[1.15] tracking-[-0.025em] text-ink [overflow-wrap:anywhere]">
           {e.name ?? e.email}
         </h1>
-        <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3">
+        <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3 [overflow-wrap:anywhere]">
           {e.email} · enrolled {formatDeadline(new Date(e.enrolled_at))} · last active{" "}
           {e.last_active_at ? formatRelative(new Date(e.last_active_at)) : "never"}
         </p>

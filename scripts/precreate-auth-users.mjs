@@ -40,7 +40,14 @@ if (error) {
 const existing = new Set();
 let page = 1;
 for (;;) {
-  const { data } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+  const { data, error: listError } = await admin.auth.admin.listUsers({
+    page,
+    perPage: 1000,
+  });
+  if (listError) {
+    console.error(`Could not list Auth users: ${listError.message}`);
+    process.exit(1);
+  }
   if (!data?.users.length) break;
   for (const u of data.users) if (u.email) existing.add(u.email.toLowerCase());
   if (data.users.length < 1000) break;
@@ -54,8 +61,6 @@ console.log(`already have an auth user: ${enrollments.length - missing.length}`)
 console.log(`to create: ${missing.length}\n`);
 
 if (dryRun) {
-  for (const m of missing.slice(0, 5)) console.log(`  would create ${m.email}`);
-  if (missing.length > 5) console.log(`  … and ${missing.length - 5} more`);
   console.log("\nDry run — nothing was written.");
   process.exit(0);
 }
@@ -63,24 +68,31 @@ if (dryRun) {
 let created = 0;
 let failed = 0;
 
-for (const m of missing) {
+for (const [index, m] of missing.entries()) {
   const { error: err } = await admin.auth.admin.createUser({
     email: m.email,
     email_confirm: true,
     user_metadata: m.name ? { name: m.name } : undefined,
   });
   if (err && !/already|registered/i.test(err.message)) {
-    console.error(`  ✗ ${m.email}: ${err.message}`);
+    console.error(`  ✗ user ${index + 1}: ${err.message}`);
     failed += 1;
   } else {
     created += 1;
   }
 }
 
-const { count: linked } = await admin
+const { count: unlinked, error: countError } = await admin
   .from("enrollments")
   .select("*", { count: "exact", head: true })
-  .not("user_id", "is", null);
+  .eq("status", "active")
+  .is("user_id", null);
+
+if (countError) {
+  console.error(`Could not verify enrolments: ${countError.message}`);
+  process.exit(1);
+}
 
 console.log(`\n✅ created ${created}${failed ? `, ${failed} failed` : ""}`);
-console.log(`enrolments now linked to an auth user: ${linked}`);
+console.log(`active enrolments still unlinked: ${unlinked}`);
+if (failed || unlinked) process.exitCode = 1;

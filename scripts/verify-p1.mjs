@@ -16,6 +16,7 @@
  */
 import { chromium } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
+import { findOverflow, PHONE } from "./_overflow.mjs";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -149,12 +150,22 @@ const { data: lockedMaterials } = await as
   );
 check("locked-week materials are hidden", lockedMaterials?.length, 0);
 
-const { data: week1Materials } = await as
+// Released module resources reach the participant — all of them. Derived from
+// the database rather than pinned: this used to assert exactly 2 week
+// resources, which were placeholders, and the check failed the day they were
+// deleted without anything being wrong.
+const releasedModuleIds = visibleModules.map((m) => m.id);
+const { count: expectedMaterials } = await admin
+  .from("learning_materials")
+  .select("*", { count: "exact", head: true })
+  .eq("owner_type", "module")
+  .in("owner_id", releasedModuleIds);
+const { data: seenMaterials } = await as
   .from("learning_materials")
   .select("id")
-  .eq("owner_type", "week")
-  .eq("owner_id", released[0].id);
-check("week 1 materials are visible", week1Materials?.length, 2);
+  .eq("owner_type", "module")
+  .in("owner_id", releasedModuleIds);
+check("every released module's resources are visible", seenMaterials?.length, expectedMaterials);
 
 // ---------------------------------------------- activity is server-only ----
 const { error: activityErr } = await as
@@ -374,21 +385,64 @@ try {
     .limit(1)
     .single();
 
-  for (const path of [
+  // The week the cohort is on is the earliest open week whose work is not yet
+  // due — NOT the most recently opened one. Weeks get opened early so people
+  // can watch ahead; when "current" followed release dates, opening Weeks 3–4
+  // put the dashboard on Week 4 and hid the Week 1 task due that Sunday.
+  const now = new Date();
+  const { data: allWeeks } = await admin
+    .from("program_weeks")
+    .select("id, number, release_at, deadline_at")
+    .eq("cohort_id", cohort.id)
+    .order("number");
+  const openWeeks = allWeeks.filter((w) => new Date(w.release_at) <= now);
+  const dueWeek =
+    openWeeks.find((w) => !w.deadline_at || new Date(w.deadline_at) > now) ?? openWeeks.at(-1);
+
+  await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
+  const dashboard = (await page.textContent("main")) ?? "";
+  check(
+    "the dashboard is on the week whose work is due next",
+    dashboard.includes(`Week ${dueWeek.number} of ${allWeeks.length}`),
+    true,
+  );
+
+  const { data: dueTask } = await admin
+    .from("program_tasks")
+    .select("id, title")
+    .eq("week_id", dueWeek.id)
+    .eq("status", "published")
+    .limit(1)
+    .maybeSingle();
+  if (dueTask) {
+    check("that week's task is on the dashboard", dashboard.includes(dueTask.title), true);
+  }
+
+  const routes = [
     "/",
     "/learn",
     `/learn/week/${openWeek.number}`,
     `/learn/module/${openSlug.slug}`,
     "/tasks",
+    ...(dueTask ? [`/tasks/${dueTask.id}`] : []),
     "/leaderboard",
     "/sessions",
     "/resources",
     "/announcements",
     "/settings",
     "/more",
-  ]) {
+  ];
+
+  for (const path of routes) {
     const response = await page.goto(`${baseUrl}${path}`, { waitUntil: "domcontentloaded" });
     check(`${path} renders without a server error`, response?.status(), 200);
+  }
+
+  // The same routes on a 360px phone: nothing may be wider than the screen.
+  await page.setViewportSize(PHONE);
+  for (const path of routes) {
+    await page.goto(`${baseUrl}${path}`, { waitUntil: "networkidle" });
+    check(`${path} fits a 360px phone`, await findOverflow(page), []);
   }
 } finally {
   await browser.close();

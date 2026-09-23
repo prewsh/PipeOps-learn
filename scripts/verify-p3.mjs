@@ -13,6 +13,7 @@
  */
 import { chromium } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
+import { findOverflow, PHONE } from "./_overflow.mjs";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -321,13 +322,16 @@ try {
     .limit(1)
     .single();
 
-  for (const path of [
+  const routes = [
     "/admin",
     "/admin/participants",
     `/admin/participants/${participant.enrollmentId}`,
+    "/admin/invites",
     "/admin/submissions",
     "/admin/content",
     `/admin/content/${firstWeek.number}`,
+    // The module editor now carries the assignment editor as well.
+    `/admin/content/module/${openModule.modules.slug}`,
     "/admin/sessions",
     "/admin/announcements",
     // The staff account also uses the participant app.
@@ -335,9 +339,18 @@ try {
     "/learn",
     `/learn/module/${openModule.modules.slug}`,
     "/tasks",
-  ]) {
+  ];
+
+  for (const path of routes) {
     const response = await page.goto(`${baseUrl}${path}`, { waitUntil: "domcontentloaded" });
     check(`${path} renders for an admin`, response?.status(), 200);
+  }
+
+  // The same routes on a 360px phone: nothing may be wider than the screen.
+  await page.setViewportSize(PHONE);
+  for (const path of routes) {
+    await page.goto(`${baseUrl}${path}`, { waitUntil: "networkidle" });
+    check(`${path} fits a 360px phone`, await findOverflow(page), []);
   }
 } finally {
   await browser.close();

@@ -4,7 +4,7 @@ import { StatusChip } from "@/components/StatusMarker";
 import { Card, EmptyState, Meta } from "@/components/ui";
 import { getAnnouncements } from "@/lib/data/announcements";
 import { getMe, getProgramTotals, getWeeks } from "@/lib/data/program";
-import { getWorkItems, outstanding } from "@/lib/data/tasks";
+import { externalDestination, getWorkItems, outstanding } from "@/lib/data/tasks";
 import { formatDeadline, formatRelative } from "@/lib/time";
 
 /**
@@ -67,21 +67,21 @@ export default async function DashboardPage() {
       {/* Hero — the one dominant action, beside this week's task. */}
       <div className="grid gap-4 lg:grid-cols-2">
         {nextModule ? (
-          <div className="flex flex-col rounded-2xl bg-ink px-6 py-6 text-white">
-            <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-white/55">
+          <div className="flex flex-col rounded-2xl bg-ink px-6 py-6 text-on-ink">
+            <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-on-ink/60">
               ▷ Continue learning
             </p>
             <p className="mt-3 text-[22px] font-bold leading-[1.2] tracking-[-0.018em]">
               {nextModule.code} · {nextModule.title}
             </p>
-            <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.06em] text-white/55">
+            <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.06em] text-on-ink/60">
               {nextModule.resumeAtSeconds > 5
                 ? `Resume ${formatClock(nextModule.resumeAtSeconds)}`
                 : `${nextModule.estimatedMinutes ?? 0} min`}
             </p>
             <Link
               href={`/learn/module/${nextModule.slug}`}
-              className="mt-6 flex min-h-12 items-center justify-center rounded-xl bg-white px-5 text-[16px] font-semibold text-ink no-underline hover:bg-fill-subtle"
+              className="mt-6 flex min-h-12 items-center justify-center rounded-xl bg-on-ink px-5 text-[16px] font-semibold text-ink no-underline hover:opacity-90"
             >
               {nextModule.resumeAtSeconds > 5 ? "Resume module →" : "Start module →"}
             </Link>
@@ -103,14 +103,20 @@ export default async function DashboardPage() {
               <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">
                 ☑ This week's task
               </p>
-              <StatusChip
-                status={
-                  !weeklyTask.submission || weeklyTask.submission.status === "draft"
-                    ? "not_started"
-                    : weeklyTask.submission.status
-                }
-                late={weeklyTask.submission?.isLate}
-              />
+              {weeklyTask.externalSubmissionUrl ? (
+                <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-ink">
+                  Submit on {externalDestination(weeklyTask.externalSubmissionUrl)}
+                </span>
+              ) : (
+                <StatusChip
+                  status={
+                    !weeklyTask.submission || weeklyTask.submission.status === "draft"
+                      ? "not_started"
+                      : weeklyTask.submission.status
+                  }
+                  late={weeklyTask.submission?.isLate}
+                />
+              )}
             </div>
             <p className="mt-3 text-[22px] font-bold leading-[1.2] tracking-[-0.018em] text-ink">
               {weeklyTask.title}
@@ -123,9 +129,11 @@ export default async function DashboardPage() {
             ) : null}
             <Link
               href={`/tasks/${weeklyTask.id}`}
-              className="mt-6 flex min-h-12 items-center justify-center rounded-xl bg-ink px-5 text-[16px] font-semibold text-white no-underline hover:bg-ink-surface"
+              className="mt-6 flex min-h-12 items-center justify-center rounded-xl bg-ink px-5 text-[16px] font-semibold text-on-ink no-underline hover:bg-ink-hover"
             >
-              {me.submissionsOpen ? "Submit task" : "View task"}
+              {weeklyTask.externalSubmissionUrl || !me.submissionsOpen
+                ? "View task"
+                : "Submit task"}
             </Link>
           </div>
         ) : current ? (
@@ -141,7 +149,7 @@ export default async function DashboardPage() {
 
       {/* Working column beside a reference column. */}
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] xl:items-start">
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           {current ? (
             <section>
               <Meta>This week · {current.title}</Meta>
@@ -193,7 +201,7 @@ export default async function DashboardPage() {
           ) : null}
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <section>
             <Meta>My programme</Meta>
             <Card className="mt-3 overflow-hidden">
@@ -229,7 +237,7 @@ export default async function DashboardPage() {
               <p className="mt-2 text-[17px] font-semibold tracking-[-0.012em] text-ink">
                 {latestAnnouncement.title}
               </p>
-              <p className="mt-1 line-clamp-4 whitespace-pre-wrap text-sm leading-[1.55] text-ink-2">
+              <p className="mt-1 line-clamp-4 whitespace-pre-wrap [overflow-wrap:anywhere] text-sm leading-[1.55] text-ink-2">
                 {latestAnnouncement.body}
               </p>
               <Link href="/announcements" className="mt-3 inline-block text-sm">

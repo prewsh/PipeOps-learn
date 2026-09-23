@@ -65,7 +65,7 @@ export async function requestAccess(_prev: AuthState, formData: FormData): Promi
   // Sends the magic link and the 6-digit code in the same email (F1.3).
   const { error: otpError } = await supabase.auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: true },
+    options: { shouldCreateUser: false },
   });
 
   if (otpError) {
@@ -74,6 +74,18 @@ export async function requestAccess(_prev: AuthState, formData: FormData): Promi
     // "try again", so pass it through rather than flattening it.
     if (otpError.status === 429) {
       return { error: otpError.message || "Too many requests. Wait a minute and try again." };
+    }
+    // Enrolled, but no login account yet. Signup is disabled, so Supabase
+    // refuses to send — and "try again in a moment" would be a promise that
+    // retrying can never keep. It needs the team, not another attempt.
+    if (
+      otpError.code === "otp_disabled" ||
+      /signups? not allowed|user not found/i.test(otpError.message)
+    ) {
+      return {
+        error:
+          "You're on the list, but your account isn't set up yet. Contact the programme team and they'll send your invite.",
+      };
     }
     return { error: "We couldn't send that email. Try again in a moment." };
   }

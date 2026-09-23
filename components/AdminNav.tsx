@@ -12,6 +12,7 @@ import { Logo } from "@/components/Logo";
 const ITEMS = [
   { href: "/admin", label: "Overview", exact: true },
   { href: "/admin/participants", label: "Participants" },
+  { href: "/admin/invites", label: "Invites" },
   { href: "/admin/submissions", label: "Review queue" },
   { href: "/admin/content", label: "Content" },
   { href: "/admin/sessions", label: "Sessions" },
@@ -29,7 +30,7 @@ export function AdminNav() {
         <div className="flex flex-col gap-1 px-3 pb-7">
           <Logo variant="white" height={26} />
           <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-white/40">
-            Learn · admin
+            Admin
           </span>
         </div>
 
@@ -43,7 +44,7 @@ export function AdminNav() {
                 aria-current={active ? "page" : undefined}
                 className={`flex min-h-11 items-center rounded-xl px-3 text-[15px] no-underline transition-colors ${
                   active
-                    ? "bg-white font-semibold text-ink"
+                    ? "bg-white font-semibold text-ink-surface"
                     : "text-white/70 hover:bg-white/10 hover:text-white"
                 }`}
               >
@@ -70,7 +71,7 @@ export function AdminNav() {
               key={item.href}
               href={item.href}
               className={`flex min-h-10 shrink-0 items-center rounded-lg px-3 font-mono text-[11px] uppercase tracking-[0.06em] no-underline ${
-                active ? "bg-white text-ink" : "text-white/70"
+                active ? "bg-white text-ink-surface" : "text-white/70"
               }`}
             >
               {item.label}

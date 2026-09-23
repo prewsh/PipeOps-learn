@@ -244,6 +244,17 @@ easiest to break:
 - Icons: 24px grid, 1.7px stroke, `currentColor` only, never filled except the
   play triangle.
 - Use tokens from `app/globals.css`. Never introduce a raw hex value.
+- **Dark mode is token-driven.** Every colour token has a dark value, so a
+  component written against tokens needs no dark-mode work. The one trap:
+  text or controls sitting ON an ink fill use `text-on-ink` / `bg-on-ink`,
+  never `text-white` / `bg-white` — ink turns near-white in dark mode and
+  white-on-ink would vanish. `ink-surface` (video shell, admin rail) stays
+  dark in both themes. The theme comes from the `theme` cookie, read in
+  `app/layout.tsx`, else the OS preference.
+- **Every page must fit a 360px phone.** Text people type (briefs, notes,
+  announcements) keeps its line breaks, so give it `[overflow-wrap:anywhere]`
+  or a pasted link widens the page. `verify-p1`/`verify-p3` measure every
+  route at 360px.
 - **Motion has three durations and one easing**, all tokens: `--motion-fast`
   (hover, focus, a marker changing), `--motion-state` (progress, disclosure,
   saved/submitted feedback), `--motion-enter` (one content region arriving).

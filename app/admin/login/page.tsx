@@ -11,8 +11,10 @@ export default function AdminLoginPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center px-6 py-16">
-      <Logo height={28} />
-      <Meta className="mt-4">Learn · admin</Meta>
+      <div className="flex flex-col items-center text-center">
+        <Logo height={28} />
+        <Meta className="mt-4">Admin</Meta>
+      </div>
 
       <h1 className="mt-6 text-[26px] font-bold leading-[1.15] tracking-[-0.025em] text-ink">
         Staff sign-in

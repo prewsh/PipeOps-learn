@@ -352,7 +352,7 @@ function SubmittedView({ item, submission }: { item: WorkItem; submission: Submi
         </a>
       ))}
       {submission.textResponse ? (
-        <p className="whitespace-pre-wrap text-[15px] leading-[1.55] text-ink">
+        <p className="whitespace-pre-wrap [overflow-wrap:anywhere] text-[15px] leading-[1.55] text-ink">
           {submission.textResponse}
         </p>
       ) : null}

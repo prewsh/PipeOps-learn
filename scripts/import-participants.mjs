@@ -93,10 +93,7 @@ if (cohortError || !cohort) {
   process.exit(1);
 }
 
-console.log(`\nImporting ${participants.length} participant(s) into ${cohort.name}:\n`);
-for (const p of participants.slice(0, 5))
-  console.log(`  ${p.email}${p.name ? ` — ${p.name}` : ""}`);
-if (participants.length > 5) console.log(`  … and ${participants.length - 5} more`);
+console.log(`\nImporting ${participants.length} participant(s) into ${cohort.name}.`);
 
 const { data, error } = await supabase
   .from("enrollments")
@@ -117,3 +114,48 @@ const { count } = await supabase
   .eq("cohort_id", cohort.id);
 
 console.log(`\n✅ ${data?.length ?? 0} new, ${count} total enrolled in ${cohort.name}.`);
+
+// Signup is disabled at the Auth level (invite-only), so an enrolment without
+// a login account is someone who can never sign in: the login page would tell
+// them "we couldn't send that email" forever. Create the accounts in the same
+// step the enrolments are made, never as a separate thing to remember.
+let created = 0;
+let failedAccounts = 0;
+for (const [index, p] of participants.entries()) {
+  const { error: accountError } = await supabase.auth.admin.createUser({
+    email: p.email,
+    email_confirm: true,
+    user_metadata: p.name ? { name: p.name } : undefined,
+  });
+  if (!accountError) created += 1;
+  else if (!/already|registered|exists/i.test(accountError.message)) {
+    failedAccounts += 1;
+    console.error(`  ✗ account for row ${index + 1}: ${accountError.message}`);
+  }
+}
+
+// An account that already existed (say, from an earlier cohort) is not linked
+// by the new-user trigger, which only fires on creation. Link by email.
+const { data: unlinked } = await supabase
+  .from("enrollments")
+  .select("id, email")
+  .eq("cohort_id", cohort.id)
+  .is("user_id", null);
+for (const e of unlinked ?? []) {
+  const { data: u } = await supabase.from("users").select("id").eq("email", e.email).maybeSingle();
+  if (u) await supabase.from("enrollments").update({ user_id: u.id }).eq("id", e.id);
+}
+
+const { count: stillUnlinked } = await supabase
+  .from("enrollments")
+  .select("*", { count: "exact", head: true })
+  .eq("cohort_id", cohort.id)
+  .eq("status", "active")
+  .is("user_id", null);
+
+console.log(
+  `   ${created} login account(s) created${failedAccounts ? `, ${failedAccounts} failed` : ""}.`,
+);
+console.log(`   Active enrolments still without an account: ${stillUnlinked ?? 0}`);
+console.log("   Nobody has been emailed. Send invites from /admin/invites.");
+if (failedAccounts || stillUnlinked) process.exitCode = 1;

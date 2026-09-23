@@ -9,7 +9,7 @@ import type { ComponentProps, ReactNode } from "react";
 type ButtonVariant = "primary" | "secondary" | "ghost";
 
 const BUTTON: Record<ButtonVariant, string> = {
-  primary: "bg-ink text-white hover:bg-ink-surface",
+  primary: "bg-ink text-on-ink hover:bg-ink-hover",
   secondary: "border border-line-strong bg-surface text-ink hover:bg-fill-subtle",
   ghost: "text-ink-2 hover:text-ink",
 };

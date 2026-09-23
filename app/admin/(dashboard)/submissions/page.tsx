@@ -48,7 +48,7 @@ export default async function ReviewQueuePage({
                 <p className="text-[17px] font-semibold tracking-[-0.012em] text-ink">
                   {q.participantName}
                 </p>
-                <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3">
+                <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3 [overflow-wrap:anywhere]">
                   {q.participantEmail}
                 </p>
               </div>
@@ -78,7 +78,7 @@ export default async function ReviewQueuePage({
             ) : null}
 
             {q.textResponse ? (
-              <p className="mt-3 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg bg-fill-subtle p-4 text-[15px] leading-[1.55] text-ink">
+              <p className="mt-3 max-h-64 overflow-y-auto whitespace-pre-wrap [overflow-wrap:anywhere] rounded-lg bg-fill-subtle p-4 text-[15px] leading-[1.55] text-ink">
                 {q.textResponse}
               </p>
             ) : null}

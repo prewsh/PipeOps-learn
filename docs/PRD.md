@@ -117,18 +117,22 @@ Weeks are the primary navigation. Course parts (Creator Mindset & Content Strate
 
 | Week | Release | Deadline | Course modules | Weekly task output |
 |------|---------|----------|----------------|--------------------|
-| 1 | Mon 21 Sep 2026 | Sun 27 Sep 23:59 | M01 Creator Economy · M02 Finding Your Niche | Niche statement + 3–5 content pillars |
+| 1 | Mon 21 Sep 2026 | Sun 27 Sep 23:59 | M01 Creator Economy · M02 Finding Your Niche | Public commitment post (submitted on Discord) |
 | 2 | Mon 28 Sep | Sun 4 Oct 23:59 | M03 Algorithms · M04 Research & Idea Generation | Content research + idea bank |
 | 3 | Mon 5 Oct | Sun 11 Oct 23:59 | M05 Planning & Scripting · M06 Hooks | 3 scripts + 5 hooks; publish first dev video |
 | 4 | Mon 12 Oct | Sun 18 Oct 23:59 | M07 Filming · M08 Lighting & Audio | Record actual content |
-| 5 | Mon 19 Oct | Sun 25 Oct 23:59 | M09 Editing · M10 Captions & Graphics | Finished edited content |
-| 6 | Mon 26 Oct | Sun 1 Nov 23:59 | M10.1 Captions & Graphics Pt 2 · M11 Publishing | Publish and analyse |
-| 7 | Mon 2 Nov | Sun 8 Nov 23:59 | M12 Growth System · M13 Success Metrics | Final project |
+| 5 | Mon 19 Oct | Sun 25 Oct 23:59 | M09 Editing · M10 Captions & Graphics · M10.1 Captions & Graphics Pt 2 | Finished edited content |
+| 6 | Mon 26 Oct | Sun 1 Nov 23:59 | M11 Publishing · M12 Growth System · M13 Success Metrics | Publish, analyse, final project |
 
-Week 7 is the **extra week**: it closes the programme with the growth system and
-an explicit account of how each participant's work was measured. Success Metrics
-was originally a Week 1 bonus; it is taught content in Week 7 and counts toward
-progress like any other module.
+Six weeks; Weeks 5 and 6 carry three modules each. (A seventh "extra week"
+briefly held M12 and Success Metrics; it was folded into Week 6 on 23 Sep 2026
+to avoid an extra, confusing week.) Success Metrics is taught content and
+counts toward progress like any other module.
+
+Weeks 1–4 were opened early on 23 Sep 2026 so participants can watch ahead.
+Opening a week does not move its deadline, and the week the cohort is "on" is
+the earliest open week whose work is not yet due — not the most recently
+opened one.
 
 All times in **Africa/Lagos (WAT, UTC+1)**. Stored as UTC timestamps, rendered in the cohort timezone.
 
@@ -137,7 +141,7 @@ Each week contains four content slots, any of which may be empty:
 1. **Modules** — course lessons (video + materials)
 2. **Course assignments** — attached to a module, from the curriculum
 3. **Program task** — the weekly UGC task from the PipeOps team (0 or 1 per week in V1; schema allows many)
-4. **Bonus resources** — PDFs, cheat sheets, templates
+4. **Week resources** — optional extras from the team; shown only when a week has some. Module material (workbook, key points) lives on the module, not here
 
 ---
 

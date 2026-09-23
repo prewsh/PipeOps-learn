@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { currentAdmin, deliverInvite } from "@/lib/auth/invite";
 import { getAdminSupabase } from "@/lib/supabase/admin";
 import { getSupabase } from "@/lib/supabase/server";
-import { getStatelessSupabase } from "@/lib/supabase/stateless";
 import { optionalHttpUrl, uuid } from "@/lib/validation";
 
 /** Admin mutations. Every one is audited by its RPC (PRD F13.6). */
@@ -112,6 +112,35 @@ export async function createAnnouncement(
   return { ok: true };
 }
 
+/** Removes an update from participant surfaces; the database trigger records
+ * the actor and deleted row for the audit trail (F15.3, F13.6). */
+export async function deleteAnnouncement(
+  announcementId: string,
+  _prev: AnnouncementState,
+  _formData: FormData,
+): Promise<AnnouncementState> {
+  if (!uuid.safeParse(announcementId).success) return { error: "Unknown update." };
+
+  const supabase = await getSupabase();
+  const { data: isAdmin, error: roleError } = await supabase.rpc("is_admin");
+  if (roleError || !isAdmin) return { error: "Not authorised." };
+
+  const { data, error } = await supabase
+    .from("announcements")
+    .delete()
+    .eq("id", announcementId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) return { error: "We couldn't delete this update. Try again." };
+  if (!data) return { error: "This update no longer exists." };
+
+  revalidatePath("/admin/announcements");
+  revalidatePath("/announcements");
+  revalidatePath("/");
+  return { ok: true };
+}
+
 export async function markAnnouncementRead(announcementId: string) {
   const supabase = await getSupabase();
   const {
@@ -154,18 +183,12 @@ export async function resendLoginLink(enrollmentId: string): Promise<{
 }> {
   if (!uuid.safeParse(enrollmentId).success) return { error: "Unknown participant." };
 
-  const supabase = await getSupabase();
-  const { data: isAdmin } = await supabase.rpc("is_admin");
-  if (!isAdmin) return { error: "Not authorised." };
+  const staff = await currentAdmin();
+  if (!staff) return { error: "Not authorised." };
 
-  const {
-    data: { user: actor },
-  } = await supabase.auth.getUser();
-
-  const admin = getAdminSupabase();
-  const { data: enrollment } = await admin
+  const { data: enrollment } = await getAdminSupabase()
     .from("enrollments")
-    .select("email, status")
+    .select("id, email, name, user_id, status")
     .eq("id", enrollmentId)
     .maybeSingle();
 
@@ -174,28 +197,10 @@ export async function resendLoginLink(enrollmentId: string): Promise<{
     return { error: `That enrolment is ${enrollment.status}. Reactivate it first.` };
   }
 
-  // A stateless client, not the admin's own session client: sending someone
-  // else a sign-in email is a support action and must not be able to disturb
-  // the cookies of the person performing it.
-  const { error } = await getStatelessSupabase().auth.signInWithOtp({
-    email: enrollment.email,
-    options: { shouldCreateUser: false },
-  });
-
-  if (error) {
-    if (error.status === 429) return { error: error.message };
-    return { error: "We couldn't send that email. Try again in a moment." };
-  }
-
-  // The address itself is never logged (AGENTS.md section 7), but an audit row
-  // without an actor answers "did this happen" and not "who did it", which is
-  // the question an audit log exists for.
-  await admin.from("audit_log").insert({
-    actor_user_id: actor?.id ?? null,
-    action: "auth.resend",
-    target_type: "enrollment",
-    target_id: enrollmentId,
-  });
+  // Same path as a first invite: the login account is created or linked if it
+  // is missing, which is exactly the case where a resend used to fail.
+  const delivered = await deliverInvite(staff.actorId, enrollment, "auth.resend");
+  if (delivered.error) return { error: `Not sent: ${delivered.error}.` };
 
   return { ok: "Sign-in email sent." };
 }

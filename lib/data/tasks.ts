@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { getMe } from "@/lib/data/program";
 import { unwrap } from "@/lib/data/query";
 import { getSupabase } from "@/lib/supabase/server";
 
@@ -51,6 +52,13 @@ export type WorkItem = {
   weekTitle: string | null;
   moduleTitle: string | null;
   isFinalProject: boolean;
+  /**
+   * Set when the task is submitted somewhere other than the portal — for now,
+   * a Discord channel. The platform cannot see those submissions, so the task
+   * shows where to submit instead of a status it would get wrong.
+   */
+  externalSubmissionUrl: string | null;
+  externalSubmissionNote: string | null;
   /** Latest version. Earlier versions are in `history`. */
   submission: Submission | null;
   history: Submission[];
@@ -72,6 +80,8 @@ type TaskRow = {
   points: number;
   deadline_at: string | null;
   is_final_project: boolean;
+  external_submission_url: string | null;
+  external_submission_note: string | null;
   program_weeks: WeekRow;
 };
 
@@ -100,21 +110,32 @@ function toSubmission(row: Record<string, unknown>): Submission {
 /** Weekly tasks the participant can currently see (release-gated by RLS). */
 export const getWorkItems = cache(async (): Promise<WorkItem[]> => {
   const supabase = await getSupabase();
+  const me = await getMe();
+  if (!me) return [];
 
+  // Both reads are scoped explicitly. RLS gives a participant only released,
+  // published tasks and their own submissions — but a staff account reads
+  // across the cohort, and unscoped it would see unreleased tasks and another
+  // participant's submission shown as its own (AGENTS.md section 7).
   const [taskRowsRes, submissionRowsRes] = await Promise.all([
     supabase
       .from("program_tasks")
       .select(
         "id, title, brief, submission_types, allowed_platforms, text_min, text_max, max_files, " +
           "file_extensions, is_required, points, deadline_at, is_final_project, " +
-          "program_weeks!inner(number, title, deadline_at)",
-      ),
+          "external_submission_url, external_submission_note, " +
+          "program_weeks!inner(number, title, deadline_at, release_at, cohort_id)",
+      )
+      .eq("status", "published")
+      .eq("program_weeks.cohort_id", me.cohortId)
+      .lte("program_weeks.release_at", new Date().toISOString()),
     supabase
       .from("submissions")
       .select(
         "id, item_type, item_id, version, status, is_late, urls, text_response, submitted_at, " +
           "reviewed_at, review_note, submission_files(id, filename, storage_path, size_bytes)",
       )
+      .eq("enrollment_id", me.enrollmentId)
       .order("version", { ascending: false }),
   ]);
   const taskRows = unwrap(taskRowsRes, "weekly tasks");
@@ -152,6 +173,8 @@ export const getWorkItems = cache(async (): Promise<WorkItem[]> => {
         weekTitle: week?.title ?? null,
         moduleTitle: null,
         isFinalProject: t.is_final_project,
+        externalSubmissionUrl: t.external_submission_url,
+        externalSubmissionNote: t.external_submission_note,
         submission: versions[0] ?? null,
         history: versions.slice(1),
       };
@@ -167,4 +190,15 @@ export async function getWorkItem(id: string): Promise<WorkItem | null> {
 /** Tasks not yet submitted, for dashboard nudges. */
 export function outstanding(items: WorkItem[]): WorkItem[] {
   return items.filter((i) => i.isRequired && (!i.submission || i.submission.status === "draft"));
+}
+
+/** Where an externally submitted task goes, in a word a participant knows. */
+export function externalDestination(url: string): string {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    if (host === "discord.gg" || host.endsWith("discord.com")) return "Discord";
+    return host;
+  } catch {
+    return "the submission link";
+  }
 }

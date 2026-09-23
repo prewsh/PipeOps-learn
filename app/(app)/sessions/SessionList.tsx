@@ -92,7 +92,7 @@ function SessionCard({ session: s }: { session: Session }) {
               href={s.joinUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex min-h-11 items-center justify-center rounded-lg bg-ink px-5 text-[15px] font-medium text-white no-underline hover:bg-ink-surface"
+              className="flex min-h-11 items-center justify-center rounded-lg bg-ink px-5 text-[15px] font-medium text-on-ink no-underline hover:bg-ink-hover"
             >
               Join now
             </a>

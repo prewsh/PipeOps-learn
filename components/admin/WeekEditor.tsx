@@ -36,6 +36,8 @@ type Task = {
   brief: string;
   submission_types: string[];
   deadline_at: string | null;
+  external_submission_url: string | null;
+  external_submission_note: string | null;
 } | null;
 
 type Material = {
@@ -175,6 +177,23 @@ export function WeekEditor({
               </div>
             </Field>
           </div>
+          <Field
+            label="Submit on Discord (or elsewhere)"
+            hint="Paste the channel or invite link while portal submissions are frozen. With a link here the task is not tracked: it will not count toward progress or health, because the platform cannot see those posts."
+          >
+            <TextInput
+              name="externalUrl"
+              defaultValue={task?.external_submission_url ?? ""}
+              placeholder="https://discord.gg/…"
+            />
+          </Field>
+          <Field label="How to submit" hint="Shown under “Submit your task”.">
+            <TextArea
+              name="externalNote"
+              rows={4}
+              defaultValue={task?.external_submission_note ?? ""}
+            />
+          </Field>
           <div className="flex items-center gap-3">
             <Button type="submit" variant="primary" disabled={taskPending}>
               {taskPending ? "Saving…" : task ? "Save task" : "Create task"}

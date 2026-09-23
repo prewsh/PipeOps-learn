@@ -1,4 +1,5 @@
 import { AnnouncementComposer } from "@/components/AnnouncementComposer";
+import { AnnouncementDeleteControl } from "@/components/AnnouncementDeleteControl";
 import { Card, EmptyState, Meta } from "@/components/ui";
 import { getAllAnnouncements } from "@/lib/data/announcements";
 import { getSupabase } from "@/lib/supabase/server";
@@ -45,6 +46,7 @@ export default async function AnnouncementsAdminPage() {
                     ? `${a.audience.ids?.length ?? 0} participants`
                     : "whole cohort"}
                 </p>
+                <AnnouncementDeleteControl id={a.id} />
               </div>
             ))}
           </Card>

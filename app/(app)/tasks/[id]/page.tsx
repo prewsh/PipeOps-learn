@@ -4,7 +4,7 @@ import { StatusChip } from "@/components/StatusMarker";
 import { SubmissionForm } from "@/components/SubmissionForm";
 import { Card, Meta } from "@/components/ui";
 import { getMe } from "@/lib/data/program";
-import { getWorkItem } from "@/lib/data/tasks";
+import { externalDestination, getWorkItem } from "@/lib/data/tasks";
 import { formatDeadline, formatRelative } from "@/lib/time";
 
 export default async function TaskPage({ params }: { params: Promise<{ id: string }> }) {
@@ -16,12 +16,13 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
 
   const s = item.submission;
   const status = !s || s.status === "draft" ? "not_started" : s.status;
+  const elsewhere = item.externalSubmissionUrl;
 
   return (
     <div className="flex flex-col gap-6">
       <header>
         <Meta>
-          {item.type === "program_task" ? "Programme task" : "Assignment"}
+          {item.type === "program_task" ? "Weekly task" : "Assignment"}
           {item.weekNumber ? ` · Week ${item.weekNumber}` : ""}
           {item.isFinalProject ? " · Final project" : ""}
         </Meta>
@@ -29,7 +30,15 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
           {item.title}
         </h1>
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <StatusChip status={status} late={s?.isLate} />
+          {elsewhere ? (
+            // The platform cannot see a Discord submission, so it must not
+            // claim "not started" to someone who has already posted.
+            <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-ink">
+              Submit on {externalDestination(elsewhere)}
+            </span>
+          ) : (
+            <StatusChip status={status} late={s?.isLate} />
+          )}
           {item.deadlineAt ? (
             <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-ink-2">
               Due {formatDeadline(new Date(item.deadlineAt))} ·{" "}
@@ -40,28 +49,55 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
       </header>
 
       <Card className="px-5 py-5">
-        <p className="whitespace-pre-wrap text-base leading-[1.55] text-ink">{item.brief}</p>
+        <p className="whitespace-pre-wrap [overflow-wrap:anywhere] text-base leading-[1.55] text-ink">
+          {item.brief}
+        </p>
       </Card>
 
       {s?.status === "needs_revision" && s.reviewNote ? (
         <Card className="px-5 py-4">
           <Meta>Reviewer asked for a revision</Meta>
-          <p className="mt-2 whitespace-pre-wrap text-[15px] leading-[1.55] text-ink">
+          <p className="mt-2 whitespace-pre-wrap [overflow-wrap:anywhere] text-[15px] leading-[1.55] text-ink">
             {s.reviewNote}
           </p>
         </Card>
       ) : null}
 
-      <section>
-        <Meta>{s && s.status !== "draft" ? "Your submission" : "Submit"}</Meta>
-        <div className="mt-3">
-          <SubmissionForm
-            item={item}
-            enrollmentId={me.enrollmentId}
-            submissionsOpen={me.submissionsOpen}
-          />
-        </div>
-      </section>
+      {elsewhere ? (
+        <section>
+          <Meta>Submit your task</Meta>
+          <Card className="mt-3 px-5 py-5">
+            {item.externalSubmissionNote ? (
+              <p className="whitespace-pre-wrap [overflow-wrap:anywhere] text-[15px] leading-[1.6] text-ink">
+                {item.externalSubmissionNote}
+              </p>
+            ) : null}
+            <a
+              href={elsewhere}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-xl bg-ink px-5 text-[16px] font-semibold text-on-ink no-underline hover:bg-ink-hover"
+            >
+              Open {externalDestination(elsewhere)}
+              <span aria-hidden>↗</span>
+            </a>
+            <p className="mt-3 text-center text-sm text-ink-2">
+              Not in the server yet? The same link invites you in.
+            </p>
+          </Card>
+        </section>
+      ) : (
+        <section>
+          <Meta>{s && s.status !== "draft" ? "Your submission" : "Submit"}</Meta>
+          <div className="mt-3">
+            <SubmissionForm
+              item={item}
+              enrollmentId={me.enrollmentId}
+              submissionsOpen={me.submissionsOpen}
+            />
+          </div>
+        </section>
+      )}
 
       {item.history.length > 0 ? (
         <section>
