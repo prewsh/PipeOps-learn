@@ -105,7 +105,7 @@ Team member who only reviews submissions. V1 ships a single `admin` role with a 
 | Cohort | **Cohort 01 · Sep–Nov 2026** | A dated run of a program with its own participants, schedule and leaderboard. |
 | Course | **The Complete UGC Creator Course** | The 12-module curriculum, reusable across cohorts. |
 
-Domain: `learn.pipeops.io`
+Domain: `pipeops-learn.pipeops.app`
 
 Participants see program and cohort branding. "PipeOps Learn" is the chrome, not the headline.
 

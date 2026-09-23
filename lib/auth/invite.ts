@@ -87,17 +87,32 @@ export async function ensureAccount(enrollment: Enrollment): Promise<{ error?: s
 }
 
 /**
- * Sends the Supabase "Magic Link" email — the code and the sign-in link.
+ * Which email a participant gets. "sign-in" carries the code and the link.
+ * "invite" is the welcome: it carries neither, and sends them to /login to
+ * request their own, so it still works when they open it days later.
+ */
+export type AuthEmail = "invite" | "sign-in";
+
+/**
+ * Sends a Supabase auth email — the invite or the sign-in email.
+ *
+ * Supabase can only email an existing account through its OTP templates, so
+ * both are the same send. The templates tell them apart by the redirect: an
+ * invite points at /login, a sign-in at /auth/confirm (docs/email-templates/).
+ * The redirect travels with the request rather than living on the account, so
+ * a failed or interrupted invite can never turn a later sign-in email into one
+ * without a code.
  *
  * Through a stateless client, not the admin's session client: emailing a
  * third party must not be able to disturb the cookies of the person doing it.
  */
-export async function sendSignInEmail(email: string): Promise<{ error?: string }> {
+export async function sendAuthEmail(email: string, kind: AuthEmail): Promise<{ error?: string }> {
+  const origin = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
   const { error } = await getStatelessSupabase().auth.signInWithOtp({
     email,
     options: {
       shouldCreateUser: false,
-      emailRedirectTo: `${env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}/auth/confirm`,
+      emailRedirectTo: kind === "invite" ? `${origin}/login` : `${origin}/auth/confirm`,
     },
   });
   if (!error) return {};
@@ -126,7 +141,12 @@ export async function recordInvite(
     });
 }
 
-/** Ensure the account, send the email, write the audit row. */
+/**
+ * Ensure the account, send the email, write the audit row.
+ *
+ * An invite gets the invite email. A resend is staff answering "I never got
+ * my code", so it gets the sign-in email with the code in it.
+ */
 export async function deliverInvite(
   actorId: string,
   enrollment: Enrollment,
@@ -135,7 +155,10 @@ export async function deliverInvite(
   const account = await ensureAccount(enrollment);
   if (account.error) return account;
 
-  const sent = await sendSignInEmail(enrollment.email);
+  const sent = await sendAuthEmail(
+    enrollment.email,
+    action === "auth.invite" ? "invite" : "sign-in",
+  );
   if (sent.error) return sent;
 
   await recordInvite(actorId, action, enrollment.id);

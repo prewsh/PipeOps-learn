@@ -9,7 +9,7 @@ import {
   ensureAccount,
   isUndeployed,
   recordInvite,
-  sendSignInEmail,
+  sendAuthEmail,
 } from "@/lib/auth/invite";
 import { getAdminSupabase } from "@/lib/supabase/admin";
 import { uuid } from "@/lib/validation";
@@ -88,10 +88,10 @@ export async function inviteParticipant(
     : `Added ${name} to ${cohort.name}.`;
   if (!sendNow) return { ok: `${added} No email sent yet.` };
 
-  const sent = await sendSignInEmail(email);
-  if (sent.error) return { error: `${added} But the email wasn't sent: ${sent.error}.` };
+  const sent = await sendAuthEmail(email, "invite");
+  if (sent.error) return { error: `${added} But the invite wasn't sent: ${sent.error}.` };
   await recordInvite(staff.actorId, "auth.invite", enrollment.id);
-  return { ok: `${added} Their sign-in email is on its way.` };
+  return { ok: `${added} Their invite is on its way.` };
 }
 
 /** Everyone in the cohort who has never signed in — the people an invite is for. */

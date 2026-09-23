@@ -1,19 +1,25 @@
-PipeOps Learn / UGC Programme
+PIPEOPS / UGC PROGRAMME
 
-SIGN IN
+{{ if eq .RedirectTo "https://pipeops-learn.pipeops.app/login" }}YOU'RE INVITED TO PIPEOPS LEARN
+
+You're invited to join PipeOps Learn, where you'll get access to your learning
+modules and updates about the PipeOps UGC Programme.
+
+Sign in at https://pipeops-learn.pipeops.app/login using your accepted email
+address. We'll send you a separate sign-in email with a code and link.
+
+You're receiving this at {{ .Email }} because you've been accepted into the
+PipeOps UGC Programme.
+{{ else }}SIGN IN
 
 Enter this code on the sign-in screen. It works once, and expires in an hour.
 
     {{ .Token }}
 
-Or open this link:
-{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup
-
-WAITING FOR YOU
-Week 1 - Creator economy & niche: two modules, your niche statement, and
-your first post.
+Or tap here to sign in:
+{{ if or (eq .RedirectTo "https://pipeops-learn.pipeops.app/auth/confirm") (eq .RedirectTo "http://localhost:3000/auth/confirm") }}{{ .RedirectTo }}{{ else }}https://pipeops-learn.pipeops.app/auth/confirm{{ end }}?token_hash={{ .TokenHash }}&type=magiclink
+If the link doesn't work in your browser, use the code above.
 
 This programme is invite-only and this code was sent to {{ .Email }}. If you
 weren't expecting it, ignore this email - nothing happens until the code is used.
-
-PIPEOPS LEARN / COHORT 01
+{{ end }}

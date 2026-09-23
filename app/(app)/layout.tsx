@@ -2,12 +2,18 @@ import { redirect } from "next/navigation";
 import { Nav } from "@/components/Nav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { signOut } from "@/lib/auth/actions";
+import { isAdmin } from "@/lib/data/admin";
 import { getMe, getWeeks } from "@/lib/data/program";
 import { getSupabase } from "@/lib/supabase/server";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const me = await getMe();
-  if (!me) redirect("/login?error=not-enrolled");
+  if (!me) {
+    // Staff without a participant enrolment have nothing to see here; send
+    // them back to the console rather than telling them they are not enrolled.
+    if (await isAdmin()) redirect("/admin");
+    redirect("/login?error=not-enrolled");
+  }
 
   const supabase = await getSupabase();
   const [weeks, { data: cohort }] = await Promise.all([

@@ -32,8 +32,8 @@ export default async function InvitesPage() {
           Invite participants
         </h1>
         <p className="mt-2 max-w-[60ch] text-base leading-[1.55] text-ink-2">
-          Participants get the Supabase sign-in email: a link and a code, either of which gets them
-          in. Nobody can sign in without being on this list.
+          Participants get an invite that sends them to the sign-in page, where they request their
+          code. Nobody can sign in without being on this list.
         </p>
       </header>
 

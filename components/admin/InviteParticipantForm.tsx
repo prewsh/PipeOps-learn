@@ -7,7 +7,7 @@ import { type InviteState, inviteParticipant } from "@/lib/actions/invites";
 
 /**
  * Add one participant: enrol them, create their login account, and (by
- * default) email their sign-in link. For late joiners and corrections — the
+ * default) email their invite. For late joiners and corrections — the
  * accepted list itself still comes in through the import.
  */
 export function InviteParticipantForm() {
@@ -25,7 +25,7 @@ export function InviteParticipantForm() {
         </Field>
         <label className="flex min-h-11 items-center gap-3 text-[15px] text-ink md:col-span-2">
           <input type="checkbox" name="sendNow" defaultChecked className="h-4 w-4" />
-          Email their sign-in link now
+          Email their invite now
         </label>
         <div className="flex flex-wrap items-center gap-3 md:col-span-2">
           <Button type="submit" variant="secondary" disabled={pending}>

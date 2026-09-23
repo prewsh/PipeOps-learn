@@ -1,19 +1,36 @@
 <!--
-  PipeOps Learn — sign-in email.
+  PipeOps Learn — invite and sign-in email.
   Paste into Supabase → Authentication → Emails → Templates.
 
-  Use type=signup in the "Confirm signup" template and type=magiclink in the
-  "Magic Link" template. Everything else is identical.
+  This file belongs in Supabase's "Confirm signup" template and uses the signup
+  token type. sign-in-magiclink.html is for "Magic link or OTP" and uses
+  magiclink.
+  Apart from that token type the two files are identical — keep them so.
+
+  ONE TEMPLATE, TWO EMAILS. Supabase can only email an existing account through
+  this template, so the invite and the sign-in email are both sent through it.
+  The app tells them apart by the redirect it asks for (lib/auth/invite.ts):
+    invite  → https://pipeops-learn.pipeops.app/login   → welcome, no code
+    sign-in → https://pipeops-learn.pipeops.app/auth/confirm → code + link
+  Anything that is not exactly the invite address gets the sign-in email, so a
+  mismatch degrades to an email with a code and a production callback link,
+  never the reverse.
+
+  The subject branches the same way: see subject.txt. Never write template
+  braces inside this comment — Supabase parses them here too.
 
   Email constraints this works within: inline styles only, table layout, no
   webfonts (IBM Plex is requested and degrades to the system stack), explicit
   colours so dark-mode clients cannot invert the code into illegibility.
 
-  Design: docs/DESIGN.md. Monochrome; #4F21EA appears only on the link. The
+  Design: docs/DESIGN.md. Monochrome; #4F21EA appears only on links. The
   code is set in mono because mono carries every number a participant is
   judged by.
 -->
-<div style="display:none;max-height:0;overflow:hidden;opacity:0">Your PipeOps Learn sign-in code</div>
+{{ $invite := eq .RedirectTo "https://pipeops-learn.pipeops.app/login" }}
+{{ $callback := "https://pipeops-learn.pipeops.app/auth/confirm" }}
+{{ if or (eq .RedirectTo $callback) (eq .RedirectTo "http://localhost:3000/auth/confirm") }}{{ $callback = .RedirectTo }}{{ end }}
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">{{ if $invite }}You're invited to PipeOps Learn{{ else }}Your PipeOps Learn sign-in code{{ end }}</div>
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F6F6F7;margin:0;padding:24px 0">
   <tr>
@@ -25,11 +42,8 @@
           <td style="padding:28px 28px 0">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td style="padding-right:10px">
-                  <div style="width:20px;height:20px;background:#0B0B0C;border-radius:4px"></div>
-                </td>
-                <td style="font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;color:#0B0B0C;letter-spacing:-0.006em;white-space:nowrap">
-                  PipeOps Learn
+                <td style="padding-right:12px">
+                  <img src="https://pipeops-learn.pipeops.app/brand/pipeops-logo.svg" width="104" alt="PipeOps" style="display:block;width:104px;height:auto;border:0">
                 </td>
                 <td style="padding-left:8px;font-family:'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace;font-size:11px;color:#8A8D93;letter-spacing:0.06em;white-space:nowrap">
                   / UGC PROGRAMME
@@ -38,6 +52,58 @@
             </table>
           </td>
         </tr>
+{{ if $invite }}
+        <!-- INVITE: no code. It sends them to /login to ask for their own, so
+             it still works however long it sits in their inbox. -->
+
+        <!-- heading -->
+        <tr>
+          <td style="padding:24px 28px 0">
+            <h1 style="margin:0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:26px;line-height:1.15;letter-spacing:-0.025em;font-weight:700;color:#0B0B0C">
+              You're invited to PipeOps Learn
+            </h1>
+            <p style="margin:12px 0 0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;color:#56585C">
+              You're invited to join PipeOps Learn, where you'll get access to your learning modules and updates about the PipeOps UGC Programme.
+            </p>
+          </td>
+        </tr>
+
+        <!-- the one action -->
+        <tr>
+          <td style="padding:24px 28px 0">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="background:#0B0B0C;border-radius:8px">
+                  <a href="https://pipeops-learn.pipeops.app/login" style="display:inline-block;padding:14px 22px;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:18px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:8px">Sign in to PipeOps Learn</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- what happens next -->
+        <tr>
+          <td style="padding:20px 28px 0">
+            <p style="margin:0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.55;color:#56585C">
+              After you enter your accepted email address, we'll send you a separate email with a sign-in code and link.
+            </p>
+            <p style="margin:12px 0 0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.55;color:#56585C">
+              Or visit
+              <a href="https://pipeops-learn.pipeops.app/login" style="color:#4F21EA;text-decoration:none;font-weight:500">pipeops-learn.pipeops.app/login</a>
+            </p>
+          </td>
+        </tr>
+
+        <!-- footer -->
+        <tr>
+          <td style="padding:22px 28px 28px">
+            <p style="margin:0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:#8A8D93">
+              You're receiving this at {{ .Email }} because you've been accepted into the PipeOps UGC Programme.
+            </p>
+          </td>
+        </tr>
+{{ else }}
+        <!-- SIGN-IN: the code and the link. -->
 
         <!-- heading -->
         <tr>
@@ -74,23 +140,9 @@
           <td style="padding:20px 28px 0">
             <p style="margin:0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.55;color:#56585C">
               Or
-              <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup" style="color:#4F21EA;text-decoration:none;font-weight:500">tap here to sign in</a>.
-              If the link misbehaves inside an in-app browser, use the code above.
+              <a href="{{ $callback }}?token_hash={{ .TokenHash }}&type=signup" style="color:#4F21EA;text-decoration:none;font-weight:500">tap here to sign in</a>.
+              If the link doesn't work in your browser, use the code above.
             </p>
-          </td>
-        </tr>
-
-        <!-- what's waiting -->
-        <tr>
-          <td style="padding:24px 28px 0">
-            <div style="border-top:1px solid #E3E4E6;padding-top:18px">
-              <div style="font-family:'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace;font-size:11px;letter-spacing:0.08em;color:#8A8D93;text-transform:uppercase">
-                Waiting for you
-              </div>
-              <p style="margin:10px 0 0;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#56585C">
-                Week 1 · Creator economy &amp; niche — two modules, your niche statement, and your first post.
-              </p>
-            </div>
           </td>
         </tr>
 
@@ -102,11 +154,9 @@
             </p>
           </td>
         </tr>
+{{ end }}
       </table>
 
-      <div style="max-width:520px;margin:16px auto 0;font-family:'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace;font-size:11px;letter-spacing:0.06em;color:#8A8D93;text-align:center">
-        PIPEOPS LEARN · COHORT 01
-      </div>
     </td>
   </tr>
 </table>

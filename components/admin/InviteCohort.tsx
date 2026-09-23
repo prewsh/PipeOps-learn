@@ -71,7 +71,7 @@ export function InviteCohort({
     <Card className="px-5 py-5">
       <Meta>Invite the cohort</Meta>
       <p className="mt-2 text-[15px] leading-[1.55] text-ink">
-        Emails a sign-in link and code to everyone enrolled who hasn't signed in yet.
+        Emails an invite to everyone enrolled who hasn't signed in yet.
         {notSignedIn > 0 ? (
           <>
             {" "}
@@ -117,8 +117,8 @@ export function InviteCohort({
         {phase.kind === "confirm" ? (
           <div className="rounded-lg border border-line-strong bg-fill-subtle p-4">
             <p className="text-[15px] leading-[1.55] text-ink">
-              Send a sign-in email to {notSignedIn} {notSignedIn === 1 ? "person" : "people"} now?
-              This can't be recalled once sent.
+              Send an invite to {notSignedIn} {notSignedIn === 1 ? "person" : "people"} now? This
+              can't be recalled once sent.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <Button variant="primary" onClick={() => void run()}>

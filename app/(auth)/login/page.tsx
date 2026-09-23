@@ -1,62 +1,23 @@
-"use client";
+import { LoginForm } from "./LoginForm";
 
-import { useActionState } from "react";
-import { Logo } from "@/components/Logo";
-import { Button, Meta } from "@/components/ui";
-import { type AuthState, requestAccess } from "@/lib/auth/actions";
+/**
+ * Sign-in (PRD F1.3). The page reads the reason someone was sent here; the
+ * form itself is a client component.
+ *
+ * Without this, an expired or already-used sign-in link dropped the person
+ * on a blank sign-in form with no idea why the link "didn't work".
+ */
+const NOTICES: Record<string, string> = {
+  link: "That sign-in link has expired or was already used. Enter your email and we'll send a fresh one.",
+  "not-enrolled":
+    "Your account isn't part of an active cohort right now. If that's a mistake, contact the programme team.",
+};
 
-export default function LoginPage() {
-  const [state, action, pending] = useActionState<AuthState, FormData>(requestAccess, {});
-
-  return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-16">
-      {/* One centred lockup. The logo used to look centred only because its
-          image box stretched full width and the SVG drew in the middle. */}
-      <div className="flex flex-col items-center text-center">
-        <Logo height={28} />
-        <Meta className="mt-4">UGC Programme</Meta>
-      </div>
-      <h1 className="mt-4 text-[28px] font-bold leading-[1.15] tracking-[-0.025em] text-ink">
-        Sign in
-      </h1>
-      <p className="mt-3 text-base leading-[1.55] text-ink-2">
-        Enter the email you applied with. We'll send you a link and a sign-in code — either one gets
-        you in.
-      </p>
-
-      <form action={action} className="mt-8 flex flex-col gap-3">
-        <label
-          htmlFor="email"
-          className="font-mono text-[11px] uppercase tracking-[0.06em] text-ink-3"
-        >
-          Email address
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          // biome-ignore lint/a11y/noAutofocus: single-purpose sign-in screen — the field is the only interactive element, and focusing it removes a tap on mobile where most participants are
-          autoFocus
-          inputMode="email"
-          placeholder="you@example.com"
-          className="min-h-11 rounded-lg border border-line-strong bg-surface px-4 text-base text-ink outline-none placeholder:text-ink-3"
-        />
-
-        {state.error ? (
-          <p className="flex gap-2 text-sm leading-[1.5] text-ink" role="alert">
-            <span aria-hidden className="font-mono font-medium">
-              !
-            </span>
-            {state.error}
-          </p>
-        ) : null}
-
-        <Button type="submit" variant="primary" disabled={pending} className="mt-2">
-          {pending ? "Sending…" : "Send me a code"}
-        </Button>
-      </form>
-    </main>
-  );
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+  return <LoginForm notice={(error && NOTICES[error]) ?? null} />;
 }

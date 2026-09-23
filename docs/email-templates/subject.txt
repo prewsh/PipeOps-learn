@@ -1,0 +1,1 @@
+{{ if eq .RedirectTo "https://pipeops-learn.pipeops.app/login" }}You're invited to PipeOps Learn{{ else }}Your PipeOps Learn sign-in code{{ end }}

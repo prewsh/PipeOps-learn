@@ -72,7 +72,11 @@ export async function proxy(request: NextRequest) {
   // authenticated participant may need to switch into a staff account, and an
   // authenticated admin may simply have landed on the wrong door. The admin
   // layout still performs the role check after authentication.
-  if (user && (path === "/login" || path === "/verify")) {
+  // …except when /login is carrying an error. The participant app sends a
+  // signed-in person with no active enrolment to /login?error=not-enrolled;
+  // bouncing them back to "/" from here looped until the browser gave up.
+  const showingError = path === "/login" && request.nextUrl.searchParams.has("error");
+  if (user && !showingError && (path === "/login" || path === "/verify")) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     url.search = "";

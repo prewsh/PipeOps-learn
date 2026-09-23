@@ -1,6 +1,6 @@
 # Deployment — PipeOps Learn
 
-Target: `learn.pipeops.io` on PipeOps. Supabase project `rxkobtsfvtogswobfdez`.
+Target: `pipeops-learn.pipeops.app` on PipeOps. Supabase project `rxkobtsfvtogswobfdez`.
 
 ---
 
@@ -13,7 +13,7 @@ Set these on the PipeOps service. Only the first two reach the browser.
 | `NEXT_PUBLIC_SUPABASE_URL` | Project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon public key |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Secret.** Bypasses RLS. Server only — never expose it to the client or a build log. |
-| `NEXT_PUBLIC_APP_URL` | `https://learn.pipeops.io` |
+| `NEXT_PUBLIC_APP_URL` | `https://pipeops-learn.pipeops.app` |
 
 `SUPABASE_DB_URL` is local tooling only (psql, migrations). Do **not** set it in production.
 
@@ -31,10 +31,12 @@ node .next/standalone/server.js
 
 ## 3. Supabase — do these before first traffic
 
-- [ ] **Custom SMTP** configured (Workspace SMTP or Resend). The built-in sender is rate-limited to a handful an hour and cannot serve 114 people.
-- [ ] **Both email templates** updated — "Confirm signup" *and* "Magic Link". Most participants have never signed in, so they hit the signup template. See `docs/email-templates/`.
-- [ ] **Site URL** = `https://learn.pipeops.io`.
-- [ ] **Redirect allow-list** includes `https://learn.pipeops.io/auth/confirm` (and localhost for development).
+- [ ] **Custom SMTP** configured (the current project uses Google Gmail SMTP). The built-in sender is rate-limited to a handful an hour and cannot serve 114 people.
+- [ ] **Both email templates** updated — "Confirm signup" (`sign-in.html`) *and* "Magic Link" (`sign-in-magiclink.html`), each with the subject in `subject.txt`. Most participants have never signed in, so they hit the signup template. See `docs/email-templates/`.
+  Each template holds two emails. A send redirecting to `/login` renders the **invite** (welcome, a button to `/login`, no code); anything else renders the **sign-in** email (code and link). The sign-in link uses the approved callback address, with the production callback as its fallback. Update the templates *before* deploying code that sends invites, or an invite goes out as a sign-in email whose link only opens the sign-in page.
+- [ ] **Email rate limit** covers two emails per participant: the invite, then the sign-in email they request from it. For 114 people that is ~230 in the launch hour.
+- [ ] **Site URL** = `https://pipeops-learn.pipeops.app`.
+- [ ] **Redirect allow-list** includes `https://pipeops-learn.pipeops.app/auth/confirm` and `https://pipeops-learn.pipeops.app/login` (and localhost for development).
 - [ ] **Auth rate limit** raised for the launch burst.
 - [ ] Schema applied: `supabase/schema.sql`, or the migrations in order.
 
@@ -47,7 +49,7 @@ Static headers are set in `next.config.ts`: `X-Frame-Options: DENY`, `nosniff`, 
 After deploying, confirm the policy is live and the player still works:
 
 ```bash
-curl -sI https://learn.pipeops.io/login | grep -i content-security-policy
+curl -sI https://pipeops-learn.pipeops.app/login | grep -i content-security-policy
 ```
 
 Then open a module page and check the console is free of CSP violations.
@@ -55,7 +57,7 @@ Then open a module page and check the console is free of CSP violations.
 Run the adversarial suite against the deployed origin before announcing:
 
 ```bash
-E2E_BASE_URL=https://learn.pipeops.io node scripts/verify-security.mjs
+E2E_BASE_URL=https://pipeops-learn.pipeops.app node scripts/verify-security.mjs
 ```
 
 58 checks: privilege escalation, cross-participant reads, forged submissions and points, function-privilege probes, forged video progress, unsafe link protocols, admin-RPC abuse, and unauthenticated route protection.
@@ -77,13 +79,38 @@ Two consequences:
 
 **Accepted advisor findings.** `citext` stays in `public`. Relocating it means dropping and recreating types two live columns depend on; the fix is riskier than the finding.
 
+## Production address
+
+The app is served at **`https://pipeops-learn.pipeops.app`**. `learn.pipeops.io`
+appeared in earlier drafts of these docs, but PipeOps does not own that domain
+— it does not resolve — so nothing may point at it. `NEXT_PUBLIC_APP_URL`, the
+Supabase Site URL and the redirect allow-list must all use the address above.
+
+### Cloudflare in front of the app
+
+PipeOps serves apps through Cloudflare, and the `pipeops.app` zone has Rocket
+Loader enabled. Rocket Loader rewrites every `<script>` tag and the app's CSP
+blocks its loader, so before the fix React never started in production: pages
+rendered, but the video player, tracking, autosave and admin buttons were
+inert. `proxy.ts` now sends `Cache-Control: … no-transform` on every page,
+which tells Cloudflare not to rewrite the body. After any deploy, confirm:
+
+```js
+// in the browser console on /login — both must be true
+[...document.scripts].every((s) => !/-text\/javascript$/.test(s.type || ""))
+Object.keys(document.querySelector("input")).some((k) => k.startsWith("__react"))
+```
+
+If either is false, ask PipeOps to disable Rocket Loader for this hostname with
+a Cloudflare Configuration Rule.
+
 ## 5. Launch-day order
 
 1. Apply the schema; confirm `select count(*) from enrollments` matches the accepted list
 2. Load video ids and week content; open the weeks that should be open
 3. Send yourself a real sign-in email and complete it end to end
 4. Run all five verification suites against production
-5. **Invite the cohort** from `/admin/invites` → "Invite N people". It emails everyone enrolled who has not signed in, in batches of ten, and asks before sending. It is switched off on any build whose `NEXT_PUBLIC_APP_URL` is localhost, so it only works on the deployed site — and only if that variable is set to `https://learn.pipeops.io` there.
+5. **Invite the cohort** from `/admin/invites` → "Invite N people". It emails everyone enrolled who has not signed in, in batches of ten, and asks before sending. It is switched off on any build whose `NEXT_PUBLIC_APP_URL` is localhost, so it only works on the deployed site — and only if that variable is set to `https://pipeops-learn.pipeops.app` there, with no trailing path. The email templates match that exact address to recognise an invite; any other value sends the sign-in email instead. The participant page's "Resend login link" still sends the sign-in email with a code, for anyone who is stuck.
 6. Announce
 
 Late joiners are added one at a time from the same page ("Add a participant"), which enrols them, creates their login account and emails them. `scripts/import-participants.mjs` now creates login accounts as well, so a bulk import can no longer leave people unable to sign in.
