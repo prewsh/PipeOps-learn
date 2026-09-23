@@ -35,8 +35,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
-      // Sign-in pages carry tokens in the query string; keep them out of
-      // caches and out of referrers entirely.
+      // The callback carries a token in its query string, so keep it out of
+      // caches and referrers entirely.
       {
         source: "/auth/:path*",
         headers: [
@@ -46,7 +46,9 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/verify",
-        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
+        // A no-referrer policy makes same-origin form POSTs send Origin: null,
+        // which Next rejects before its Server Action can verify the code.
+        headers: [{ key: "Referrer-Policy", value: "same-origin" }],
       },
     ];
   },
