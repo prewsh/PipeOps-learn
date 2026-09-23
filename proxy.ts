@@ -81,11 +81,18 @@ export async function proxy(request: NextRequest) {
 
   response.headers.set("content-security-policy", csp);
 
-  // Sign-in screens carry tokens in the query string. Keep every variant out
-  // of shared caches, including the ones next.config.ts does not match.
-  if (isPublicPath(path)) {
-    response.headers.set("Cache-Control", "no-store, max-age=0, must-revalidate");
-  }
+  // `no-transform` is a best-effort workaround for possible edge rewriting.
+  // Rocket Loader is reported to be enabled for the shared pipeops.app zone,
+  // but only a live browser check after deployment can confirm whether this
+  // directive prevents its script changes. Keep this response non-cacheable
+  // because it is personalized and may carry sign-in state.
+  //
+  response.headers.set(
+    "Cache-Control",
+    isPublicPath(path)
+      ? "no-store, max-age=0, must-revalidate, no-transform"
+      : "private, no-store, max-age=0, must-revalidate, no-transform",
+  );
 
   return response;
 }
